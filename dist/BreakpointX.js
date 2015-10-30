@@ -1,5 +1,5 @@
 /**
- * BreakpointX JavaScript Module v0.0.1
+ * BreakpointX JavaScript Module v0.1
  * 
  *
  * Define breakpoints and register callbacks when crossed.
@@ -7,7 +7,7 @@
  * Copyright 2015, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Oct 29 17:32:51 PDT 2015
+ * Date: Thu Oct 29 17:46:04 PDT 2015
  */
 /**
  * @code
@@ -50,7 +50,7 @@ var BreakpointX = (function ($) {
   // };
 
   function BreakpointX (breakpoints, settings) {
-    this.version     = "0.0.1";
+    this.version     = "0.1";
     this.settings    = $.extend({}, this.options, settings);
     this.init(breakpoints);
   }

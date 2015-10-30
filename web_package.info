@@ -1,4 +1,4 @@
 name = "BreakpointX"
 description = "Define breakpoints and register callbacks when crossed."
-version = 0.0.1
+version = "0.1"
 author = Aaron Klump <sourcecode@intheloftstudios.com>
