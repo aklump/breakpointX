@@ -7,12 +7,17 @@
  * Copyright 2015, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Oct 29 17:46:04 PDT 2015
+ * Date: Mon Nov  2 13:35:11 PST 2015
  */
 /**
+ * 
+ * Each breakpoint consists of a minimum width and an alias.
+ * Each viewport is the span of the breakpoint minimum width to one pixel
+ * less than the next-larger breakpoint's minimum width.
+ * 
  * @code
  *   breakpointX
- *   .init({desktop: 768, tiny: 320})
+ *   .init({tiny: 0, mobile: 241, desktop: 769})
  *   .add('smaller', ['desktop'], function () {
  *     console.log('Now you\'re in mobile!');
  *   })
@@ -23,10 +28,10 @@
  *     console.log('Now you\'re in desktop!');
  *   });
  *   
- *   breakpointX.add('both', ['desktop', 'tiny'], function (width, alias, direction, bp) {
- *     var pixels = bp.value(alias);
- *     console.log('Window width is: ' + width);
- *     console.log('Breakpoint ' + alias + ' (' + pixels + ') has been crossed getting ' + direction + '.');
+ *   breakpointX.add('both', ['desktop', 'tiny'], function (from, to, direction, bp) {
+ *     var pixels = bp.value(to);
+ *     console.log('Previous viewport was: ' + from);
+ *     console.log('Breakpoint ' + to + ' (' + pixels + ') has been crossed getting ' + direction + '.');
  *   });
  * @endcode
  *
@@ -42,16 +47,10 @@
  */
 var BreakpointX = (function ($) {
 
-  // $.fn.breakpointx = function(settings) {
-  //   return this.each(function () {
-  //     var $el = $(this);
-  //     $el.data('breakpointx', new BreakpointX($el, settings));
-  //   });
-  // };
-
   function BreakpointX (breakpoints, settings) {
     this.version     = "0.1";
     this.settings    = $.extend({}, this.options, settings);
+
     this.init(breakpoints);
   }
 
@@ -71,14 +70,31 @@ var BreakpointX = (function ($) {
    * Register the allowed breakpoints.
    *
    * @param  {object} breakpoints
-   *   E.g. {small_mobile:480, desktop:768}
+   *   Each object element is comprised of an alias and a pixel value, where
+   *   the pixel value is the width where the breakpoint begins.  Any value less
+   *   than the lowest value indicated in this object, will be considered a part
+   *   of the lowest breakpoint.
    *
-   * @return {[type]} [description]
+   * @return {this}
+   *
+   * Given this code...
+   * @code
+   *   var bp = new BreakpointX({tiny: 0, mobile: 241, desktop: 769});
+   *   bp.alias(240) === 'tiny';
+   *   bp.alias(320) === 'mobile';
+   *   bp.alias(321) === 'mobile';
+   *   bp.alias(768) === 'mobile';
+   *   bp.alias(769) === 'desktop';
+
+   * @endcode
+   *
+   * ... the following will be true:
+   * 
    */
   BreakpointX.prototype.init = function(breakpoints) {
     var self = this;
     if (typeof breakpoints !== 'object') {
-      throw new Error("breakpoints should be an object in this format: {alias: width}");
+      throw new Error("breakpoints should be an object in this format: {alias: width} where width is the maximum width of the viewport");
     }    
 
     // Make sure that breakpoint values are integars in pixels.
@@ -88,27 +104,33 @@ var BreakpointX = (function ($) {
       breakpoints[alias] = parseInt(breakpoints[alias], 10);
     }
     
-    self.lastWidth = window.innerWidth;
-
     self.breakpoints = breakpoints;
     self.reset();
+    self.last.alias = this.alias(window.innerWidth);
+    self.last.width = this.value(self.last.alias);
 
     $(window).resize(function () {
-      var width = window.innerWidth;
-      var direction = width > self.lastWidth ? 'bigger' : 'smaller';
+      var winWidth  = window.innerWidth;
+      var direction = winWidth > self.last.width ? 'bigger' : 'smaller';
       var callbacks = [self.actions[direction], self.actions.both];
+      var bp        = null;
       for (var i in callbacks) {
-        for (var breakpoint in callbacks[i]) {
-          var bp = self.value(breakpoint);
-          var crossed = self.lastWidth < bp && width > bp || self.lastWidth > bp && width < bp;
+        for (var bpAlias in callbacks[i]) {
+          var lastAlias = lastAlias || null;
+          bp            = self.value(bpAlias);
+          var crossed   = self.last.width < bp && winWidth > bp || self.last.width > bp && winWidth < bp;
           if (crossed) {
-            for (var j in callbacks[i][breakpoint]) {
-              callbacks[i][breakpoint][j](width, breakpoint, direction, self);  
+            var from = direction === 'bigger' ? lastAlias : bpAlias;
+            var to   = bpAlias;
+            for (var j in callbacks[i][bpAlias]) {
+              console.log(from, to, direction);
+              callbacks[i][bpAlias][j](from, to, direction, self);
             }
+            self.last = {"width": bp, "alias": bpAlias, "direction": direction};
           }
+          lastAlias = bpAlias;
         }
       }
-      self.lastWidth = width;
     });
 
     return self;
@@ -125,8 +147,34 @@ var BreakpointX = (function ($) {
       "smaller": [],
       "both": []
     };
+    this.last = {"width": null, "alias": null, "direction": null};
 
     return this;
+  };
+
+  /**
+   * Return the alias of a pixel width.
+   *
+   * Any pixel value within a viewport will yield the same alias, e.g. 
+   * 750, 760, 768 would all yield "tablet" if "tablet" was set up with 768
+   * as the width.
+   *
+   * Be aware that a value larger than the highest defined breakpoint will
+   * still return the hightest defined breakpoint alias.
+   *
+   * @return {string}
+   */
+  BreakpointX.prototype.alias = function(width) {
+    var found;
+    for (var alias in this.breakpoints) {
+      found = found || alias; 
+      if (width < this.breakpoints[alias]) {
+        return found;
+      }
+      found = alias;
+    }
+
+    return found;
   };
 
   /**
@@ -145,8 +193,12 @@ var BreakpointX = (function ($) {
    * breakpoints getting smaller, larger or in both directions.
    *
    * @param {string} direction One of: smaller, larger, both
-   * @param {array} breakpoints E.g. [480, 768]
-   * @param {Function} callback A callback to be executed.
+   * @param {array} breakpoints E.g. [mobile, desktop] These are aliases not values.
+   * @param {Function} callback A callback to be executed.  CAllbacks receive:
+   *   - 0 The breakpoint alias moving from. (To get the pixel value use arg#3.value())
+   *   - 1 The alias/name of the new viewport.
+   *   - 2 The direction string.
+   *   - 3 The current BreakpointX object.
    */
   BreakpointX.prototype.add = function (direction, breakpoints, callback) {
     var self = this;

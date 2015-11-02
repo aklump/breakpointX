@@ -1,0 +1,13 @@
+--2015-11-02 10:27:31--  http://code.jquery.com/qunit/qunit-git.js
+Resolving code.jquery.com... 94.31.29.230, 94.31.29.53
+Connecting to code.jquery.com|94.31.29.230|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 112462 (110K) [application/javascript]
+Saving to: 'qunit.js'
+
+     0K .......... .......... .......... .......... .......... 45% 2.39M 0s
+    50K .......... .......... .......... .......... .......... 91% 11.3M 0s
+   100K .........                                             100% 12.1M=0.03s
+
+2015-11-02 10:27:31 (4.19 MB/s) - 'qunit.js' saved [112462/112462]
+
