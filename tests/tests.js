@@ -125,6 +125,28 @@ QUnit.test("Assert reset clears actions.", function(assert) {
   assert.strictEqual(obj.actions.both.length, 0);
 });
 
+QUnit.test("Assert non-function to add() throws error.", function(assert) {
+  assert.throws(function () {
+    obj.add('both', ['tiny'], 'tree');
+  });
+});
+
+QUnit.test("Assert empty breakpoints to add() throws error.", function(assert) {
+  assert.throws(function () {
+    obj.add('both', [], function () {
+      var called = true;
+    });
+  });
+});
+
+QUnit.test("Assert bad direction to add() throws error.", function(assert) {
+  assert.throws(function () {
+    obj.add('hungry', ['tiny'], function () {
+      var called = true;
+    });
+  });
+});
+
 QUnit.test("Assert add 'both' works.", function(assert) {
   assert.strictEqual(obj.actions.both.length, 0);
   obj.add('both', ['tiny'], function () {

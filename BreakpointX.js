@@ -113,7 +113,7 @@ var BreakpointX = (function ($) {
   BreakpointX.prototype.init = function(breakpoints) {
     var self = this;
     if (typeof breakpoints !== 'object') {
-      throw new Error("breakpoints must be an object in this format: {alias: width, alias2: width} where width is the viewport width when the viewport begins, i.e., minimum width.");
+      throw ("Object needs format {alias: minWidth}.");
     }    
 
     // Make sure that breakpoint values are integars in pixels and listed in
@@ -141,7 +141,7 @@ var BreakpointX = (function ($) {
 
     // Register our own handler if we're to manipulate classes.
     if (this.settings.addClassesTo) {
-      self.add('both', this.aliases, this.classHandler);
+      self.add('both', this.aliases, this.cssHandler);
     }
 
     if (self.actions.hasOwnProperty('bigger') || self.actions.hasOwnProperty('smaller') || self.actions.hasOwnProperty('both')) {
@@ -158,7 +158,7 @@ var BreakpointX = (function ($) {
     return self;
   };
 
-  BreakpointX.prototype.classHandler = function (from, to, direction, self) {
+  BreakpointX.prototype.cssHandler = function (from, to, direction, self) {
     $el = self.settings.addClassesTo instanceof jQuery ? self.settings.addClassesTo : $(self.settings.addClassesTo);
     var p = self.settings.classPrefix;
     $el
@@ -281,19 +281,19 @@ var BreakpointX = (function ($) {
   BreakpointX.prototype.add = function (direction, breakpoints, callback) {
     var self = this;
     if (typeof self.actions[direction] === 'undefined') {
-      throw new Error('Invalid direction: ' + direction);
+      throw ('Bad direction: ' + direction);
     }
-    else if (breakpoints.length < 1) {
-      throw new Error('breakpoints must be an array with at least one alias.');
+    else if (breakpoints.length === 0) {
+      throw ('Breakpoints must be an array of aliases.');
     }
     else if (typeof callback !== 'function') {
-      throw new Error('callback must be a function');
+      throw ('Callback must be a function');
     }
     else {
       for (var i in breakpoints) {
         var alias = breakpoints[i];
         if (self.aliases.indexOf(alias) === -1) {
-          throw new Error('Unregistered breakpoint alias: "' + alias + '"');
+          throw ('Unknown alias: "' + alias + '"');
         }
         self.actions[direction][alias] = self.actions[direction][alias] || [];  
         self.actions[direction][alias].push(callback);
