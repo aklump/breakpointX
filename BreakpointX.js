@@ -82,7 +82,7 @@ var BreakpointX = (function ($) {
      *
      * @type {String}
      */
-    classPrefix: 'breakpointx-',
+    classPrefix: 'bpx-',
   };
 
   /**
@@ -180,7 +180,7 @@ var BreakpointX = (function ($) {
       var direction    = crossed ? (width > self.last.width ? 'bigger' : 'smaller') : null;
       var callbacks    = [self.actions.both];
       if (direction) {
-        callbacks.push = slef.actions[direction];
+        callbacks.push = self.actions[direction];
       }
 
       self.last = {
