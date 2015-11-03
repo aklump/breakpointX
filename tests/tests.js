@@ -16,6 +16,50 @@ var obj = {};
 // Build your tests below here...
 //
 
+QUnit.test("Assert classes are not added to the html tag when options set.", function(assert) {
+  var bp = new BreakpointX({"desktop": 0});
+  assert.notOk($('html').hasClass('breakpointx-desktop'));
+});
+
+
+QUnit.test("Assert classes are added to the html tag when options set.", function(assert) {
+  assert.notOk($('html').hasClass('breakpointx-desktop'));
+  var bp = new BreakpointX({"desktop": 0}, {"addClassesTo": "html"});
+  assert.ok($('html').hasClass('breakpointx-desktop'));
+});
+
+QUnit.test("Assert instantiation without callbacks still shows this.current and this.last.", function(assert) {
+  var bp = new BreakpointX({"mainWindow": 0});
+  assert.strictEqual(bp.current, "mainWindow");
+  assert.deepEqual(bp.last, {
+    "alias": "mainWindow",
+    "direction": null,
+    "width": [0, null]
+  });
+});
+
+QUnit.test("Assert instantiation without args throws error.", function(assert) {
+  assert.throws(function () {
+    var bp = new BreakpointX();  
+  });  
+});
+
+QUnit.test("Assert breakpoints out of order are put into asc order.", function(assert) {
+  var outOfOrder = {
+    desktop: 769,
+    mobile: 320,
+    tiny: 0,
+  };
+  var bp      = new BreakpointX(outOfOrder);
+  console.log(bp);
+  var result  = [];
+  for (var breakpoint in bp.breakpoints) {
+    result.push(bp.breakpoints[breakpoint]);
+  }
+
+  assert.deepEqual(result, [[0, 319], [320, 768], [769, null]]);
+  assert.deepEqual(bp.aliases, ['tiny', 'mobile', 'desktop']);
+});
 
 QUnit.test("Assert two breakpoints with string values works.", function(assert) {
   var bp = new BreakpointX({"mobile": "0px", "desktop": "769px"});
@@ -49,6 +93,15 @@ QUnit.test("Assert two breakpoints alias works.", function(assert) {
   assert.strictEqual(bp.alias(1024), 'desktop');
   assert.strictEqual(bp.alias(1600), 'desktop');
   assert.strictEqual(bp.alias(0), 'mobile');
+});
+
+QUnit.test("Assert reset sets the current window width.", function(assert) {
+  obj.reset();
+  var width = $(window).width();
+  var alias = obj.alias(width);
+  assert.strictEqual(obj.last.alias, alias);
+  assert.strictEqual(obj.last.width, obj.value(alias));
+  assert.strictEqual(obj.current, alias);
 });
 
 QUnit.test("Assert reset clears actions.", function(assert) {
@@ -97,9 +150,9 @@ QUnit.test("Assert add 'smaller' works.", function(assert) {
 });
 
 QUnit.test("Assert value method works.", function(assert) {
-  assert.strictEqual(obj.value('tiny'), 0);
-  assert.strictEqual(obj.value('mobile'), 241);
-  assert.strictEqual(obj.value('desktop'), 769);
+  assert.deepEqual(obj.value('tiny'), [0, 240]);
+  assert.deepEqual(obj.value('mobile'), [241, 768]);
+  assert.deepEqual(obj.value('desktop'), [769, null]);
 });
 
 QUnit.test("Able to instantiate and find version.", function(assert) {

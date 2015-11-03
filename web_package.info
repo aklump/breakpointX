@@ -1,4 +1,4 @@
 name = "BreakpointX"
-description = "Define breakpoints and register callbacks when crossed."
+description = "Define responsive breakpoints, register callbacks when crossing, with optional css class handling."
 version = "0.1"
 author = Aaron Klump <sourcecode@intheloftstudios.com>

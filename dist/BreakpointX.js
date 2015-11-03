@@ -2,18 +2,22 @@
  * BreakpointX JavaScript Module v0.1
  * 
  *
- * Define breakpoints and register callbacks when crossed.
+ * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
  *
  * Copyright 2015, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Nov  2 13:35:11 PST 2015
+ * Date: Tue Nov  3 07:02:40 PST 2015
  */
 /**
  * 
  * Each breakpoint consists of a minimum width and an alias.
  * Each viewport is the span of the breakpoint minimum width to one pixel
- * less than the next-larger breakpoint's minimum width.
+ * less than the next-larger breakpoint's minimum width.  The largest breakpoint
+ * has no maximum width.
+ *
+ * Access the current viewport using this.current; but this will only work if
+ * you provide callbacks, using this.add().
  * 
  * @code
  *   breakpointX
@@ -39,18 +43,18 @@
  * @code
  *   var breakpointx = new BreakpointX();
  * @endcode
- *
- * Available using jQuery syntax
- * @code
- *   var breakpointx = $('body').breakpointx().data('breakpointx');
- * @endcode
  */
 var BreakpointX = (function ($) {
 
   function BreakpointX (breakpoints, settings) {
     this.version     = "0.1";
     this.settings    = $.extend({}, this.options, settings);
-
+    this.current     = null;
+    this.last        = {};
+    this.actions     = {};
+    this.breakpoints = {};
+    this.aliases     = [];
+    
     this.init(breakpoints);
   }
 
@@ -64,7 +68,22 @@ var BreakpointX = (function ($) {
    *   });
    * @endcode
    */
-  BreakpointX.prototype.options = {};
+  BreakpointX.prototype.options = {
+    
+    /**
+     * Optional, a jquery selector or object where classes will be added.
+     *
+     * @type {String|jQuery}
+     */
+    addClassesTo: null,
+
+    /**
+     * A prefix to be added to all css classes.
+     *
+     * @type {String}
+     */
+    classPrefix: 'breakpointx-',
+  };
 
   /**
    * Register the allowed breakpoints.
@@ -94,46 +113,99 @@ var BreakpointX = (function ($) {
   BreakpointX.prototype.init = function(breakpoints) {
     var self = this;
     if (typeof breakpoints !== 'object') {
-      throw new Error("breakpoints should be an object in this format: {alias: width} where width is the maximum width of the viewport");
+      throw new Error("breakpoints must be an object in this format: {alias: width, alias2: width} where width is the viewport width when the viewport begins, i.e., minimum width.");
     }    
 
-    // Make sure that breakpoint values are integars in pixels.
+    // Make sure that breakpoint values are integars in pixels and listed in
+    // ascending order; calculate the maxWidth values.
     self.aliases = [];
-    for (var alias in breakpoints) {
+    var sortable = [];
+    var alias, pixels;
+    for (alias in breakpoints) {
+      pixels = parseInt(breakpoints[alias], 10);
+      sortable.push([alias, pixels]);
+    }
+    sortable.sort(function (a, b) {
+      return a[1] - b[1];
+    });
+    for (var i in sortable) {
+      i *= 1;
+      minWidth = sortable[i][1];
+      alias  = sortable[i][0];
       self.aliases.push(alias);
-      breakpoints[alias] = parseInt(breakpoints[alias], 10);
+      var maxWidth = typeof sortable[i + 1] === 'undefined' ? null : sortable[i + 1][1] - 1;
+      self.breakpoints[alias] = [minWidth, maxWidth];
     }
     
-    self.breakpoints = breakpoints;
     self.reset();
-    self.last.alias = this.alias(window.innerWidth);
-    self.last.width = this.value(self.last.alias);
 
-    $(window).resize(function () {
-      var winWidth  = window.innerWidth;
-      var direction = winWidth > self.last.width ? 'bigger' : 'smaller';
-      var callbacks = [self.actions[direction], self.actions.both];
-      var bp        = null;
-      for (var i in callbacks) {
-        for (var bpAlias in callbacks[i]) {
-          var lastAlias = lastAlias || null;
-          bp            = self.value(bpAlias);
-          var crossed   = self.last.width < bp && winWidth > bp || self.last.width > bp && winWidth < bp;
-          if (crossed) {
-            var from = direction === 'bigger' ? lastAlias : bpAlias;
-            var to   = bpAlias;
-            for (var j in callbacks[i][bpAlias]) {
-              console.log(from, to, direction);
-              callbacks[i][bpAlias][j](from, to, direction, self);
-            }
-            self.last = {"width": bp, "alias": bpAlias, "direction": direction};
-          }
-          lastAlias = bpAlias;
-        }
-      }
-    });
+    // Register our own handler if we're to manipulate classes.
+    if (this.settings.addClassesTo) {
+      self.add('both', this.aliases, this.classHandler);
+    }
+
+    if (self.actions.hasOwnProperty('bigger') || self.actions.hasOwnProperty('smaller') || self.actions.hasOwnProperty('both')) {
+
+      var winWidth = window.innerWidth;
+      self.callbacksHandler(winWidth, true);
+
+      $(window).resize(function () {
+        winWidth     = window.innerWidth;
+        self.callbacksHandler(winWidth);
+      });
+    }
 
     return self;
+  };
+
+  BreakpointX.prototype.classHandler = function (from, to, direction, self) {
+    $el = self.settings.addClassesTo instanceof jQuery ? self.settings.addClassesTo : $(self.settings.addClassesTo);
+    var p = self.settings.classPrefix;
+    $el
+    .removeClass(p + 'smaller')
+    .removeClass(p + 'larger')
+    .removeClass(p + from.name)
+    .addClass(p + to.name);
+    if (direction) {
+      $el.addClass(p + direction);
+    }
+  };
+
+  BreakpointX.prototype.callbacksHandler = function (width, force) {
+    var self = this;
+    var currentAlias = self.alias(width);
+    var crossed      = currentAlias !== self.last.alias;
+
+    if (crossed || force) {
+      var direction    = crossed ? (width > self.last.width ? 'bigger' : 'smaller') : null;
+      var callbacks    = [self.actions.both];
+      if (direction) {
+        callbacks.push = slef.actions[direction];
+      }
+
+      self.last = {
+        "width": self.value(currentAlias),
+        "alias": currentAlias,
+        "direction": direction
+      };
+      self.current = currentAlias;
+
+      for (var i in callbacks) {
+        var from = {
+          minWidth: self.breakpoints[self.last.alias][0],
+          maxWidth: self.breakpoints[self.last.alias][1],
+          name: self.last.alias
+        };
+        var to = {
+          minWidth: self.breakpoints[currentAlias][0],
+          maxWidth: self.breakpoints[currentAlias][1],
+          name: currentAlias
+        };
+        for (var j in callbacks[i][currentAlias]) {
+          callbacks[i][currentAlias][j](from, to, direction, self);
+        }
+      }
+    }  
   };
 
   /**
@@ -148,6 +220,11 @@ var BreakpointX = (function ($) {
       "both": []
     };
     this.last = {"width": null, "alias": null, "direction": null};
+    
+    // Set values based on current window.
+    this.last.alias = this.alias(window.innerWidth);
+    this.last.width = this.value(this.last.alias);
+    this.current    = this.last.alias;
 
     return this;
   };
@@ -167,8 +244,9 @@ var BreakpointX = (function ($) {
   BreakpointX.prototype.alias = function(width) {
     var found;
     for (var alias in this.breakpoints) {
+      var bp = this.breakpoints[alias][0];
       found = found || alias; 
-      if (width < this.breakpoints[alias]) {
+      if (width < bp) {
         return found;
       }
       found = alias;
@@ -195,8 +273,8 @@ var BreakpointX = (function ($) {
    * @param {string} direction One of: smaller, larger, both
    * @param {array} breakpoints E.g. [mobile, desktop] These are aliases not values.
    * @param {Function} callback A callback to be executed.  CAllbacks receive:
-   *   - 0 The breakpoint alias moving from. (To get the pixel value use arg#3.value())
-   *   - 1 The alias/name of the new viewport.
+   *   - 0 The object moving from: {minWidth, maxWidth, name}
+   *   - 1 The object moving to...
    *   - 2 The direction string.
    *   - 3 The current BreakpointX object.
    */
