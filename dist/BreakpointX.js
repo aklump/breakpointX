@@ -1,5 +1,5 @@
 /**
- * BreakpointX JavaScript Module v0.2.3
+ * BreakpointX JavaScript Module v0.2.4
  * 
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
@@ -7,7 +7,7 @@
  * Copyright 2015, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Nov 18 17:53:58 PST 2015
+ * Date: Wed Nov 18 17:54:58 PST 2015
  */
 /**
  * 
@@ -47,7 +47,7 @@
 var BreakpointX = (function ($) {
 
   function BreakpointX (breakpoints, settings) {
-    this.version     = "0.2.3";
+    this.version     = "0.2.4";
     this.settings    = $.extend({}, this.options, settings);
     this.current     = null;
     this.last        = {};
