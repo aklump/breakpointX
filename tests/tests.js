@@ -18,14 +18,14 @@ var obj = {};
 
 QUnit.test("Assert classes are not added to the html tag when options set.", function(assert) {
   var bp = new BreakpointX({"desktop": 0});
-  assert.notOk($('html').hasClass('breakpointx-desktop'));
+  assert.notOk($('html').hasClass('bpx-desktop'));
 });
 
 
 QUnit.test("Assert classes are added to the html tag when options set.", function(assert) {
-  assert.notOk($('html').hasClass('breakpointx-desktop'));
+  assert.notOk($('html').hasClass('bpx-desktop'));
   var bp = new BreakpointX({"desktop": 0}, {"addClassesTo": "html"});
-  assert.ok($('html').hasClass('breakpointx-desktop'));
+  assert.ok($('html').hasClass('bpx-desktop'));
 });
 
 QUnit.test("Assert instantiation without callbacks still shows this.current and this.last.", function(assert) {
