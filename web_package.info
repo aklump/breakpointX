@@ -1,4 +1,4 @@
 name = "BreakpointX"
 description = "Define responsive breakpoints, register callbacks when crossing, with optional css class handling."
-version = "0.2.3"
+version = "0.2.4"
 author = Aaron Klump <sourcecode@intheloftstudios.com>
