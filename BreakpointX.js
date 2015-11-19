@@ -7,7 +7,7 @@
  * Copyright 2015, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Nov 18 17:22:00 PST 2015
+ * Date: Wed Nov 18 17:53:58 PST 2015
  */
 /**
  * 
@@ -120,7 +120,7 @@ var BreakpointX = (function ($) {
     // ascending order; calculate the maxWidth values.
     self.aliases = [];
     var sortable = [];
-    var alias, pixels;
+    var alias, pixels, minWidth, maxWidth;
     for (alias in breakpoints) {
       pixels = parseInt(breakpoints[alias], 10);
       sortable.push([alias, pixels]);
@@ -131,9 +131,9 @@ var BreakpointX = (function ($) {
     for (var i in sortable) {
       i *= 1;
       minWidth = sortable[i][1];
-      alias  = sortable[i][0];
+      alias        = sortable[i][0];
       self.aliases.push(alias);
-      var maxWidth = typeof sortable[i + 1] === 'undefined' ? null : sortable[i + 1][1] - 1;
+      maxWidth = typeof sortable[i + 1] === 'undefined' ? null : sortable[i + 1][1] - 1;
       self.breakpoints[alias] = [minWidth, maxWidth];
     }
     
@@ -159,8 +159,8 @@ var BreakpointX = (function ($) {
   };
 
   BreakpointX.prototype.cssHandler = function (from, to, direction, self) {
-    $el = self.settings.addClassesTo instanceof jQuery ? self.settings.addClassesTo : $(self.settings.addClassesTo);
-    var p = self.settings.classPrefix;
+    var $el = self.settings.addClassesTo instanceof jQuery ? self.settings.addClassesTo : $(self.settings.addClassesTo);
+    var p   = self.settings.classPrefix;
     $el
     .removeClass(p + 'smaller')
     .removeClass(p + 'larger')
@@ -177,10 +177,11 @@ var BreakpointX = (function ($) {
     var crossed      = currentAlias !== self.last.alias;
 
     if (crossed || force) {
-      var direction    = crossed ? (width > self.last.width ? 'bigger' : 'smaller') : null;
+      var direction    = crossed ? (width > self.last.width[0] ? 'bigger' : 'smaller') : null;
+      var breakpoint   = direction === 'smaller' ? self.last.alias : currentAlias;
       var callbacks    = [self.actions.both];
       if (direction) {
-        callbacks.push = self.actions[direction];
+        callbacks.push(self.actions[direction]);
       }
 
       self.last = {
@@ -201,8 +202,8 @@ var BreakpointX = (function ($) {
           maxWidth: self.breakpoints[currentAlias][1],
           name: currentAlias
         };
-        for (var j in callbacks[i][currentAlias]) {
-          callbacks[i][currentAlias][j](from, to, direction, self);
+        for (var j in callbacks[i][breakpoint]) {
+          callbacks[i][breakpoint][j](from, to, direction, self);
         }
       }
     }  
