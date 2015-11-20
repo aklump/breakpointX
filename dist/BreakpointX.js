@@ -7,7 +7,7 @@
  * Copyright 2015, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Nov 18 17:54:58 PST 2015
+ * Date: Thu Nov 19 08:32:27 PST 2015
  */
 /**
  * 
@@ -21,18 +21,18 @@
  * 
  * @code
  *   breakpointX
- *   .init({tiny: 0, mobile: 241, desktop: 769})
- *   .add('smaller', ['desktop'], function () {
- *     console.log('Now you\'re in mobile!');
+ *   .init({small: 0, medium: 241, large: 769})
+ *   .add('smaller', ['large'], function () {
+ *     console.log('Now you\'re in medium!');
  *   })
- *   .add('smaller', ['tiny'], function () {
- *     console.log('Now you\'re in tiny!');
+ *   .add('smaller', ['small'], function () {
+ *     console.log('Now you\'re in small!');
  *   })
- *   .add('bigger', ['desktop'], function () {
- *     console.log('Now you\'re in desktop!');
+ *   .add('bigger', ['large'], function () {
+ *     console.log('Now you\'re in large!');
  *   });
  *   
- *   breakpointX.add('both', ['desktop', 'tiny'], function (from, to, direction, bp) {
+ *   breakpointX.add('both', ['large', 'small'], function (from, to, direction, bp) {
  *     var pixels = bp.value(to);
  *     console.log('Previous viewport was: ' + from);
  *     console.log('Breakpoint ' + to + ' (' + pixels + ') has been crossed getting ' + direction + '.');
@@ -98,12 +98,12 @@ var BreakpointX = (function ($) {
    *
    * Given this code...
    * @code
-   *   var bp = new BreakpointX({tiny: 0, mobile: 241, desktop: 769});
-   *   bp.alias(240) === 'tiny';
-   *   bp.alias(320) === 'mobile';
-   *   bp.alias(321) === 'mobile';
-   *   bp.alias(768) === 'mobile';
-   *   bp.alias(769) === 'desktop';
+   *   var bp = new BreakpointX({small: 0, medium: 241, large: 769});
+   *   bp.alias(240) === 'small';
+   *   bp.alias(320) === 'medium';
+   *   bp.alias(321) === 'medium';
+   *   bp.alias(768) === 'medium';
+   *   bp.alias(769) === 'large';
 
    * @endcode
    *
@@ -259,7 +259,7 @@ var BreakpointX = (function ($) {
   /**
    * Return the pixel value of a breakpoint alias.
    *
-   * @param  {string} alias E.g. 'desktop'
+   * @param  {string} alias E.g. 'large'
    *
    * @return {int} The pixel value.
    */
@@ -272,7 +272,7 @@ var BreakpointX = (function ($) {
    * breakpoints getting smaller, larger or in both directions.
    *
    * @param {string} direction One of: smaller, larger, both
-   * @param {array} breakpoints E.g. [mobile, desktop] These are aliases not values.
+   * @param {array} breakpoints E.g. [medium, large] These are aliases not values.
    * @param {Function} callback A callback to be executed.  CAllbacks receive:
    *   - 0 The object moving from: {minWidth, maxWidth, name}
    *   - 1 The object moving to...
