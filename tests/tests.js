@@ -15,6 +15,23 @@ var obj = {};
 //
 // Build your tests below here...
 //
+QUnit.test("Assert alias(last) works.", function (assert) {
+  var bp = new BreakpointX([0,480,768,1080]);
+  assert.strictEqual(bp.alias('first'), '(min-width: 0)');
+  assert.strictEqual(bp.alias('last'), '(min-width: 1080px)');
+});
+
+
+QUnit.test("Assert that breakpoints as an array of values works.", function (assert) {
+  var bp = new BreakpointX([0,480,768,1080]);
+  assert.deepEqual(bp.aliases, ['(min-width: 0)','(min-width: 480px)','(min-width: 768px)','(min-width: 1080px)']);
+  assert.strictEqual(bp.alias(0), '(min-width: 0)');
+  assert.strictEqual(bp.alias(100), '(min-width: 0)');
+  assert.strictEqual(bp.alias(320), '(min-width: 0)');
+  assert.strictEqual(bp.alias(480), '(min-width: 480px)');
+  assert.strictEqual(bp.alias(768), '(min-width: 768px)');
+  assert.strictEqual(bp.alias(1080), '(min-width: 1080px)');
+});
 
 QUnit.test("Assert classes are not added to the html tag when options set.", function(assert) {
   var bp = new BreakpointX({"desktop": 0});
@@ -51,7 +68,6 @@ QUnit.test("Assert breakpoints out of order are put into asc order.", function(a
     tiny: 0,
   };
   var bp      = new BreakpointX(outOfOrder);
-  console.log(bp);
   var result  = [];
   for (var breakpoint in bp.breakpoints) {
     result.push(bp.breakpoints[breakpoint]);
