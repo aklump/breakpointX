@@ -17,19 +17,19 @@ var obj = {};
 //
 QUnit.test("Assert alias(last) works.", function (assert) {
   var bp = new BreakpointX([0,480,768,1080]);
-  assert.strictEqual(bp.alias('first'), '(min-width: 0)');
+  assert.strictEqual(bp.alias('first'), '(max-width: 479px)');
   assert.strictEqual(bp.alias('last'), '(min-width: 1080px)');
 });
 
 
 QUnit.test("Assert that breakpoints as an array of values works.", function (assert) {
   var bp = new BreakpointX([0,480,768,1080]);
-  assert.deepEqual(bp.aliases, ['(min-width: 0)','(min-width: 480px)','(min-width: 768px)','(min-width: 1080px)']);
-  assert.strictEqual(bp.alias(0), '(min-width: 0)');
-  assert.strictEqual(bp.alias(100), '(min-width: 0)');
-  assert.strictEqual(bp.alias(320), '(min-width: 0)');
-  assert.strictEqual(bp.alias(480), '(min-width: 480px)');
-  assert.strictEqual(bp.alias(768), '(min-width: 768px)');
+  assert.deepEqual(bp.aliases, ['(max-width: 479px)','(max-width: 767px)','(max-width: 1079px)','(min-width: 1080px)']);
+  assert.strictEqual(bp.alias(0), '(max-width: 479px)');
+  assert.strictEqual(bp.alias(100), '(max-width: 479px)');
+  assert.strictEqual(bp.alias(320), '(max-width: 479px)');
+  assert.strictEqual(bp.alias(480), '(max-width: 767px)');
+  assert.strictEqual(bp.alias(768), '(max-width: 1079px)');
   assert.strictEqual(bp.alias(1080), '(min-width: 1080px)');
 });
 
