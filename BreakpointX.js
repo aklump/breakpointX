@@ -1,5 +1,5 @@
 /**
- * BreakpointX JavaScript Module v0.2.6
+ * BreakpointX JavaScript Module v0.2.7
  * 
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
@@ -7,7 +7,7 @@
  * Copyright 2015-2016, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Jan 11 21:25:43 PST 2016
+ * Date: Tue Jan 12 17:01:21 PST 2016
  */
 /**
  *
@@ -42,17 +42,17 @@
  * You can also just send min widths like this:
  * @code
  *   var bp = new BreakpointX([0, 240, 768]);
- *   bp.alias(240) === '(min-width: 320px)';
+ *   bp.alias(240) === '(max-width: 767px)';
  *
- *   bp..add('smaller', ['(min-width: 320px)'], function () {
- *     console.log('Now you\'re in (min-width: 320px)!');
+ *   bp..add('smaller', ['(max-width: 767px)'], function () {
+ *     console.log('Now you\'re in (max-width: 767px)!');
  *   })
  * @endcode
  */
 var BreakpointX = (function ($) {
 
   function BreakpointX(breakpoints, settings) {
-    this.version = "0.2.6";
+    this.version = "0.2.7";
     this.settings = $.extend({}, this.options, settings);
     this.current = null;
     this.last = {};
@@ -127,10 +127,19 @@ var BreakpointX = (function ($) {
     // Convert arrays to min-width objects.
     var converted = {};
     if (breakpoints instanceof Array) {
-      var px;
+      var directive, value, px, next;
       for (i in breakpoints) {
-        px = breakpoints[i] > 0 ? 'px' : '';
-        converted['(min-width: ' + breakpoints[i] + px + ')'] = breakpoints[i];
+        next = i * 1 + 1;
+        if (typeof breakpoints[next] !== 'undefined') {
+          directive = 'max';
+          value = breakpoints[next] * 1 - 1;
+        }
+        else {
+          directive = 'min';
+          value = breakpoints[i];
+        }
+        px = value === 0 ? '' : 'px';
+        converted['(' + directive + '-width: ' + value + px + ')'] = breakpoints[i];
       }
       breakpoints = converted;
     }
