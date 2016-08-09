@@ -1,13 +1,13 @@
 /**
  * BreakpointX JavaScript Module v0.2.8
- * 
+ *
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
  *
  * Copyright 2015-2016, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Tue Jan 12 17:01:41 PST 2016
+ * Date: Mon Aug  8 20:42:27 PDT 2016
  */
 /**
  *
@@ -49,7 +49,7 @@
  *   })
  * @endcode
  */
-var BreakpointX = (function ($) {
+var BreakpointX = (function ($, window) {
 
   function BreakpointX(breakpoints, settings) {
     this.version = "0.2.8";
@@ -122,7 +122,8 @@ var BreakpointX = (function ($) {
    *
    */
   BreakpointX.prototype.init = function (breakpoints) {
-    var self = this;
+    var self = this,
+        i;
 
     // Convert arrays to min-width objects.
     var converted = {};
@@ -160,7 +161,7 @@ var BreakpointX = (function ($) {
     sortable.sort(function (a, b) {
       return a[1] - b[1];
     });
-    for (var i in sortable) {
+    for (i in sortable) {
       i *= 1;
       minWidth = sortable[i][1];
       alias = sortable[i][0];
@@ -206,40 +207,33 @@ var BreakpointX = (function ($) {
     }
     width = e[a + 'Width'];
     return width;
-  }
+  };
 
   BreakpointX.prototype.cssHandler = function (from, to, direction, self) {
     var $el = self.settings.addClassesTo instanceof jQuery ? self.settings.addClassesTo : $(self.settings.addClassesTo);
     var p = self.settings.classPrefix;
     $el
-      .removeClass(p + 'smaller')
-      .removeClass(p + 'larger')
-      .removeClass(p + from.name)
-      .addClass(p + to.name);
+    .removeClass(p + 'smaller')
+    .removeClass(p + 'bigger')
+    .removeClass(p + from.name)
+    .addClass(p + to.name);
     if (direction) {
       $el.addClass(p + direction);
     }
   };
 
   BreakpointX.prototype.callbacksHandler = function (width, force) {
-    var self = this;
-    var currentAlias = self.alias(width);
-    var crossed = currentAlias !== self.last.alias;
+    var self         = this,
+        currentAlias = self.alias(width),
+        crossed      = currentAlias !== self.last.alias;
 
     if (crossed || force) {
-      var direction = crossed ? (width > self.last.width[0] ? 'bigger' : 'smaller') : null;
-      var breakpoint = direction === 'smaller' ? self.last.alias : currentAlias;
-      var callbacks = [self.actions.both];
+      var direction  = crossed ? (width > self.last.width[0] ? 'bigger' : 'smaller') : null,
+          breakpoint = direction === 'smaller' ? self.last.alias : currentAlias,
+          callbacks  = [self.actions.both];
       if (direction) {
         callbacks.push(self.actions[direction]);
       }
-
-      self.last = {
-        "width"    : self.value(currentAlias),
-        "alias"    : currentAlias,
-        "direction": direction
-      };
-      self.current = currentAlias;
 
       for (var i in callbacks) {
         var from = {
@@ -256,6 +250,14 @@ var BreakpointX = (function ($) {
           callbacks[i][breakpoint][j](from, to, direction, self);
         }
       }
+
+      // Update for next round.
+      self.last = {
+        "width"    : self.value(currentAlias),
+        "alias"    : currentAlias,
+        "direction": direction
+      };
+      self.current = currentAlias;
     }
   };
 
@@ -367,4 +369,4 @@ var BreakpointX = (function ($) {
   };
 
   return BreakpointX;
-})(jQuery);
+})(jQuery, window);

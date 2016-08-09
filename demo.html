@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BreakpointX Demo</title>
+</head>
+<body>
+  <p>View source and observer the html element classes whilst changing browser widths.</p>
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="BreakpointX.js"></script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    var b = new BreakpointX({mobile: 0, desktop: 768}, {
+      addClassesTo: 'html'
+    });
+  });
+</script>
+</body>
+</html>
