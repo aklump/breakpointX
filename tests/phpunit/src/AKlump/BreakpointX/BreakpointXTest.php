@@ -8,6 +8,14 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+    public function testGetSettings()
+    {
+        $control = [0, 480, 768];
+        $this->assertSame($control, $this->obj->getSetting('breakpoints'));
+        $this->assertNull($this->obj->getSetting('lunch'));
+        $this->assertSame(1, $this->obj->getSetting('index', 1));
+    }
+
     public function testFirst()
     {
         $this->assertSame("(max-width: 479px)", $this->obj->alias('first'));
