@@ -1,1 +1,0 @@
-1. Set up `tests/sass/test.scss` to compile to `tests/test.css`

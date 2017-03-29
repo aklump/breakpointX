@@ -1,5 +1,7 @@
 .web_package
 !.web_package/hooks
 !.web_package/config
-/bower_components/jquery/*
-!/bower_components/jquery/dist
+/bower_components
+s/jquery/dist
+.idea
+bower_components
