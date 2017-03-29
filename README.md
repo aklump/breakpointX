@@ -39,8 +39,9 @@ Define responsive breakpoints, register callbacks when crossing, with optional c
     });
 
     // When the window crosses any breakpoint in either direction
-    bp.add('both', bp.aliases, function () {
-      console.log('Now you\'re in (max-width: 767px)!');
+    bp.add('both', bp.aliases, function (from, to, direction) {
+      console.log('Now you\'re in: ' + to.name);
+      console.log('Window just got ' + direction);
     });
 
 

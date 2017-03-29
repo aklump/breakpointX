@@ -1,5 +1,5 @@
 /**
- * BreakpointX (Breakpoint Crossing) JavaScript Module v0.2.11
+ * BreakpointX ("Crossing") JavaScript Module v0.2.11
  * 
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
@@ -7,7 +7,7 @@
  * Copyright 2015-2017, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Mar 29 10:56:03 PDT 2017
+ * Date: Wed Mar 29 11:09:41 PDT 2017
  */
 /**
  *
@@ -32,8 +32,8 @@
  *     console.log('Now you\'re in large!');
  *   });
  *
- *   breakpointX.add('both', ['large', 'small'], function (from, to, direction, bp) {
- *     var pixels = bp.value(to);
+ *   breakpointX.add('both', ['large', 'small'], function (from, to, direction) {
+ *     var pixels = this.value(to);
  *     console.log('Previous viewport was: ' + from);
  *     console.log('Breakpoint ' + to + ' (' + pixels + ') has been crossed getting ' + direction + '.');
  *   });
@@ -44,7 +44,7 @@
  *   var bp = new BreakpointX([0, 240, 768]);
  *   bp.alias(240) === '(max-width: 767px)';
  *
- *   bp..add('smaller', ['(max-width: 767px)'], function () {
+ *   bp.add('smaller', ['(max-width: 767px)'], function (from, to, direction) {
  *     console.log('Now you\'re in (max-width: 767px)!');
  *   })
  * @endcode
@@ -59,7 +59,6 @@ var BreakpointX = (function ($, window) {
     this.actions = {};
     this.breakpoints = {};
     this.aliases = [];
-
     this.init(breakpoints);
   }
 
@@ -209,9 +208,9 @@ var BreakpointX = (function ($, window) {
     return width;
   };
 
-  BreakpointX.prototype.cssHandler = function (from, to, direction, self) {
-    var $el = self.settings.addClassesTo instanceof jQuery ? self.settings.addClassesTo : $(self.settings.addClassesTo);
-    var p = self.settings.classPrefix;
+  BreakpointX.prototype.cssHandler = function (from, to, direction) {
+    var $el = this.settings.addClassesTo instanceof jQuery ? this.settings.addClassesTo : $(this.settings.addClassesTo),
+        p   = this.settings.classPrefix;
     $el
     .removeClass(p + 'smaller')
     .removeClass(p + 'bigger')
@@ -226,7 +225,6 @@ var BreakpointX = (function ($, window) {
     var self         = this,
         currentAlias = self.alias(width),
         crossed      = currentAlias !== self.last.alias;
-
     if (crossed || force) {
       var direction  = crossed ? (width > self.last.width[0] ? 'bigger' : 'smaller') : null,
           breakpoint = direction === 'smaller' ? self.last.alias : currentAlias,
@@ -247,7 +245,7 @@ var BreakpointX = (function ($, window) {
           name    : currentAlias
         };
         for (var j in callbacks[i][breakpoint]) {
-          callbacks[i][breakpoint][j](from, to, direction, self);
+          callbacks[i][breakpoint][j].call(self, from, to, direction);
         }
       }
 
@@ -341,7 +339,7 @@ var BreakpointX = (function ($, window) {
    *   - 0 The object moving from: {minWidth, maxWidth, name}
    *   - 1 The object moving to...
    *   - 2 The direction string.
-   *   - 3 The current BreakpointX object.
+   *   - The current BreakpointX object is available as this
    */
   BreakpointX.prototype.add = function (direction, breakpoints, callback) {
     var self = this;

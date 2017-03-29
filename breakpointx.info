@@ -1,4 +1,4 @@
-name = BreakpointX (Breakpoint Crossing)
+name = BreakpointX ("Crossing")
 description = Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
 version = 0.2.11
 author = Aaron Klump <sourcecode@intheloftstudios.com>

@@ -13,6 +13,11 @@
     var b = new BreakpointX({mobile: 0, desktop: 768}, {
       addClassesTo: 'html'
     });
+    b.add('both', b.aliases, function (from, to, direction) {
+      console.log('Now you\'re in: ' + to.name);
+      console.log('Window just got ' + direction);
+      console.log(this);
+    });
   });
 </script>
 </body>
