@@ -1,4 +1,4 @@
-# Breakpointx
+# BreakpointX (Breakpoint Crossing)
 
 Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
 
