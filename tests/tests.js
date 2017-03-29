@@ -28,9 +28,18 @@ QUnit.test("Assert that breakpoints as an array of values works.", function (ass
   assert.strictEqual(bp.alias(0), '(max-width: 479px)');
   assert.strictEqual(bp.alias(100), '(max-width: 479px)');
   assert.strictEqual(bp.alias(320), '(max-width: 479px)');
+  assert.strictEqual(bp.alias(479), '(max-width: 479px)');
+
   assert.strictEqual(bp.alias(480), '(max-width: 767px)');
+  assert.strictEqual(bp.alias(500), '(max-width: 767px)');
+  assert.strictEqual(bp.alias(600), '(max-width: 767px)');
+  assert.strictEqual(bp.alias(767), '(max-width: 767px)');
+
+
   assert.strictEqual(bp.alias(768), '(max-width: 1079px)');
+
   assert.strictEqual(bp.alias(1080), '(min-width: 1080px)');
+  assert.strictEqual(bp.alias(2560), '(min-width: 1080px)');
 });
 
 QUnit.test("Assert classes are not added to the html tag when options set.", function(assert) {

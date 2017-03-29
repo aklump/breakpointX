@@ -1,0 +1,18 @@
+{
+    "name": "aklump/breakpointx",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Aaron Klump",
+            "email": "sourcecode@intheloftstudios.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "AKlump\\BreakpointX\\": "src/AKlump/BreakpointX/"
+        }
+    }
+}

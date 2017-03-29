@@ -323,7 +323,7 @@ var BreakpointX = (function ($, window) {
    *
    * @param  {string} alias E.g. 'large'
    *
-   * @return {int} The pixel value.
+   * @return {array} [min, max]
    */
   BreakpointX.prototype.value = function (alias) {
     return typeof this.breakpoints[alias] === 'undefined' ? null : this.breakpoints[alias];

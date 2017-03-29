@@ -5,3 +5,5 @@
 s/jquery/dist
 .idea
 bower_components
+/tests/phpunit/build
+/vendor/
