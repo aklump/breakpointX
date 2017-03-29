@@ -13,6 +13,7 @@ namespace AKlump\BreakpointX;
 class BreakpointX {
 
     public $aliases, $breakpoints;
+    protected $settings = [];
 
     /**
      * BreakpointX constructor.
@@ -22,8 +23,27 @@ class BreakpointX {
         $this->init($breakpoints);
     }
 
+    /**
+     * Return the value of a settings.
+     *
+     * Most importantly, to get the breakpoint setting used to instantiate.
+     *
+     * @code
+     *   $obj->getSetting('breakpoints');
+     * @endcode
+     *
+     * @param mixed $default Optional, a default value other than null.
+     *
+     * @return array
+     */
+    public function getSetting($setting, $default = null)
+    {
+        return isset($this->settings[$setting]) ? $this->settings[$setting] : $default;
+    }
+
     public function init($breakpoints)
     {
+        $this->settings['breakpoints'] = $breakpoints;
         foreach (array_keys($breakpoints) as $i) {
             $next = $i + 1;
             if (isset($breakpoints[$next])) {
