@@ -4,10 +4,10 @@
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
  *
- * Copyright 2015-2016, Aaron Klump <sourcecode@intheloftstudios.com>
+ * Copyright 2015-2017, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Aug  8 21:30:49 PDT 2016
+ * Date: Wed Mar 29 10:54:22 PDT 2017
  */
 /**
  *
