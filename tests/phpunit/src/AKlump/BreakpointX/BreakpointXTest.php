@@ -8,6 +8,17 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+    public function testGop()
+    {
+        $setting = array(
+            "mobile"  => 0,
+            "desktop"  => 768,
+        );
+        $obj = new BreakpointX($setting);
+        $this->assertSame($setting, $obj->getSetting('breakpoints'));
+        $this->assertSame(array_keys($setting), $obj->aliases);
+    }
+
     public function testGetSettings()
     {
         $control = [0, 480, 768];

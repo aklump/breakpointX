@@ -11,7 +11,7 @@
  */
 /**
  *
- * Each breakpoint consists of a minimum width (and an alias; the alias may be created for you if you pass an array
+ * Each breakpoint setting consists of a minimum width (and an alias; the alias will be created for you if you pass an array
  * rather than an object to init()). Each viewport is the span of the breakpoint minimum width to one pixel less than
  * the next-larger breakpoint's minimum width.  The largest breakpoint has no maximum width. The first breakpoint
  * should most always be 0.
@@ -125,7 +125,10 @@ var BreakpointX = (function ($, window) {
     var self = this,
         i;
 
-    // Convert arrays to min-width objects.
+    //
+    //
+    // Convert numeric keys to media queries.
+    //
     var converted = {};
     if (breakpoints instanceof Array) {
       var directive, value, px, next;
@@ -149,7 +152,7 @@ var BreakpointX = (function ($, window) {
       throw ("Object needs format {alias: minWidth}.");
     }
 
-    // Make sure that breakpoint values are integars in pixels and listed in
+    // Make sure that breakpoint values are integers in pixels and listed in
     // ascending order; calculate the maxWidth values.
     self.aliases = [];
     var sortable = [];

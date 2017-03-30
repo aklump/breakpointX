@@ -15,6 +15,15 @@ var obj = {};
 //
 // Build your tests below here...
 //
+
+
+
+QUnit.test("Assert named aliases appear as obj.aliases.", function(assert) {
+  var bp = new BreakpointX({"mobile": 0, "desktop": 768});
+  assert.strictEqual('mobile', bp.aliases[0]);
+  assert.strictEqual('desktop', bp.aliases[1]);
+});
+
 QUnit.test("Assert alias(last) works.", function (assert) {
   var bp = new BreakpointX([0,480,768,1080]);
   assert.strictEqual(bp.alias('first'), '(max-width: 479px)');
