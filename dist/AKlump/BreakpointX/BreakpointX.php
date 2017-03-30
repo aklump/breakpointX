@@ -44,20 +44,27 @@ class BreakpointX {
     public function init($breakpoints)
     {
         $this->settings['breakpoints'] = $breakpoints;
-        foreach (array_keys($breakpoints) as $i) {
-            $next = $i + 1;
-            if (isset($breakpoints[$next])) {
-                $directive = 'max';
-                $value = $breakpoints[$next] - 1;
+
+        //
+        //
+        // Convert numeric keys to media queries.
+        //
+        if (is_numeric(key($breakpoints))) {
+            foreach (array_keys($breakpoints) as $i) {
+                $next = $i + 1;
+                if (isset($breakpoints[$next])) {
+                    $directive = 'max';
+                    $value = $breakpoints[$next] - 1;
+                }
+                else {
+                    $directive = 'min';
+                    $value = $breakpoints[$i];
+                }
+                $px = $value === 0 ? '' : 'px';
+                $converted["({$directive}-width: {$value}{$px})"] = $breakpoints[$i];
             }
-            else {
-                $directive = 'min';
-                $value = $breakpoints[$i];
-            }
-            $px = $value === 0 ? '' : 'px';
-            $converted["({$directive}-width: {$value}{$px})"] = $breakpoints[$i];
+            $breakpoints = $converted;
         }
-        $breakpoints = $converted;
 
         $this->aliases = [];
         $sortable = [];
@@ -65,43 +72,46 @@ class BreakpointX {
             $pixels = intval($breakpoints[$alias]);
             $sortable[] = [$alias, $pixels];
         }
-        uasort($sortable, function ($a, $b) {
-            return $a[1] - $b[1];
-        });
-        foreach (array_keys($sortable) as $i) {
-            $i *= 1;
-            $minWidth = $sortable[$i][1];
-            $alias = $sortable[$i][0];
-            $this->aliases[] = $alias;
-            $maxWidth = isset($sortable[$i + 1]) ? $sortable[$i + 1][1] - 1 : null;
-            $this->breakpoints[$alias] = [$minWidth, $maxWidth];
-        }
+
+uasort($sortable, function ($a, $b) {
+    return $a[1] - $b[1];
+});
+foreach (array_keys($sortable) as $i) {
+    $i *= 1;
+    $minWidth = $sortable[$i][1];
+    $alias = $sortable[$i][0];
+    $this->aliases[] = $alias;
+    $maxWidth = isset($sortable[$i + 1]) ? $sortable[$i + 1][1] - 1 : null;
+    $this->breakpoints[$alias] = [$minWidth, $maxWidth];
+}
+}
+
+public
+function value($alias)
+{
+    return isset($this->breakpoints[$alias]) ? $this->breakpoints[$alias] : null;
+}
+
+public
+function alias($width)
+{
+    if ($width === 'first') {
+        return reset($this->aliases);
+    }
+    if ($width === 'last') {
+        return end($this->aliases);
     }
 
-    public function value($alias)
-    {
-        return isset($this->breakpoints[$alias]) ? $this->breakpoints[$alias] : null;
+    $found = null;
+    foreach (array_keys($this->breakpoints) as $alias) {
+        $bp = $this->breakpoints[$alias][0];
+        $found = $found ? $found : $alias;
+        if ($width < $bp) {
+            return $found;
+        }
+        $found = $alias;
     }
 
-    public function alias($width)
-    {
-        if ($width === 'first') {
-            return reset($this->aliases);
-        }
-        if ($width === 'last') {
-            return end($this->aliases);
-        }
-
-        $found = null;
-        foreach (array_keys($this->breakpoints) as $alias) {
-            $bp = $this->breakpoints[$alias][0];
-            $found = $found ? $found : $alias;
-            if ($width < $bp) {
-                return $found;
-            }
-            $found = $alias;
-        }
-
-        return $found;
-    }
+    return $found;
+}
 }
