@@ -1,5 +1,5 @@
 /**
- * BreakpointX ("Crossing") JavaScript Module v0.3.3
+ * BreakpointX ("Crossing") JavaScript Module v0.3.4
  * 
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
@@ -7,11 +7,11 @@
  * Copyright 2015-2017, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Mar 29 16:35:56 PDT 2017
+ * Date: Wed Mar 29 17:09:51 PDT 2017
  */
 /**
  *
- * Each breakpoint consists of a minimum width (and an alias; the alias may be created for you if you pass an array
+ * Each breakpoint setting consists of a minimum width (and an alias; the alias will be created for you if you pass an array
  * rather than an object to init()). Each viewport is the span of the breakpoint minimum width to one pixel less than
  * the next-larger breakpoint's minimum width.  The largest breakpoint has no maximum width. The first breakpoint
  * should most always be 0.
@@ -52,7 +52,7 @@
 var BreakpointX = (function ($, window) {
 
   function BreakpointX(breakpoints, settings) {
-    this.version = "0.3.3";
+    this.version = "0.3.4";
     this.settings = $.extend({}, this.options, settings);
     this.settings.breakpoints = breakpoints;
     this.current = null;
@@ -125,7 +125,10 @@ var BreakpointX = (function ($, window) {
     var self = this,
         i;
 
-    // Convert arrays to min-width objects.
+    //
+    //
+    // Convert numeric keys to media queries.
+    //
     var converted = {};
     if (breakpoints instanceof Array) {
       var directive, value, px, next;
@@ -149,7 +152,7 @@ var BreakpointX = (function ($, window) {
       throw ("Object needs format {alias: minWidth}.");
     }
 
-    // Make sure that breakpoint values are integars in pixels and listed in
+    // Make sure that breakpoint values are integers in pixels and listed in
     // ascending order; calculate the maxWidth values.
     self.aliases = [];
     var sortable = [];
