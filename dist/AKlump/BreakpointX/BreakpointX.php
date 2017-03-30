@@ -52,16 +52,14 @@ class BreakpointX {
         if (is_numeric(key($breakpoints))) {
             foreach (array_keys($breakpoints) as $i) {
                 $next = $i + 1;
+                $value = $breakpoints[$i];
+                $isLast = true;
                 if (isset($breakpoints[$next])) {
-                    $directive = 'max';
+                    $isLast = false;
                     $value = $breakpoints[$next] - 1;
                 }
-                else {
-                    $directive = 'min';
-                    $value = $breakpoints[$i];
-                }
-                $px = $value === 0 ? '' : 'px';
-                $converted["({$directive}-width: {$value}{$px})"] = $breakpoints[$i];
+                $query = $this->_query($value, $isLast);
+                $converted[$query] = $breakpoints[$i];
             }
             $breakpoints = $converted;
         }
@@ -93,16 +91,11 @@ class BreakpointX {
 
     public function query($alias)
     {
-        $last = $this->alias('last');
+        $isLast = $alias === $this->alias('last');
         $value = $this->value($alias);
-        $declaration = 'max';
-        $px = $value[1];
-        if ($alias === $last) {
-            $declaration = 'min';
-            $px = $value[0];
-        }
+        $value = $isLast ? $value[0] : $value[1];
 
-        return "({$declaration}-width: {$px}px)";
+        return $this->_query($value, $isLast);
     }
 
     public function alias($width)
@@ -125,5 +118,20 @@ class BreakpointX {
         }
 
         return $found;
+    }
+
+    /**
+     * Helper function to determine the media query by raw data.
+     *
+     * @param array $range [min, max]
+     * @param bool  $isLast
+     *
+     * @return string
+     */
+    protected function _query($value, $isLast = false)
+    {
+        $declaration = $isLast ? 'min' : 'max';
+
+        return "{$declaration}-width: {$value}px";
     }
 }
