@@ -8,6 +8,18 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+    public function testQuery()
+    {
+        $setting = array(
+            "small"  => 0,
+            "mobile" => 480,
+            "desktop"  => 768,
+        );
+        $obj = new BreakpointX($setting);
+        $this->assertSame('(max-width: 479px)', $obj->query('small'));
+        $this->assertSame('(max-width: 767px)', $obj->query('mobile'));
+        $this->assertSame('(min-width: 768px)', $obj->query('desktop'));
+    }
     public function testGop()
     {
         $setting = array(
