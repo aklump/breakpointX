@@ -1,5 +1,5 @@
 /**
- * BreakpointX ("Crossing") JavaScript Module v0.3.5
+ * BreakpointX ("Crossing") JavaScript Module v0.4
  * 
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
@@ -7,13 +7,13 @@
  * Copyright 2015-2017, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Mar 29 21:24:09 PDT 2017
+ * Date: Thu Mar 30 10:43:55 PDT 2017
  */
 /**
  *
- * Each breakpoint setting consists of a minimum width (and an alias; the alias will be created for you if you pass an array
- * rather than an object to init()). Each viewport is the span of the breakpoint minimum width to one pixel less than
- * the next-larger breakpoint's minimum width.  The largest breakpoint has no maximum width. The first breakpoint
+ * Each breakpoint setting consists of a minimum width (and an alias; the alias will be created for you if you pass an
+ * array rather than an object to init()). Each viewport is the span of the breakpoint minimum width to one pixel less
+ * than the next-larger breakpoint's minimum width.  The largest breakpoint has no maximum width. The first breakpoint
  * should most always be 0.
  *
  * Access the current viewport using this.current; but this will only work if
@@ -51,8 +51,22 @@
  */
 var BreakpointX = (function ($, window) {
 
+  /**
+   * Helper function to determine the media query by raw data.
+   *
+   * @param value
+   * @param isLast
+   * @returns {string}
+   * @private
+   */
+  function _query(value, isLast) {
+    declaration = isLast ? 'min' : 'max';
+
+    return declaration + '-width: ' + value + 'px';
+  }
+
   function BreakpointX(breakpoints, settings) {
-    this.version = "0.3.5";
+    this.version = "0.4";
     this.settings = $.extend({}, this.options, settings);
     this.settings.breakpoints = breakpoints;
     this.current = null;
@@ -131,19 +145,17 @@ var BreakpointX = (function ($, window) {
     //
     var converted = {};
     if (breakpoints instanceof Array) {
-      var directive, value, px, next;
+      var value, next;
       for (i in breakpoints) {
         next = i * 1 + 1;
+        value = breakpoints[i];
+        var isLast = true;
         if (typeof breakpoints[next] !== 'undefined') {
-          directive = 'max';
+          isLast = false;
           value = breakpoints[next] * 1 - 1;
         }
-        else {
-          directive = 'min';
-          value = breakpoints[i];
-        }
-        px = value === 0 ? '' : 'px';
-        converted['(' + directive + '-width: ' + value + px + ')'] = breakpoints[i];
+        var query = _query(value, isLast);
+        converted[query] = breakpoints[i];
       }
       breakpoints = converted;
     }
@@ -331,6 +343,14 @@ var BreakpointX = (function ($, window) {
    */
   BreakpointX.prototype.value = function (alias) {
     return typeof this.breakpoints[alias] === 'undefined' ? null : this.breakpoints[alias];
+  };
+
+  BreakpointX.prototype.query = function (alias) {
+    var isLast = alias === this.alias('last'),
+        value  = this.value(alias);
+    value = isLast ? value[0] : value[1];
+
+    return _query(value, isLast);
   };
 
   /**
