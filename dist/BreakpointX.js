@@ -7,7 +7,7 @@
  * Copyright 2015-2017, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Mar 30 10:43:55 PDT 2017
+ * Date: Sat May 13 18:36:07 PDT 2017
  */
 /**
  *
@@ -249,6 +249,15 @@ var BreakpointX = (function ($, window) {
         callbacks.push(self.actions[direction]);
       }
 
+      // Update for next round.
+      self.last = {
+        "width"    : self.value(currentAlias),
+        "alias"    : currentAlias,
+        "direction": direction
+      };
+      self.current = currentAlias;
+
+      // Fire off all callbacks.
       for (var i in callbacks) {
         var from = {
           minWidth: self.breakpoints[self.last.alias][0],
@@ -264,14 +273,6 @@ var BreakpointX = (function ($, window) {
           callbacks[i][breakpoint][j].call(self, from, to, direction);
         }
       }
-
-      // Update for next round.
-      self.last = {
-        "width"    : self.value(currentAlias),
-        "alias"    : currentAlias,
-        "direction": direction
-      };
-      self.current = currentAlias;
     }
   };
 
