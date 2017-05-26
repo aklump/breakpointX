@@ -7,7 +7,7 @@
  * Copyright 2015-2017, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sat May 13 18:36:36 PDT 2017
+ * Date: Fri May 26 15:25:55 PDT 2017
  */
 /**
  *
@@ -60,7 +60,7 @@ var BreakpointX = (function ($, window) {
    * @private
    */
   function _query(value, isLast) {
-    declaration = isLast ? 'min' : 'max';
+    var declaration = isLast ? 'min' : 'max';
 
     return declaration + '-width: ' + value + 'px';
   }
@@ -250,29 +250,30 @@ var BreakpointX = (function ($, window) {
       }
 
       // Update for next round.
-      self.last = {
-        "width"    : self.value(currentAlias),
-        "alias"    : currentAlias,
-        "direction": direction
+      var from = {
+        minWidth: self.breakpoints[self.last.alias][0],
+        maxWidth: self.breakpoints[self.last.alias][1],
+        name    : self.last.alias
+      };
+      var to = {
+        minWidth: self.breakpoints[currentAlias][0],
+        maxWidth: self.breakpoints[currentAlias][1],
+        name    : currentAlias
       };
       self.current = currentAlias;
 
       // Fire off all callbacks.
       for (var i in callbacks) {
-        var from = {
-          minWidth: self.breakpoints[self.last.alias][0],
-          maxWidth: self.breakpoints[self.last.alias][1],
-          name    : self.last.alias
-        };
-        var to = {
-          minWidth: self.breakpoints[currentAlias][0],
-          maxWidth: self.breakpoints[currentAlias][1],
-          name    : currentAlias
-        };
         for (var j in callbacks[i][breakpoint]) {
           callbacks[i][breakpoint][j].call(self, from, to, direction);
         }
       }
+
+      self.last = {
+        "width"    : self.value(currentAlias),
+        "alias"    : currentAlias,
+        "direction": direction
+      };
     }
   };
 
