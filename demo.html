@@ -14,9 +14,11 @@
       addClassesTo: 'html'
     });
     b.add('both', b.aliases, function (from, to, direction) {
-      console.log('Now you\'re in: ' + to.name);
-      console.log('Window just got ' + direction);
-      console.log(this);
+      console.log('direction', direction);
+      console.log('from', from);
+      console.log('to', to);
+      console.log('current', this.current);
+      console.log('last.alias', this.last.alias);
     });
   });
 </script>
