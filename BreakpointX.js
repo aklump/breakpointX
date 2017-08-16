@@ -1,13 +1,13 @@
 /**
- * BreakpointX ("Crossing") JavaScript Module v0.4.2
- *
+ * BreakpointX ("Crossing") JavaScript Module v0.4.3
+ * 
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
  *
  * Copyright 2015-2017, Aaron Klump <sourcecode@intheloftstudios.com>
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Fri May 26 15:27:21 PDT 2017
+ * Date: Tue Aug 15 21:36:44 PDT 2017
  */
 /**
  *
@@ -66,7 +66,7 @@ var BreakpointX = (function ($, window) {
   }
 
   function BreakpointX(breakpoints, settings) {
-    this.version = "0.4.2";
+    this.version = "0.4.3";
     this.settings = $.extend({}, this.options, settings);
     this.settings.breakpoints = breakpoints;
     this.current = null;
@@ -251,16 +251,18 @@ var BreakpointX = (function ($, window) {
       // We've just moved from self.last.alias to currentAlias so we need to get all the breakpoint aliases that we
       // have crossed.
       var breakpointsCrossed = [],
+          bp,
           from,
-          to;
+          to,
+          alias;
       if (direction === 'smaller') {
         breakpointsCrossed.push(self.last.alias);
         from = this.value(self.last.alias);
         from = from[0];
         to = this.value(currentAlias);
         to = to[1];
-        for (var alias in this.breakpoints) {
-          var bp = this.breakpoints[alias][1];
+        for (alias in this.breakpoints) {
+          bp = this.breakpoints[alias][1];
           if (to < bp && bp < from) {
             breakpointsCrossed.push(alias);
           }
@@ -272,8 +274,8 @@ var BreakpointX = (function ($, window) {
         from = from[0];
         to = this.value(self.last.alias);
         to = to[1];
-        for (var alias in this.breakpoints) {
-          var bp = this.breakpoints[alias][0];
+        for (alias in this.breakpoints) {
+          bp = this.breakpoints[alias][0];
           if (to < bp && bp < from) {
             breakpointsCrossed.push(alias);
           }
@@ -281,12 +283,12 @@ var BreakpointX = (function ($, window) {
       }
 
       // Update for next round.
-      var from = {
+      from = {
         minWidth: self.breakpoints[self.last.alias][0],
         maxWidth: self.breakpoints[self.last.alias][1],
         name: self.last.alias
       };
-      var to = {
+      to = {
         minWidth: self.breakpoints[currentAlias][0],
         maxWidth: self.breakpoints[currentAlias][1],
         name: currentAlias
