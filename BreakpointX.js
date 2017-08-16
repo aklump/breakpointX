@@ -1,6 +1,6 @@
 /**
  * BreakpointX ("Crossing") JavaScript Module v0.4.2
- * 
+ *
  *
  * Define responsive breakpoints, register callbacks when crossing, with optional css class handling.
  *
@@ -242,36 +242,70 @@ var BreakpointX = (function ($, window) {
         currentAlias = self.alias(width),
         crossed      = currentAlias !== self.last.alias;
     if (crossed || force) {
-      var direction  = crossed ? (width > self.last.width[0] ? 'bigger' : 'smaller') : null,
-          breakpoint = direction === 'smaller' ? self.last.alias : currentAlias,
-          callbacks  = [self.actions.both];
+      var direction = crossed ? (width > self.last.width[0] ? 'bigger' : 'smaller') : null,
+          callbacks = [self.actions.both];
       if (direction) {
         callbacks.push(self.actions[direction]);
+      }
+
+      // We've just moved from self.last.alias to currentAlias so we need to get all the breakpoint aliases that we
+      // have crossed.
+      var breakpointsCrossed = [],
+          from,
+          to;
+      if (direction === 'smaller') {
+        breakpointsCrossed.push(self.last.alias);
+        from = this.value(self.last.alias);
+        from = from[0];
+        to = this.value(currentAlias);
+        to = to[1];
+        for (var alias in this.breakpoints) {
+          var bp = this.breakpoints[alias][1];
+          if (to < bp && bp < from) {
+            breakpointsCrossed.push(alias);
+          }
+        }
+      }
+      else {
+        breakpointsCrossed.push(currentAlias);
+        from = this.value(currentAlias);
+        from = from[0];
+        to = this.value(self.last.alias);
+        to = to[1];
+        for (var alias in this.breakpoints) {
+          var bp = this.breakpoints[alias][0];
+          if (to < bp && bp < from) {
+            breakpointsCrossed.push(alias);
+          }
+        }
       }
 
       // Update for next round.
       var from = {
         minWidth: self.breakpoints[self.last.alias][0],
         maxWidth: self.breakpoints[self.last.alias][1],
-        name    : self.last.alias
+        name: self.last.alias
       };
       var to = {
         minWidth: self.breakpoints[currentAlias][0],
         maxWidth: self.breakpoints[currentAlias][1],
-        name    : currentAlias
+        name: currentAlias
       };
       self.current = currentAlias;
 
       // Fire off all callbacks.
-      for (var i in callbacks) {
-        for (var j in callbacks[i][breakpoint]) {
-          callbacks[i][breakpoint][j].call(self, from, to, direction);
+      for (var k in breakpointsCrossed) {
+        var breakpoint = breakpointsCrossed[k];
+        for (var i in callbacks) {
+          for (var j in callbacks[i][breakpoint]) {
+            callbacks[i][breakpoint][j].call(self, from, to, direction);
+          }
         }
       }
 
       self.last = {
-        "width"    : self.value(currentAlias),
-        "alias"    : currentAlias,
+        "width": self.value(currentAlias),
+        "alias": currentAlias,
         "direction": direction
       };
     }
@@ -284,9 +318,9 @@ var BreakpointX = (function ($, window) {
    */
   BreakpointX.prototype.reset = function () {
     this.actions = {
-      "bigger" : [],
+      "bigger": [],
       "smaller": [],
-      "both"   : []
+      "both": []
     };
     this.last = {"width": null, "alias": null, "direction": null};
 
