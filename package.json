@@ -1,10 +1,10 @@
 {
-  "name": "aklump/breakpointx",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "private": true,
-  "devDependencies": {
-    "uglify-js": "^3.4.9"
-  }
+    "name": "BreakpointX",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "private": true,
+    "devDependencies": {
+        "uglify-js": "^3.4.9"
+    }
 }

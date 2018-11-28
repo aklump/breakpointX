@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AKlump\BreakpointX;
 
 /**
@@ -82,10 +81,26 @@ class BreakpointX {
     }
   }
 
+  /**
+   * Return the pixel value of a breakpoint alias.
+   *
+   * @param  {string} alias E.g. 'large'
+   *
+   * @return {array} [min, max]
+   */
   public function value($alias) {
     return isset($this->breakpoints[$alias]) ? $this->breakpoints[$alias] : NULL;
   }
 
+  /**
+   * Return the media query string for an alias.
+   *
+   * @param string alias
+   *   The alias name
+   *
+   * @return string
+   *   The media query string, e.g. 'min-width: 769px'.
+   */
   public function query($alias) {
     $isLast = $alias === $this->alias('last');
     $value = $this->value($alias);
@@ -94,6 +109,22 @@ class BreakpointX {
     return $this->_query($value, $isLast);
   }
 
+  /**
+   * Return the alias of a pixel width.
+   *
+   * Special width keys are:
+   *   - 'first' Returns the alias of the smallest breakpoint.
+   *   - 'last' Returns the alias of the widest breakpoint.
+   *
+   * Any pixel value within a viewport will yield the same alias, e.g.
+   * 750, 760, 768 would all yield "tablet" if "tablet" was set up with 768
+   * as the width.
+   *
+   * Be aware that a value larger than the highest defined breakpoint will
+   * still return the hightest defined breakpoint alias.
+   *
+   * @return string
+   */
   public function alias($width) {
     if ($width === 'first') {
       return reset($this->aliases);
@@ -118,7 +149,8 @@ class BreakpointX {
   /**
    * Helper function to determine the media query by raw data.
    *
-   * @param array $range [min, max]
+   * @param array $value
+   *   The array should contain [min, max].
    * @param bool $isLast
    *
    * @return string
