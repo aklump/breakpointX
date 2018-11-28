@@ -1,6 +1,6 @@
 /**
  * @aklump/breakpointx jQuery Plugin v0.4.8
- * https://github.com/aklump/breakpointX
+ * https://github.com/aklump/breakpointX#readme
  *
  * Define responsive breakpoints, register callbacks when crossing, with
  * optional css class handling.
@@ -9,7 +9,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Wed Nov 28 15:11:04 PST 2018
+ * Date: Wed Nov 28 15:22:16 PST 2018
  */
 /**
  *

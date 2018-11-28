@@ -2,7 +2,7 @@
     "name": "@aklump/breakpointx",
     "version": "0.4.8",
     "description": "Define responsive breakpoints, register callbacks when crossing, with optional css class handling.",
-    "main": "dist/BreakpointX.min.js",
+    "main": "BreakpointX.min.js",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/aklump/breakpointX.git"

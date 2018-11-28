@@ -1,0 +1,8 @@
+/.web_package
+/vendor
+/.idea
+/demo*
+/tests
+composer*
+/yarn.lock
+phpunit*
