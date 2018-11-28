@@ -1,5 +1,5 @@
 /**
- * BreakpointX ("Crossing") JavaScript Module v0.4.5
+ * BreakpointX ("Crossing") jQuery Plugin v0.4.5
  * https://github.com/aklump/breakpointx
  *
  * Define responsive breakpoints, register callbacks when crossing, with
@@ -9,7 +9,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Nov 28 13:03:28 PST 2018
+ * Date: Wed Nov 28 13:17:46 PST 2018
  */
 /**
  *

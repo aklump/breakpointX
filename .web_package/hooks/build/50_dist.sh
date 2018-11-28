@@ -18,3 +18,4 @@ cp "$7/BreakpointX.min.js" "$7/dist/"
 cp "$7/BreakpointX.php" "$7/dist/"
 cp "$7/version.yml" "$7/dist/"
 
+cd "$7" && git add .
