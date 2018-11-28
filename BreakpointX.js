@@ -1,5 +1,5 @@
 /**
- * BreakpointX ("Crossing") jQuery Plugin v0.4.7
+ * BreakpointX ("Crossing") jQuery Plugin v0.4.8
  * https://github.com/aklump/breakpointx
  *
  * Define responsive breakpoints, register callbacks when crossing, with
@@ -9,7 +9,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Nov 28 13:21:22 PST 2018
+ * Date: Wed Nov 28 13:46:08 PST 2018
  */
 /**
  *
@@ -70,7 +70,7 @@ var BreakpointX = (function($, window) {
   }
 
   function BreakpointX(breakpoints, settings) {
-    this.version = '0.4.7';
+    this.version = '0.4.8';
     this.settings = $.extend({}, this.options, settings);
     this.settings.breakpoints = breakpoints;
     this.current = null;

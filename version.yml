@@ -1,5 +1,5 @@
 name: 'BreakpointX ("Crossing")'
 description: 'Define responsive breakpoints, register callbacks when crossing, with optional css class handling.'
-version: 0.4.7
+version: 0.4.8
 author: 'Aaron Klump <sourcecode@intheloftstudios.com>'
 homepage: 'https://github.com/aklump/breakpointx'

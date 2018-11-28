@@ -1,0 +1,3 @@
+## 0.4.6
+
+The path the to the PHP has changed; you may need to update your autoloaders.  Change `lib/breakpointx/dist/AKlump/BreakpointX` to `lib/breakpointx/dist`.
