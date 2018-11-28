@@ -1,9 +1,7 @@
 .web_package
 !.web_package/hooks
 !.web_package/config
-/bower_components
-s/jquery/dist
-.idea
-bower_components
+bower_components/
 /tests/phpunit/build
-/vendor/
+vendor/
+node_modules/
