@@ -55,9 +55,8 @@ $comment_lines_replace = explode(PHP_EOL, $matches[0][0]);
 // Target each comment line based on convention
 js_replace_name_version($comment_lines_replace[1], $package_name, $new_version);
 js_replace_homepage($comment_lines_replace[2], $homepage);
-js_replace_description($comment_lines_replace[4], $description);
-js_replace_copyright($comment_lines_replace[6], $author);
-js_replace_date($comment_lines_replace[10], $date);
+js_replace_copyright($comment_lines_replace[7], $author);
+js_replace_date($comment_lines_replace[11], $date);
 
 // Replace the old comment block with new one.
 $replace  = implode(PHP_EOL, $comment_lines_replace);
