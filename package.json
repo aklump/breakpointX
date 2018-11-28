@@ -1,9 +1,24 @@
 {
-    "name": "BreakpointX",
-    "version": "1.0.0",
-    "main": "index.js",
-    "license": "MIT",
-    "private": true,
+    "name": "@aklump/breakpointx",
+    "version": "0.4.8",
+    "description": "Define responsive breakpoints, register callbacks when crossing, with optional css class handling.",
+    "main": "dist/BreakpointX.min.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/aklump/breakpointX.git"
+    },
+    "keywords": [
+        "responsive",
+        "breakpoints",
+        "mobile-first",
+        "adaptive"
+    ],
+    "author": "Aaron Klump <sourcecode@intheloftstudios.com>",
+    "license": "MIT OR GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/aklump/breakpointX/issues"
+    },
+    "homepage": "https://github.com/aklump/breakpointX#readme",
     "devDependencies": {
         "uglify-js": "^3.4.9"
     }

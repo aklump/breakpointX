@@ -7,4 +7,4 @@ push_tags = auto
 push_master = auto
 push_develop = no
 patch_prefix = .
-info_file = version.yml
+info_file = package.json
