@@ -8,6 +8,21 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+  public function testSortingOrderWorksCorrectly() {
+    $setting = [
+      "desktop--wide" => '1081',
+      "desktop" => '769',
+      "desktop--medium" => '961',
+    ];
+    $obj = new BreakpointX($setting);
+    $this->assertSame(769, $obj->breakpoints['desktop'][0]);
+    $this->assertSame(960, $obj->breakpoints['desktop'][1]);
+    $this->assertSame(961, $obj->breakpoints['desktop--medium'][0]);
+    $this->assertSame(1080, $obj->breakpoints['desktop--medium'][1]);
+    $this->assertSame(1081, $obj->breakpoints['desktop--wide'][0]);
+    $this->assertSame(null, $obj->breakpoints['desktop--wide'][1]);
+  }
+
   public function testQuery() {
     $setting = array(
       "small" => 0,

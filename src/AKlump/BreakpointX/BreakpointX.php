@@ -69,7 +69,7 @@ class BreakpointX {
       $sortable[] = [$alias, $pixels];
     }
 
-    uasort($sortable, function ($a, $b) {
+    usort($sortable, function ($a, $b) {
       return $a[1] - $b[1];
     });
     foreach (array_keys($sortable) as $i) {
