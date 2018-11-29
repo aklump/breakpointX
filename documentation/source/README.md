@@ -10,7 +10,7 @@ This project provides a means to define horizontal breakpoints, which will fire 
 
 ## Quick Start
 
-Install using `yarn add @aklump/breakpointx` or `npm install @aklump/breakpointx`
+Install using `yarn add @aklump/breakpointx` or `npm i @aklump/breakpointx`
 
 ## Contributing
 
