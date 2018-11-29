@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Breakpoint X (Crossing)</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--readme">
+<header>
+  <div class="pager">
+  <a href="CHANGELOG.html" class="prev CHANGELOG">&laquo;CHANGELOG</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="index.html" class="next index">Index&raquo;</a>
+</div>
+</header>
+
+  <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+
+  <h1>Breakpoint X (Crossing)</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<section>
+
+<p><img src="images/breakpoint-x.jpg" alt="Breakpoint X" /></p>
+
+<h2>Summary</h2>
+
+<p>This project provides a means to define horizontal breakpoints, which will fire JS callbacks when the browser width crosses said breakpoints.  It also allows for CSS classes to be applied to designated elements which reflect the current breakpoint.  It can be used when you need to do anything in Javascript based on window resizing.  The server-side component is useful if you're using a PHP-based CMS for coordinating breakpoints.</p>
+
+<h2>Quick Start</h2>
+
+<p>Install using <code>yarn add @aklump/breakpointx</code> or <code>npm install @aklump/breakpointx</code></p>
+
+<h2>Contributing</h2>
+
+<p>If you find this project useful... please consider <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=4E5KZHDQCEUV8&amp;item_name=Gratitude%20for%20aklump%2Fbreakpoint_x">making a donation</a>.</p>
+
+<h2>Usage</h2>
+
+<h3>Create a new instance, define breakpoints</h3>
+
+<pre><code>// Register three breakpoints that indicate these sections on the horizontal axis:
+// - 0px - 239px
+// - 240px - 767px
+// - 768px +
+var bp = new BreakpointX([0, 240, 768]);
+</code></pre>
+
+<h3>Find the breakpoint by a horizontal, x value.</h3>
+
+<pre><code>var alias = bp.alias(240);
+// alias === '(max-width: 767px)';
+
+var alias = bp.alias(200);
+// alias === '(max-width: 239px)';
+
+var alias = bp.alias(300);
+// alias === '(max-width: 767px)';
+
+var alias = bp.alias(1080);
+// alias === '(min-width: 768px)';
+</code></pre>
+
+<h3>Register a callback to fire</h3>
+
+<pre><code>// When the window crosses 768 getting smaller
+bp.add('smaller', ['(max-width: 767px)'], function () {
+  console.log('Now you\'re in (max-width: 767px)!');
+});
+
+// When the window crosses 768 getting bigger
+bp.add('bigger', ['(max-width: 767px)'], function () {
+  console.log('Now you\'re in (max-width: 767px)!');
+});
+
+// When the window crosses any breakpoint in either direction
+bp.add('both', bp.aliases, function (from, to, direction) {
+  console.log('Now you\'re in: ' + to.name);
+  console.log('Window just got ' + direction);
+});
+</code></pre>
+
+<h3>Alternative: Create a new instance with named aliases</h3>
+
+<pre><code>var bp = new BreakpointX([{small: 0, medium: 240, large: 768}]);
+</code></pre>
+
+<h3>Add a class to an element reflecting the current breakpoint</h3>
+
+<pre><code>var bp = new BreakpointX([{mobile: 0, desktop: 768}], {
+  addClassesTo: 'body'
+});
+</code></pre>
+
+<p>The body element will look like this when the browser gets larger and crosses 768px.</p>
+
+<pre><code>&lt;body class="bpx-desktop bpx-bigger"&gt;
+</code></pre>
+
+<h3>PHP</h3>
+
+<p>For PHP usage the namespace <code>AKlump\\BreakpointX</code> should map to <em>node_modules/@aklump/breakpointx/</em>.  Here's an example for <em>composer.json</em>.</p>
+
+<pre><code>{
+    "autoload": {
+        "psr-4": {
+            "AKlump\\BreakpointX\\": "node_modules/@aklump/breakpointx"
+        }
+    }
+}
+</code></pre>
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager">
+  <a href="CHANGELOG.html" class="prev CHANGELOG">&laquo;CHANGELOG</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="index.html" class="next index">Index&raquo;</a>
+</div>
+  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 0.4.9 &bull; Last Updated: Wed, 28 Nov 2018 18:00:31 -0800</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>
+

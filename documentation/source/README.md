@@ -1,6 +1,6 @@
 # Breakpoint X (Crossing)
 
-![Breakpoint X](docs/images/breakpoint-x.jpg)
+![Breakpoint X](images/breakpoint-x.jpg)
 
 ## Summary
 
