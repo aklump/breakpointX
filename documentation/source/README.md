@@ -12,6 +12,10 @@ This project provides a means to define horizontal breakpoints, which will fire 
 
 Install using `yarn add @aklump/breakpointx` or `npm i @aklump/breakpointx`
 
+## Requirements
+
+* jQuery >= 1.4
+
 ## Contributing
 
 If you find this project useful... please consider [making a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4E5KZHDQCEUV8&item_name=Gratitude%20for%20aklump%2Fbreakpoint_x).
