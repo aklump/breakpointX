@@ -6,3 +6,4 @@
 composer*
 /yarn.lock
 phpunit*
+/documentation

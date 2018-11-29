@@ -6,6 +6,8 @@
 
 This project provides a means to define horizontal breakpoints, which will fire JS callbacks when the browser width crosses said breakpoints.  It also allows for CSS classes to be applied to designated elements which reflect the current breakpoint.  It can be used when you need to do anything in Javascript based on window resizing.  The server-side component is useful if you're using a PHP-based CMS for coordinating breakpoints.
 
+**Visit <https://aklump.github.io/breakpointX/> for full documentation.**
+
 ## Quick Start
 
 Install using `yarn add @aklump/breakpointx` or `npm install @aklump/breakpointx`
