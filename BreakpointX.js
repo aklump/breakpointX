@@ -441,3 +441,6 @@ var BreakpointX = (function($, window) {
 
   return BreakpointX;
 })(jQuery, window);
+if (typeof module === 'object' && module.exports) {
+  module.exports = BreakpointX;
+}
