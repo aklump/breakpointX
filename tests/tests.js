@@ -16,11 +16,17 @@ var obj = {};
 // Build your tests below here...
 //
 
+QUnit.test("Assert alias(last) works.", function (assert) {
+  var bp = new BreakpointX([0,480,768,1080]);
+  assert.strictEqual(bp.alias('first'), 'max-width:479px');
+  assert.strictEqual(bp.alias('last'), 'min-width:1080px');
+});
+
 QUnit.test("test query method", function (assert) {
   var bp = new BreakpointX({"small": 0, "mobile": 480, "desktop": 768});
-  assert.strictEqual('max-width: 479px', bp.query('small'));
-  assert.strictEqual('max-width: 767px', bp.query('mobile'));
-  assert.strictEqual('min-width: 768px', bp.query('desktop'));
+  assert.strictEqual(bp.query('small'), 'max-width:479px');
+  assert.strictEqual(bp.query('mobile'), '(min-width:480px) and (max-width:767px)');
+  assert.strictEqual(bp.query('desktop'), 'min-width:768px');
 });
 
 QUnit.test("Assert named aliases appear as obj.aliases.", function(assert) {
@@ -29,31 +35,23 @@ QUnit.test("Assert named aliases appear as obj.aliases.", function(assert) {
   assert.strictEqual('desktop', bp.aliases[1]);
 });
 
-QUnit.test("Assert alias(last) works.", function (assert) {
-  var bp = new BreakpointX([0,480,768,1080]);
-  assert.strictEqual(bp.alias('first'), 'max-width: 479px');
-  assert.strictEqual(bp.alias('last'), 'min-width: 1080px');
-});
-
-
 QUnit.test("Assert that breakpoints as an array of values works.", function (assert) {
   var bp = new BreakpointX([0,480,768,1080]);
-  assert.deepEqual(bp.aliases, ['max-width: 479px','max-width: 767px','max-width: 1079px','min-width: 1080px']);
-  assert.strictEqual(bp.alias(0), 'max-width: 479px');
-  assert.strictEqual(bp.alias(100), 'max-width: 479px');
-  assert.strictEqual(bp.alias(320), 'max-width: 479px');
-  assert.strictEqual(bp.alias(479), 'max-width: 479px');
+  assert.deepEqual(bp.aliases, ['max-width:479px','(min-width:480px) and (max-width:767px)','(min-width:768px) and (max-width:1079px)','min-width:1080px']);
+  assert.strictEqual(bp.alias(0), 'max-width:479px');
+  assert.strictEqual(bp.alias(100), 'max-width:479px');
+  assert.strictEqual(bp.alias(320), 'max-width:479px');
+  assert.strictEqual(bp.alias(479), 'max-width:479px');
 
-  assert.strictEqual(bp.alias(480), 'max-width: 767px');
-  assert.strictEqual(bp.alias(500), 'max-width: 767px');
-  assert.strictEqual(bp.alias(600), 'max-width: 767px');
-  assert.strictEqual(bp.alias(767), 'max-width: 767px');
+  assert.strictEqual(bp.alias(480), '(min-width:480px) and (max-width:767px)');
+  assert.strictEqual(bp.alias(500), '(min-width:480px) and (max-width:767px)');
+  assert.strictEqual(bp.alias(600), '(min-width:480px) and (max-width:767px)');
+  assert.strictEqual(bp.alias(767), '(min-width:480px) and (max-width:767px)');
 
+  assert.strictEqual(bp.alias(768), '(min-width:768px) and (max-width:1079px)');
 
-  assert.strictEqual(bp.alias(768), 'max-width: 1079px');
-
-  assert.strictEqual(bp.alias(1080), 'min-width: 1080px');
-  assert.strictEqual(bp.alias(2560), 'min-width: 1080px');
+  assert.strictEqual(bp.alias(1080), 'min-width:1080px');
+  assert.strictEqual(bp.alias(2560), 'min-width:1080px');
 });
 
 QUnit.test("Assert classes are not added to the html tag when options set.", function(assert) {
@@ -80,8 +78,8 @@ QUnit.test("Assert instantiation without callbacks still shows this.current and 
 
 QUnit.test("Assert instantiation without args throws error.", function(assert) {
   assert.throws(function () {
-    var bp = new BreakpointX();  
-  });  
+    var bp = new BreakpointX();
+  });
 });
 
 QUnit.test("Assert breakpoints out of order are put into asc order.", function(assert) {
@@ -102,7 +100,7 @@ QUnit.test("Assert breakpoints out of order are put into asc order.", function(a
 
 QUnit.test("Assert two breakpoints with string values works.", function(assert) {
   var bp = new BreakpointX({"mobile": "0px", "desktop": "769px"});
-  
+
   assert.strictEqual(bp.alias(320), 'mobile');
   assert.strictEqual(bp.alias(768), 'mobile');
   assert.strictEqual(bp.alias(769), 'desktop');
@@ -125,7 +123,7 @@ QUnit.test("Assert alias method works.", function(assert) {
 
 QUnit.test("Assert two breakpoints alias works.", function(assert) {
   var bp = new BreakpointX({"mobile": 0, "desktop": 769});
-  
+
   assert.strictEqual(bp.alias(320), 'mobile');
   assert.strictEqual(bp.alias(768), 'mobile');
   assert.strictEqual(bp.alias(769), 'desktop');
@@ -229,7 +227,7 @@ QUnit.test("Able to instantiate and find version.", function(assert) {
 QUnit.testStart(function (details) {
   // Create a new DOM element #test, cloned from #template.
   $('#test').replaceWith(QUnit.storage.$template.clone().attr('id', 'test'));
-  
+
   // Create a new breakpointX to be used in each test.
   obj = new BreakpointX(breakpoints);
 });

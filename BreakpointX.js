@@ -58,15 +58,22 @@ var BreakpointX = (function($, window) {
   /**
    * Helper function to determine the media query by raw data.
    *
-   * @param value
-   * @param isLast
+   * @param int lower_breakpoint The lower breakpoint value.
+   * @param int upper_breakpoint The upper breakpoint value.
    * @returns {string}
    * @private
    */
-  function _query(value, isLast) {
-    var declaration = isLast ? 'min' : 'max';
+  function _query(lower_breakpoint, upper_breakpoint) {
+    if (null !== upper_breakpoint) {
+      --upper_breakpoint;
+    }
+    if (lower_breakpoint == 0) {
+      return 'max-width:' + upper_breakpoint + 'px';
+    } else if (null === upper_breakpoint) {
+      return 'min-width:' + lower_breakpoint + 'px';
+    }
 
-    return declaration + '-width: ' + value + 'px';
+    return '(min-width:' + lower_breakpoint + 'px) and (max-width:' + upper_breakpoint + 'px)';
   }
 
   function BreakpointX(breakpoints, settings) {
@@ -143,7 +150,6 @@ var BreakpointX = (function($, window) {
   BreakpointX.prototype.init = function(breakpoints) {
     var self = this,
       i;
-
     //
     //
     // Convert numeric keys to media queries.
@@ -153,13 +159,10 @@ var BreakpointX = (function($, window) {
       var value, next;
       for (i in breakpoints) {
         next = i * 1 + 1;
-        value = breakpoints[i];
-        var isLast = true;
-        if (typeof breakpoints[next] !== 'undefined') {
-          isLast = false;
-          value = breakpoints[next] * 1 - 1;
-        }
-        var query = _query(value, isLast);
+        var query = _query(
+          breakpoints[i],
+          typeof breakpoints[next] !== 'undefined' ? breakpoints[next] * 1 : null
+        );
         converted[query] = breakpoints[i];
       }
       breakpoints = converted;
@@ -397,11 +400,10 @@ var BreakpointX = (function($, window) {
    *   The media query string, e.g. 'min-width: 769px'.
    */
   BreakpointX.prototype.query = function(alias) {
-    var isLast = alias === this.alias('last'),
-      value = this.value(alias);
-    value = isLast ? value[0] : value[1];
-
-    return _query(value, isLast);
+    var value = this.value(alias),
+      lower_breakpoint = value[0],
+      upper_breakpoint = value[1] ? ++value[1] : null;
+    return _query(lower_breakpoint, upper_breakpoint);
   };
 
   /**
@@ -441,6 +443,7 @@ var BreakpointX = (function($, window) {
 
   return BreakpointX;
 })(jQuery, window);
+
 if (typeof module === 'object' && module.exports) {
   module.exports = BreakpointX;
 }

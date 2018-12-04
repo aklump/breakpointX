@@ -40,6 +40,7 @@ class BreakpointX {
   }
 
   public function init($breakpoints) {
+    asort($breakpoints);
     $this->settings['breakpoints'] = $breakpoints;
 
     //
@@ -48,14 +49,11 @@ class BreakpointX {
     //
     if (is_numeric(key($breakpoints))) {
       foreach (array_keys($breakpoints) as $i) {
-        $next = $i + 1;
-        $value = $breakpoints[$i];
-        $isLast = TRUE;
-        if (isset($breakpoints[$next])) {
-          $isLast = FALSE;
-          $value = $breakpoints[$next] - 1;
-        }
-        $query = $this->_query($value, $isLast);
+        $next_bp_index = $i + 1;
+        $query = $this->_query(
+          $breakpoints[$i],
+          (isset($breakpoints[$next_bp_index]) ? $breakpoints[$next_bp_index] : NULL)
+        );
         $converted[$query] = $breakpoints[$i];
       }
       $breakpoints = $converted;
@@ -102,11 +100,10 @@ class BreakpointX {
    *   The media query string, e.g. 'min-width: 769px'.
    */
   public function query($alias) {
-    $isLast = $alias === $this->alias('last');
-    $value = $this->value($alias);
-    $value = $isLast ? $value[0] : $value[1];
+    list($lower_breakpoint, $upper_breakpoint) = $this->value($alias);
+    $upper_breakpoint = is_null($upper_breakpoint) ? NULL : ++$upper_breakpoint;
 
-    return $this->_query($value, $isLast);
+    return $this->_query($lower_breakpoint, $upper_breakpoint);
   }
 
   /**
@@ -149,15 +146,22 @@ class BreakpointX {
   /**
    * Helper function to determine the media query by raw data.
    *
-   * @param array $value
-   *   The array should contain [min, max].
-   * @param bool $isLast
+   * @param array $lower_breakpoint
+   *   The x of the smaller breakpoint.
+   * @param array $upper_breakpoint
+   *   The x value of the higher breakpoint or null if there is none.
    *
    * @return string
    */
-  protected function _query($value, $isLast = FALSE) {
-    $declaration = $isLast ? 'min' : 'max';
+  protected function _query($lower_breakpoint, $upper_breakpoint = NULL) {
+    !is_null($upper_breakpoint) && --$upper_breakpoint;
+    if ($lower_breakpoint == 0) {
+      return "max-width:{$upper_breakpoint}px";
+    }
+    elseif (is_null($upper_breakpoint)) {
+      return "min-width:{$lower_breakpoint}px";
+    }
 
-    return "{$declaration}-width: {$value}px";
+    return "(min-width:{$lower_breakpoint}px) and (max-width:{$upper_breakpoint}px)";
   }
 }

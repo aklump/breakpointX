@@ -8,6 +8,18 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+  public function testQuery() {
+    $setting = array(
+      "small" => 0,
+      "mobile" => 480,
+      "desktop" => 768,
+    );
+    $obj = new BreakpointX($setting);
+    $this->assertSame('max-width:479px', $obj->query('small'));
+    $this->assertSame('(min-width:480px) and (max-width:767px)', $obj->query('mobile'));
+    $this->assertSame('min-width:768px', $obj->query('desktop'));
+  }
+
   public function testSortingOrderWorksCorrectly() {
     $setting = [
       "desktop--wide" => '1081',
@@ -21,18 +33,6 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame(1080, $obj->breakpoints['desktop--medium'][1]);
     $this->assertSame(1081, $obj->breakpoints['desktop--wide'][0]);
     $this->assertSame(null, $obj->breakpoints['desktop--wide'][1]);
-  }
-
-  public function testQuery() {
-    $setting = array(
-      "small" => 0,
-      "mobile" => 480,
-      "desktop" => 768,
-    );
-    $obj = new BreakpointX($setting);
-    $this->assertSame('max-width: 479px', $obj->query('small'));
-    $this->assertSame('max-width: 767px', $obj->query('mobile'));
-    $this->assertSame('min-width: 768px', $obj->query('desktop'));
   }
 
   public function testGop() {
@@ -53,11 +53,11 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testFirst() {
-    $this->assertSame("max-width: 479px", $this->obj->alias('first'));
+    $this->assertSame("max-width:479px", $this->obj->alias('first'));
   }
 
   public function testLast() {
-    $this->assertSame("min-width: 768px", $this->obj->alias('last'));
+    $this->assertSame("min-width:768px", $this->obj->alias('last'));
   }
 
   /**
@@ -65,9 +65,9 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
    */
   function DataForTestValueProvider() {
     $tests = array();
-    $tests[] = array([0, 479], "max-width: 479px", [100, 320]);
-    $tests[] = array([480, 767], "max-width: 767px", [500, 600]);
-    $tests[] = array([768, NULL], "min-width: 768px", [800, 2560]);
+    $tests[] = array([0, 479], "max-width:479px", [100, 320]);
+    $tests[] = array([480, 767], "(min-width:480px) and (max-width:767px)", [500, 600]);
+    $tests[] = array([768, NULL], "min-width:768px", [800, 2560]);
 
     return $tests;
   }
@@ -91,9 +91,9 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
   public function testConstruct() {
     $control = [
-      "max-width: 479px" => [0, 479],
-      "max-width: 767px" => [480, 767],
-      "min-width: 768px" => [768, NULL],
+      "max-width:479px" => [0, 479],
+      "(min-width:480px) and (max-width:767px)" => [480, 767],
+      "min-width:768px" => [768, NULL],
     ];
     $this->assertSame($control, $this->obj->breakpoints);
     $this->assertSame(array_keys($control), $this->obj->aliases);
