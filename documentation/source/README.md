@@ -6,6 +6,8 @@
 
 This project provides a means to define horizontal breakpoints, which will fire JS callbacks when the browser width crosses said breakpoints.  It also allows for CSS classes to be applied to designated elements which reflect the current breakpoint.  It can be used when you need to do anything in Javascript based on window resizing.  The server-side component is useful if you're using a PHP-based CMS for coordinating breakpoints.
 
+A breakpoint is defined as a single point along the horizontal axis.  Breakpoints themselves do not have width, but the span between two breakpoints has width.  Given a single breakpoint at 768px, the horizontal axis is broken into two spans: _0 to 767_ and _768 to infinity_.  The first span has a width of 767 pixels and the second has a width of infinity.
+
 **Visit <https://aklump.github.io/breakpointX/> for full documentation.**
 
 ## Quick Start
@@ -24,7 +26,7 @@ If you find this project useful... please consider [making a donation](https://w
 
 ### Create a new instance, define breakpoints
 
-    // Register three breakpoints that indicate these sections on the horizontal axis:
+    // Register three breakpoints that indicate these spans along the horizontal axis:
     // - 0px - 239px
     // - 240px - 767px
     // - 768px +
@@ -33,27 +35,27 @@ If you find this project useful... please consider [making a donation](https://w
 ### Find the breakpoint by a horizontal, x value.
 
     var alias = bp.alias(240);
-    // alias === '(max-width: 767px)';
+    // alias === '(min-width:240px) and (max-width: 767px)';
 
     var alias = bp.alias(200);
-    // alias === '(max-width: 239px)';
+    // alias === 'max-width: 239px';
 
     var alias = bp.alias(300);
-    // alias === '(max-width: 767px)';
+    // alias === '(min-width:240px) and (max-width: 767px)';
 
     var alias = bp.alias(1080);
-    // alias === '(min-width: 768px)';
+    // alias === 'min-width: 768px';
 
 ### Register a callback to fire
 
     // When the window crosses 768 getting smaller
-    bp.add('smaller', ['(max-width: 767px)'], function () {
-      console.log('Now you\'re in (max-width: 767px)!');
+    bp.add('smaller', ['(min-width:240px) and (max-width: 767px)'], function () {
+      console.log('Now you\'re in (min-width:240px) and (max-width: 767px)!');
     });
 
     // When the window crosses 768 getting bigger
-    bp.add('bigger', ['(max-width: 767px)'], function () {
-      console.log('Now you\'re in (max-width: 767px)!');
+    bp.add('bigger', ['(min-width:240px) and (max-width: 767px)'], function () {
+      console.log('Now you\'re in (min-width:240px) and (max-width: 767px)!');
     });
 
     // When the window crosses any breakpoint in either direction
@@ -61,7 +63,6 @@ If you find this project useful... please consider [making a donation](https://w
       console.log('Now you\'re in: ' + to.name);
       console.log('Window just got ' + direction);
     });
-
 
 ### Alternative: Create a new instance with named aliases
 

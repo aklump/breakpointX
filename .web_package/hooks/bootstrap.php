@@ -1,0 +1,2 @@
+<?php
+$build->setDistributionDir('dist');

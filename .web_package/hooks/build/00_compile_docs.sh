@@ -2,9 +2,9 @@
 #
 # @file Compiles Loft Docs.
 #
-! test -d "$7/docs" || rm -rf "$7/docs" || exit 1
-cd "$7/documentation/" && ./core/compile.sh || exit 1
-test -f "$7/docs/index.html" || exit 1
+! test -d "$7/docs" || rm -rf "$7/docs" || hook_exception
+cd "$7/documentation/" && ./core/compile.sh || hook_exception
+test -f "$7/docs/index.html" || hook_exception
 
 # Auto commit the files generated as output.
 git=$(type git >/dev/null 2>&1 && which git)
@@ -20,5 +20,3 @@ basename="breakpoint-x"
 basename=${basename/-/\\-}
 basename=${basename/./\\.}
 eval "sed -i '' 's/(images\/$basename\.jpg)/(docs\/images\/$basename\.jpg)/g' \"$7/README.md\""
-
-exit 0
