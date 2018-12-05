@@ -1,9 +1,9 @@
 {
     "name": "@aklump\/breakpointx",
     "title": "Breakpoint X (Crossing)",
-    "version": "0.4.13",
+    "version": "0.4.14",
     "description": "Define responsive breakpoints, register callbacks when crossing, with optional css class handling.",
-    "main": "./dist/BreakpointX.js",
+    "main": ".\/dist\/BreakpointX.js",
     "repository": {
         "type": "git",
         "url": "git+https:\/\/github.com\/aklump\/breakpointX.git"
