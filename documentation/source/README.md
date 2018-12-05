@@ -80,12 +80,12 @@ The body element will look like this when the browser gets larger and crosses 76
 
 ### PHP
 
-For PHP usage the namespace `AKlump\\BreakpointX` should map to _node_modules/@aklump/breakpointx/_.  Here's an example for _composer.json_.
+For PHP usage the namespace `AKlump\\BreakpointX` should map to _node_modules/@aklump/breakpointx/dist_.  Here's an example for _composer.json_.
 
     {
         "autoload": {
             "psr-4": {
-                "AKlump\\BreakpointX\\": "node_modules/@aklump/breakpointx"
+                "AKlump\\BreakpointX\\": "node_modules/@aklump/breakpointx/dist"
             }
         }
     }

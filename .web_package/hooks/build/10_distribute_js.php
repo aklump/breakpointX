@@ -11,6 +11,9 @@ $build
   ->loadFile('src/BreakpointX.js')
   ->replaceTokens()
   ->saveToDist()
+  ->loadFile('src/BreakpointX.php')
+  ->replaceTokens()
+  ->saveToDist()
   ->minifyFile('dist/BreakpointX.js')
   ->addFilesToScm(["dist"])
   ->displayMessages();
