@@ -8,8 +8,9 @@
 namespace AKlump\WebPackage;
 
 $build
-  ->load('src/BreakpointX.js')
-  ->replace()
+  ->loadFile('src/BreakpointX.js')
+  ->replaceTokens()
   ->saveToDist()
-  ->minify('dist/BreakpointX.js')
+  ->minifyFile('dist/BreakpointX.js')
+  ->addFilesToScm(["dist"])
   ->displayMessages();
