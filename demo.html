@@ -13,7 +13,7 @@
 <script src="dist/BreakpointX.js"></script>
 <script type="text/javascript">
   $(document).ready(function () {
-    var b = new BreakpointX({mobile: 0, desktop: 768}, {
+    var b = new BreakpointX({mobile: 768, desktop: Infinity}, {
       addClassesTo: 'html'
     });
     b.add('both', b.aliases, function (from, to, direction) {
