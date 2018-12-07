@@ -343,24 +343,31 @@ var BreakpointX = (function($, window) {
       }
     }
 
-    self.respondToWindowWidth(this.getWindowWidth());
+    respondToWindowWidth.call(this);
     var throttleTimeout = null;
     $(window).resize(function() {
       clearTimeout(throttleTimeout);
       throttleTimeout = setTimeout(function() {
-        self.respondToWindowWidth(self.getWindowWidth());
+        respondToWindowWidth.call(this);
       }, self.settings.resizeThrottle);
     });
 
     return self;
   };
 
+  /**
+   * Trigger all actions based on a width or the current window.
+   *
+   * @param int width
+   *   Optional.  Omit to use the current window width.
+   * @returns {*}
+   */
   BreakpointX.prototype.triggerActions = function(width) {
     previousCallbackData.segment = this.getSegment(null);
-    return this.respondToWindowWidth(width);
+    return respondToWindowWidth.call(this, width);
   };
 
-  BreakpointX.prototype.respondToWindowWidth = function(width) {
+  function respondToWindowWidth(width) {
     var self = this,
       pointValue = width || this.getWindowWidth(),
       segment = self.getSegment(pointValue),
