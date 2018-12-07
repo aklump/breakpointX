@@ -37,6 +37,28 @@ Download this [Cheatsheet](images/breakpoint-cheatsheet.pdf) by [In the Loft Stu
 
 ## Usage
 
+    // Breakpoints only, using default settings.
+    var obj = new BreakpointX(480, 768);
+    
+    // Breakpoints only with settings.
+    var obj = new BreakpointX([480, 768], {
+      addClassesTo: 'html',
+      classPrefix: 'bpx-',
+      resizeThrottle: 200,
+      breakpointRayImageWidthRatio: 1.5,
+    });
+    
+    // With named segments.
+    var obj = new BreakpointX([480, 768], ['small', 'medium', 'large']);
+    
+    // Named segments and custom settings.
+    var obj = new BreakpointX([480, 768], ['small', 'medium', 'large'], {
+      addClassesTo: 'html',
+      classPrefix: 'bpx-',
+      resizeThrottle: 200,
+      breakpointRayImageWidthRatio: 1.5,
+    });
+
 ### Create a new instance, define breakpoints
 
     // Register three breakpoints that indicate the following:

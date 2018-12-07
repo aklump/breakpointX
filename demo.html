@@ -5,24 +5,25 @@
   <title>BreakpointX Demo</title>
 </head>
 <body>
-  <p>Inspect element (dev tools) and observe the html element classes whilst changing browser widths.</p>
+<p>Inspect element (dev tools) and observe the html element classes whilst changing browser widths.</p>
 <script
-  src="https://code.jquery.com/jquery-2.1.4.min.js"
-  integrity="sha256-8WqyJLuWKRBVhxXIL1jBDD7SDxU936oZkCnxQbWwJVw="
-  crossorigin="anonymous"></script>
-<script src="dist/BreakpointX.js"></script>
+    src="https://code.jquery.com/jquery-2.1.4.min.js"
+    integrity="sha256-8WqyJLuWKRBVhxXIL1jBDD7SDxU936oZkCnxQbWwJVw="
+    crossorigin="anonymous"></script>
+<script src="src/BreakpointX.js"></script>
 <script type="text/javascript">
-  $(document).ready(function () {
-    var b = new BreakpointX({mobile: 768, desktop: Infinity}, {
+  $(document).ready(function() {
+    var bpx = new BreakpointX([480, 768], ['mobpxile', 'iphone', 'ipad-portrait'], {
       addClassesTo: 'html'
     });
-    b.add('both', b.aliases, function (from, to, direction) {
-      console.log('direction', direction);
-      console.log('from', from);
-      console.log('to', to);
-      console.log('current', this.current);
-      console.log('last.alias', this.last.alias);
-    });
+    bpx
+      .addWidthCrossesBreakpointAction(768, function(to, direction, breakpoint, from) {
+        console.log('direction:', direction);
+        console.log('breakpoint:', breakpoint);
+        console.log('from:', from);
+        console.log('to:', to);
+      })
+      .triggerActions()
   });
 </script>
 </body>

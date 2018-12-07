@@ -19,40 +19,55 @@
  * breakpoint has no maximum width. The first breakpoint should most always be
  * 0.
  *
- * Access the current viewport using this.current; but this will only work if
- * you provide callbacks, using this.add().
+ * Access the current segment using this.getSegmentByWindow()
  *
  * @code
- *   var bp = new BreakpointX({small: 0, medium: 240, large: 768});
+ *   var bp = new BreakpointX([240, 768], ['small', 'medium', 'large']);
  *   bp
- *   .add('smaller', ['large'], function () {
+ *   .addAction('smaller', ['large'], function () {
  *     console.log('Now you\'re in medium!');
  *   })
- *   .add('smaller', ['small'], function () {
+ *   .addAction('smaller', ['small'], function () {
  *     console.log('Now you\'re in small!');
  *   })
- *   .add('bigger', ['large'], function () {
+ *   .addAction('bigger', ['large'], function () {
  *     console.log('Now you\'re in large!');
+ *   })
+ *   .addAction('both', ['large', 'small'], function(from, to, direction) {
+ *     var bp = to.breakpoint;
+ *     var message "You moved from "+ from.type +" " + from.name;
+ *     console.log('Moved from segment '++' across breakpoint '++' to '+
+ *   to.type +' ' + to.name);
  *   });
  *
- *   breakpointX.add('both', ['large', 'small'], function (from, to, direction)
- *   { var pixels = this.value(to); console.log('Previous viewport was: ' +
- *   from); console.log('Breakpoint ' + to + ' (' + pixels + ') has been
- *   crossed getting ' + direction + '.');
- *   });
  * @endcode
  *
- * You can also just send min widths like this:
  * @code
- *   var bp = new BreakpointX([0, 240, 768]);
- *   bp.alias(240) === '(max-width: 767px)';
- *
- *   bp.add('smaller', ['(max-width: 767px)'], function (from, to, direction) {
- *     console.log('Now you\'re in (max-width: 767px)!');
+ *   var bp = new BreakpointX([240, 768]);
+ *   bp.getSegment(240).name === '240-767';
+ *   bp.getSegment(240)['@media'] === '(min-width:240px) and (max-width:
+ *   767px)'; bp.addAction('smaller', ['240-767'], function (from, to,
+ *   direction) { console.log('Now you\'re in 240-767!');
  *   })
  * @endcode
  */
 var BreakpointX = (function($, window) {
+
+  /**
+   * Stores data from the last callback fire.
+   *
+   * @type {{}}
+   */
+  var previousCallbackData = {};
+
+  /**
+   * Stores the segment information.
+   *
+   * Use ::getSegment for public access.
+   *
+   * @type {{}}
+   */
+  var segmentData = {};
 
   /**
    * Helper function to determine the media query by raw data.
@@ -62,7 +77,7 @@ var BreakpointX = (function($, window) {
    * @returns {string}
    * @private
    */
-  function _query(leftBreakpointValue, breakpointValue) {
+  function getMediaQuery(leftBreakpointValue, breakpointValue) {
     var type = breakpointValue === Infinity ? 'ray' : 'segment';
     var queries = [];
     if (type === 'ray') {
@@ -78,23 +93,115 @@ var BreakpointX = (function($, window) {
     return '(' + queries.join('px) and (') + 'px)';
   }
 
-  function BreakpointX(breakpoints, settings) {
+  /**
+   * Apply the appropriate CSS to the DOM.
+   *
+   * @param object from
+   *   A segment definition object.
+   * @param object to
+   *   A segment definition object.
+   * @param string direction
+   *   The direction of change. One of:
+   *   - bigger
+   *   - smaller
+   *   - both
+   */
+  function actionApplyCss(segment, direction, breakpoint, pSegment) {
+    var $el = $(this.settings.addClassesTo),
+      p = this.settings.classPrefix;
+    $el
+      .removeClass(p + 'smaller')
+      .removeClass(p + 'bigger')
+      .removeClass(p + pSegment.name)
+      .addClass(p + segment.name);
+    if (direction) {
+      $el.addClass(p + direction);
+    }
+  };
+
+  /**
+   * Determine if a value is a numeric point or not.
+   *
+   * @param mixed value
+   *
+   * @returns {boolean}
+   *   True if value is a breakpoint and not a name or media query.
+   */
+  function valueIsPoint(value) {
+    return value === Infinity || parseInt(value, 10);
+  }
+
+  function valueIsMediaQuery(value) {
+    return typeof value === 'string' && value.indexOf('-width:') >= 0;
+  }
+
+  /**
+   * Return a new instance of BreakpointX
+   *
+   * @param array breakpoints
+   * @param ...
+   *   -  array An optional array of segment names.
+   *   -  object An optional last argument, which should be a settings object
+   *   if not using default options.
+   *
+   * @constructor
+   */
+  function BreakpointX(breakpoints) {
+    if (breakpoints.length < 1) {
+      throw new Error('You must include at least one breakpoint; you\'ve included none.');
+    }
+    var segmentNames = [];
+    var settings = {};
+    breakpoints = breakpoints.slice().sort(function(a, b) {
+      return a - b;
+    });
+    if (breakpoints[0] === 0) {
+      throw new Error('You must not include a breakpoint of 0.');
+    }
+    // breakpoints = breakpoints ? breakpoints.slice().sort() : [];
+    breakpointSettings = breakpoints;
+    if (arguments.length === 3) {
+      settings = $.extend({}, arguments[2]);
+      segmentNames = arguments[1].slice();
+    } else if (arguments.length === 2) {
+      segmentNames = arguments[1];
+      if (!segmentNames instanceof Array) {
+        segmentNames = [];
+        settings = $.extend({}, segmentNames);
+      }
+    }
+    if (segmentNames.length) {
+      if (segmentNames.length - 1 !== breakpoints.length) {
+        throw new Error('You must have one more segment name than you have breakpoints; you need ' + (breakpoints.length + 1) + ' segment names.');
+      }
+      var breakpointSettings = {};
+      for (var i in segmentNames) {
+        breakpointSettings[segmentNames[i]] = breakpoints[i] || Infinity;
+      }
+    }
+
     this.version = '__version';
     this.settings = $.extend({}, this.options, settings);
-    this.settings.breakpoints = breakpoints;
-    this.current = null;
-    this.last = {};
-    this.actions = {};
 
-    // @deprecated Use this.segmentNames instead.
-    this.breakpoints = {};
-
-    // @deprecated Use this.segmentNames instead.
-    this.aliases = [];
-
-    this.segments = {};
+    /**
+     * A public array of segment names in ascending from/to values.
+     *
+     * @type {Array}
+     */
     this.segmentNames = [];
-    this.init(breakpoints);
+
+    /**
+     * A public sorted array of breakpoints
+     *
+     * @type {Array}
+     *   Each value is the point on the axis of the breakpoint.
+     */
+    this.breakpoints = [];
+
+    segmentData = {};
+
+    this.reset();
+    init.call(this, breakpointSettings);
   }
 
   /**
@@ -126,7 +233,7 @@ var BreakpointX = (function($, window) {
     /**
      * This number will slow down the firing of the of the resize callbacks,
      * the higher the number, the longer the delay when the window resize
-     * changes.
+     * changes, but the less resource intensive.
      *
      * @type {int}
      */
@@ -154,62 +261,54 @@ var BreakpointX = (function($, window) {
    *
    * Given this code...
    * @code
-   *   var bp = new BreakpointX({small: 0, medium: 241, large: 769});
-   *   bp.alias(240) === 'small';
-   *   bp.alias(320) === 'medium';
-   *   bp.alias(321) === 'medium';
-   *   bp.alias(768) === 'medium';
-   *   bp.alias(769) === 'large';
+   *   var bp = new BreakpointX([241, 769], ['small', 'medium', 'large']);
+   *   bp.getSegment(240).name === 'small';
+   *   bp.getSegment(320).name === 'medium';
+   *   bp.getSegment(321).name === 'medium';
+   *   bp.getSegment(768).name === 'medium';
+   *   bp.getSegment(769).name === 'large';
 
    * @endcode
    *
    * ... the following will be true:
    *
    */
-  BreakpointX.prototype.init = function(breakpoints) {
-    var self = this,
-      i;
-    //
-    //
+  function init(breakpointSettings) {
+    var self = this;
+
     // Convert numeric keys to media queries.
-    //
     var converted = {};
-    if (breakpoints instanceof Array) {
-      breakpoints.unshift(0);
-      if (breakpoints[breakpoints.length - 1] !== Infinity) {
-        breakpoints.push(Infinity);
+    if (breakpointSettings instanceof Array) {
+      breakpointSettings.unshift(0);
+      if (breakpointSettings[breakpointSettings.length - 1] !== Infinity) {
+        breakpointSettings.push(Infinity);
       }
       var next;
-      for (i in breakpoints) {
+      for (var i in breakpointSettings) {
         next = i * 1 + 1;
-        var query = _query(
-          breakpoints[i],
-          breakpoints[next] || Infinity
-        );
-        if (breakpoints[next]) {
-          converted[query] = breakpoints[next];
+        var autoname = [
+          breakpointSettings[i],
+          (breakpointSettings[next] - 1) || Infinity
+        ].join('-');
+        if (breakpointSettings[next]) {
+          converted[autoname] = breakpointSettings[next];
         }
       }
-      breakpoints = converted;
+      breakpointSettings = converted;
     }
-    if (typeof breakpoints !== 'object') {
-      throw ('Object needs format {alias: minWidth}.');
+    if (typeof breakpointSettings !== 'object') {
+      throw ('The breakpoint settings must be either an array of breakpoint values, or an object with segment names and breakpoint values.');
     }
 
     // Make sure that breakpoint values are integers in pixels and listed in
     // ascending order; calculate the maxWidth values.
-    self.aliases = [];
     var sortable = [];
-    var alias, pixels, minWidth, maxWidth;
-    for (alias in breakpoints) {
-      var breakpointValue = breakpoints[alias];
-      if (breakpointValue === 0) {
-        throw new Error('A breakpoint must be greater than 0');
-      }
+    for (var name in breakpointSettings) {
+      var breakpointValue = breakpointSettings[name];
       if (breakpointValue !== Infinity) {
         breakpointValue = parseInt(breakpointValue, 10);
       }
-      sortable.push([alias, breakpointValue]);
+      sortable.push([name, breakpointValue]);
     }
     sortable.sort(function(a, b) {
       return a[1] - b[1];
@@ -220,59 +319,116 @@ var BreakpointX = (function($, window) {
       var segmentName = sortable[i][0],
         breakpointValue = sortable[i][1],
         type = breakpointValue === Infinity ? 'ray' : 'segment';
-      self.segments[segmentName] = {
+      segmentData[segmentName] = {
         name: segmentName,
         type: type,
         from: leftBreakpointValue,
-
-        // I've made the decision to set the "to" the same as the breakpoint
-        // because in theory, the left segments ends at the same point where
-        // the right segment or ray beings; and the segment should contain the
-        // breakpoint it's named after.  However with a computer, you can't
-        // share a pixel, therefor the "width" value is included here, which is
-        // -1.  Also you will notice that the media queries are generated using
-        // the to - 1 as well.
-        to: breakpointValue === Infinity ? Infinity : breakpointValue,
-
-        // This is calculated 1px less than the breakpoint and
-        // represents the maximum number of pixels that fit into this segment
-        // before the breakpoint is crossed.
+        to: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
         pixelWidth: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
-        breakpoint: breakpointValue === Infinity ? undefined : breakpointValue,
-        '@media': _query(leftBreakpointValue, breakpointValue),
+        '@media': getMediaQuery(leftBreakpointValue, breakpointValue),
 
         // Images for this segment should have this width.
         imageWidth: type === 'segment' ? breakpointValue - 1 : parseInt(leftBreakpointValue * self.settings.breakpointRayImageWidthRatio, 10),
       };
-      self.breakpoints[segmentName] = this.value(segmentName);
-      self.aliases.push(segmentName);
       self.segmentNames.push(segmentName);
+      breakpointValue !== Infinity && self.breakpoints.push(breakpointValue);
       leftBreakpointValue = breakpointValue;
     }
     self.reset();
 
     // Register our own handler if we're to manipulate classes.
     if (this.settings.addClassesTo) {
-      self.add('both', this.segmentNames, this.cssHandler);
+      for (var i in this.breakpoints) {
+        self.addWidthCrossesBreakpointAction(this.breakpoints[i], actionApplyCss);
+      }
     }
 
-    if (self.actions.hasOwnProperty('bigger') || self.actions.hasOwnProperty('smaller') || self.actions.hasOwnProperty('both')) {
-
-      var winWidth = self.getWindowWidth();
-      self.callbacksHandler(winWidth, true);
-
-      var throttleSpeed = self.settings.resizeThrottle;
-      var throttle = null;
-      $(window).resize(function() {
-        clearTimeout(throttle);
-        throttle = setTimeout(function() {
-          winWidth = self.getWindowWidth();
-          self.callbacksHandler(winWidth);
-        }, throttleSpeed);
-      });
-    }
+    self.respondToWindowWidth(this.getWindowWidth());
+    var throttleTimeout = null;
+    $(window).resize(function() {
+      clearTimeout(throttleTimeout);
+      throttleTimeout = setTimeout(function() {
+        self.respondToWindowWidth(self.getWindowWidth());
+      }, self.settings.resizeThrottle);
+    });
 
     return self;
+  };
+
+  BreakpointX.prototype.triggerActions = function(width) {
+    previousCallbackData.segment = this.getSegment(null);
+    return this.respondToWindowWidth(width);
+  };
+
+  BreakpointX.prototype.respondToWindowWidth = function(width) {
+    var self = this,
+      pointValue = width || this.getWindowWidth(),
+      segment = self.getSegment(pointValue),
+      pSegment = previousCallbackData.segment,
+      crossed = segment.name !== pSegment.name,
+      callbacks = [];
+    if (crossed || !pSegment.name) {
+      var callbacks = {},
+        direction = null,
+        breakpoint = null;
+      if (pSegment.name) {
+        direction = crossed ? (pointValue > pSegment.from ? 'bigger' : 'smaller') : null;
+      }
+      if (direction) {
+        callbacks.push(self.actions[direction]);
+        breakpoint = direction === 'smaller' ? pSegment.from : segment.from;
+      }
+
+      if (!breakpoint) {
+        // This is the first run, when we have no previous info, thus not cross.
+        var currentWindowSegment = this.getSegmentByWindow();
+        for (var d in this.actions) {
+          if (!this.actions[d].length) {
+            continue;
+          }
+          for (var bp in this.actions[d]) {
+            var breakpoint = this.getSegment(bp).from,
+              addToCallbacks = false,
+              addSmaller = currentWindowSegment.to + 1 === breakpoint,
+              addBigger = breakpoint === currentWindowSegment.from;
+
+            switch (d) {
+              case 'smaller':
+                addToCallbacks = addSmaller;
+                break;
+              case 'bigger':
+                addToCallbacks = addBigger;
+                break;
+              case 'both':
+                addToCallbacks = addSmaller || addBigger;
+                break;
+            }
+
+            if (addToCallbacks) {
+              callbacks[d] = callbacks[d] || [];
+              callbacks[d][breakpoint] = this.actions[d][bp];
+            }
+          }
+        }
+      }
+      // Fire off all callbacks.
+      for (var d in callbacks) {
+        for (var bp in callbacks[d]) {
+          for (var i in callbacks[d][bp]) {
+            callbacks[d][bp][i].call(self, segment, direction, breakpoint, pSegment);
+          }
+        }
+      }
+
+
+      previousCallbackData = {
+        breakpoint: breakpoint,
+        direction: direction,
+        segment: segment,
+      };
+    }
+
+    return this;
   };
 
   /**
@@ -291,87 +447,6 @@ var BreakpointX = (function($, window) {
     return width;
   };
 
-  BreakpointX.prototype.cssHandler = function(from, to, direction) {
-    var $el = this.settings.addClassesTo instanceof jQuery ? this.settings.addClassesTo : $(this.settings.addClassesTo),
-      p = this.settings.classPrefix;
-    $el
-      .removeClass(p + 'smaller')
-      .removeClass(p + 'bigger')
-      .removeClass(p + from.name)
-      .addClass(p + to.name);
-    if (direction) {
-      $el.addClass(p + direction);
-    }
-  };
-
-  BreakpointX.prototype.callbacksHandler = function(width, force) {
-    var self = this,
-      currentAlias = self.alias(width),
-      crossed = currentAlias !== self.last.alias;
-    if (crossed || force) {
-      var direction = crossed ? (width > self.last.width[0] ? 'bigger' : 'smaller') : null,
-        callbacks = [self.actions.both];
-      if (direction) {
-        callbacks.push(self.actions[direction]);
-      }
-
-      // We've just moved from self.last.alias to currentAlias so we need to
-      // get all the breakpoint aliases that we have crossed.
-      var breakpointsCrossed = [],
-        bp,
-        from,
-        to,
-        alias;
-      if (direction === 'smaller') {
-        breakpointsCrossed.push(self.last.alias);
-        from = this.value(self.last.alias);
-        from = from[0];
-        to = this.value(currentAlias);
-        to = to[1];
-        for (alias in this.breakpoints) {
-          bp = this.breakpoints[alias][1];
-          if (to < bp && bp < from) {
-            breakpointsCrossed.push(alias);
-          }
-        }
-      } else {
-        breakpointsCrossed.push(currentAlias);
-        from = this.value(currentAlias);
-        from = from[0];
-        to = this.value(self.last.alias);
-        to = to[1];
-        for (alias in this.breakpoints) {
-          bp = this.breakpoints[alias][0];
-          if (to < bp && bp < from) {
-            breakpointsCrossed.push(alias);
-          }
-        }
-      }
-
-      // Update for next round.
-      from = self.segments[self.last.alias];
-      to = self.segments[currentAlias];
-
-      self.current = currentAlias;
-
-      // Fire off all callbacks.
-      for (var k in breakpointsCrossed) {
-        var breakpoint = breakpointsCrossed[k];
-        for (var i in callbacks) {
-          for (var j in callbacks[i][breakpoint]) {
-            callbacks[i][breakpoint][j].call(self, from, to, direction);
-          }
-        }
-      }
-
-      self.last = {
-        'width': self.value(currentAlias),
-        'alias': currentAlias,
-        'direction': direction
-      };
-    }
-  };
-
   /**
    * Clears all callbacks
    *
@@ -383,100 +458,56 @@ var BreakpointX = (function($, window) {
       'smaller': [],
       'both': []
     };
-    this.last = { 'width': null, 'alias': null, 'direction': null };
-
-    // Set values based on current window.
-    this.last.alias = this.alias(this.getWindowWidth());
-    this.last.width = this.value(this.last.alias);
-    this.current = this.last.alias;
+    previousCallbackData = {
+      segment: this.getSegment(null),
+      direction: null
+    };
 
     return this;
   };
 
-  /**
-   * Return the alias of a pixel width.
-   *
-   * Special width keys are:
-   *   - 'first' Returns the alias of the smallest breakpoint.
-   *   - 'last' Returns the alias of the widest breakpoint.
-   *
-   * Any pixel value within a viewport will yield the same alias, e.g.
-   * 750, 760, 768 would all yield "tablet" if "tablet" was set up with 768
-   * as the width.
-   *
-   * Be aware that a value larger than the highest defined breakpoint will
-   * still return the highest defined breakpoint alias.
-   *
-   * @return {string}
-   *
-   * @deprecated
-   */
-  BreakpointX.prototype.alias = function(width) {
-
-    if (width === 'first') {
-      return this.segmentNames[0];
-    }
-    if (width === 'last') {
-      return this.segmentNames[this.segmentNames.length - 1];
-    }
-    for (var name in this.segments) {
-      var segment = this.segments[name];
-      if (segment.from <= width && width < segment.breakpoint) {
-        return name;
-      } else if (segment.to === Infinity && width >= segment.from) {
-        return name;
-      }
-    }
-    return null;
-  };
-
   BreakpointX.prototype.getBreakpointRay = function() {
-    var last = this.alias('last');
-    return this.getSegmentByName(last);
+    var name = this.segmentNames[this.segmentNames.length - 1];
+    return this.getSegment(name);
   };
 
-  /**
-   * Return a segment definition given a point anywhere on the axis.
-   *
-   * @param int|Infinity point_value
-   *   The point along the axis.
-   *
-   * @returns {{}|undefined}
-   */
-  BreakpointX.prototype.getSegmentByPoint = function(point_value) {
-    var segment_name = this.alias(point_value);
-    return this.getSegmentByName(segment_name);
-  };
 
   /**
-   * Return a segment definition given it's name.
+   * Utility function to get a segment from value, name or media query.
    *
-   * @param string name
-   *   The name of a segment.
-   *
-   * @returns {{}|undefined}
+   * @param int|string data
+   *   Can be point value, segment name or media query.
+   * @returns {{}}
    */
-  BreakpointX.prototype.getSegmentByName = function(segment_name) {
-    return this.segments[segment_name] || undefined;
-  };
-
-  /**
-   * Return a segment definition given it's name.
-   *
-   * @param string media_query
-   *   The media query for a segment.
-   *
-   * @returns {{}|undefined}
-   */
-  BreakpointX.prototype.getSegmentByMediaQuery = function(media_query) {
-
-    for (var name in this.segments) {
-      var segment = this.segments[name];
-      if (segment && segment['@media'].replace(/ /g, '') === media_query.replace(/ /g, '')) {
-        return segment;
+  BreakpointX.prototype.getSegment = function(data) {
+    if (valueIsPoint(data)) {
+      var point = parseInt(data, 10);
+      data = null;
+      for (var name in segmentData) {
+        var segment = segmentData[name];
+        if (segment.from <= point && point <= segment.to) {
+          data = name;
+          break;
+        } else if (segment.to === Infinity && point >= segment.from) {
+          data = name;
+          break;
+        }
+      }
+    } else if (valueIsMediaQuery(data)) {
+      for (var name in segmentData) {
+        var segment = segmentData[name];
+        if (segment && segment['@media'].replace(/ /g, '') === data.replace(/ /g, '')) {
+          // Clone the object we return so it can't be manipulated externally.
+          return $.extend({}, segment);
+        }
       }
     }
-    return undefined;
+    return segmentData[data] || {
+      name: null,
+      from: null,
+      to: null,
+      '@media': null,
+    };
   };
 
   /**
@@ -486,43 +517,35 @@ var BreakpointX = (function($, window) {
    */
   BreakpointX.prototype.getSegmentByWindow = function() {
     var width = this.getWindowWidth();
-    return this.getSegmentByPoint(width);
+    return this.getSegment(width);
   };
 
-  /**
-   * Return the pixel value of a breakpoint alias.
-   *
-   * This is the same as the values used in the @media query
-   *
-   * @param  {string} alias E.g. 'large'
-   *
-   * @return {array} [min, max]
-   *
-   * @deprecated
-   */
-  BreakpointX.prototype.value = function(alias) {
-    if (typeof this.segments[alias] === 'undefined') return null;
-    var value = [
-      this.segments[alias].from,
-      this.segments[alias].breakpoint,
-    ];
-    value[0] = value[0] > 0 ? value[0] : value[0];
-    value[1] = value[1] ? value[1] - 1 : null;
-    return value;
+  BreakpointX.prototype.addWidthCrossesBreakpointAction = function(breakpoint, callable) {
+    var segment = this.getSegment(breakpoint);
+    var direction = 'both';
+    if (valueIsPoint(breakpoint)) {
+      if (breakpoint !== segment.from) {
+        throw new Error('You tried to add an action to an unregistered breakpoint "' + breakpoint + '"; you must use one of: ' + this.breakpoints.join(', '));
+      }
+    } else {
+      throw new Error('The provided breakpoint "' + breakpoint + '" is not recognized.');
+    }
+    this.actions[direction][breakpoint] = this.actions[direction][breakpoint] || [];
+    this.actions[direction][breakpoint].push(callable);
+    return this;
   };
 
-  /**
-   * Return the media query string for an alias.
-   *
-   * @param string alias
-   *   The alias name
-   *
-   * @return string
-   *   The media query string, e.g. 'min-width: 769px'.
-   */
-  BreakpointX.prototype.query = function(alias) {
-    if (typeof this.segments[alias] === 'undefined') return null;
-    return this.segments[alias]['@media'];
+  BreakpointX.prototype.addWidthBecomesLessThanAction = function(breakpoint, callable) {
+    var segment = this.getSegment(breakpoint),
+      point = segment.from;
+
+    console.log(segment);
+  };
+  BreakpointX.prototype.addWidthBecomesGreaterThanAction = function(breakpoint, callable) {
+    var segment = this.getSegment(breakpoint),
+      point = segment.from;
+
+    console.log(segment);
   };
 
   /**
@@ -534,26 +557,31 @@ var BreakpointX = (function($, window) {
    * @param {array} segmentNames
    *   E.g. [medium, large]
    * @param {Function} callback
-   *   A callback to be executed.  CAllbacks receive:
+   *   A callback to be executed.  Callbacks receive:
    *   - 0 The object moving from: {minWidth, maxWidth, name}
    *   - 1 The object moving to...
    *   - 2 The direction string.
    *   - The current BreakpointX object is available as this
    */
-  BreakpointX.prototype.add = function(direction, segmentNames, callback) {
-    var self = this;
-    if (typeof self.actions[direction] === 'undefined') {
-      throw ('Bad direction: ' + direction);
-    } else if (segmentNames.length === 0) {
-      throw ('segmentNames must be an array of aliases.');
+  BreakpointX.prototype.addAction = function(direction) {
+    var self = this,
+      breakpoints = this.breakpoints,
+      callback;
+    if (arguments.length === 2) {
+      callback = arguments[1];
+    } else if (arguments.length === 3) {
+      breakpoints = arguments[1];
+      callback = arguments[2];
+    }
+    if (typeof self.actions[direction] === undefined) {
+      throw ('The direction you provided is not understood: ' + direction);
+    } else if (breakpoints.length === 0) {
+      throw ('You must provide at least one breakpoint in an array as the second argument.');
     } else if (typeof callback !== 'function') {
-      throw ('Callback must be a function');
+      throw ('The provided value for the callback is not a function.');
     } else {
-      for (var i in segmentNames) {
-        var name = segmentNames[i];
-        if (self.segmentNames.indexOf(name) === -1) {
-          throw ('Unknown name: "' + name + '"');
-        }
+      for (var i in breakpoints) {
+        var name = this.getSegment(breakpoints[i]).to;
         self.actions[direction][name] = self.actions[direction][name] || [];
         self.actions[direction][name].push(callback);
       }
