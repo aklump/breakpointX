@@ -7,12 +7,12 @@ namespace AKlump\BreakpointX;
  *
  * A server-side compliment to BreakpointX.js
  *
- * @version 0.4.14
+ * @version 0.5
  * @package AKlump\BreakpointX
  */
 class BreakpointX {
 
-  public $version = '0.4.14';
+  public $version = '0.5';
 
   public $aliases;
 
