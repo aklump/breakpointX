@@ -25,7 +25,24 @@
   <h1>CHANGELOG</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
 
-<section><h2>0.4.6</h2>
+<section><h2>0.5.0</h2>
+
+<ol>
+<li><p>The way breakpoints are defined has changed.  The old syntax:</p>
+
+<pre><code>var bp = new BreakpointX({"small": 0, "mobile": 480, "desktop": 768});
+</code></pre>
+
+<p>Changes to:</p>
+
+<pre><code>var bp = new BreakpointX({"small": 480, "mobile": 768, "desktop": Infinity});
+</code></pre></li>
+<li><p>The query method now returns all values wrapped in <code>()</code>.</p></li>
+<li>The objects received by callbacks have changed in their structure.</li>
+<li>Breakpoint values have to be greater than 0.</li>
+</ol>
+
+<h2>0.4.6</h2>
 
 <p>The path the to the PHP class has changed; you must update your autoloaders.</p>
 </section>
@@ -42,7 +59,7 @@
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.4.14 &bull; Last Updated: Tue, 04 Dec 2018 18:37:22 -0800</p>
+    <p class="legaleeze center">Version: 0.4.14 &bull; Last Updated: Thu, 06 Dec 2018 19:20:44 -0800</p>
   </div>
 </footer>
 
