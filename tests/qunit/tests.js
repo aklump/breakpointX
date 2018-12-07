@@ -13,16 +13,15 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
-
 QUnit.test('Assert classes are added to the html tag when options set on change.', function(assert) {
   var obj = new BreakpointX([480, 768], ['mobile', 'iphone', 'ipad-portrait'], {
     addClassesTo: 'html'
   });
-  obj.respondToWindowWidth(0);
+  obj.triggerActions(0);
   assert.ok($('html').hasClass('bpx-mobile'));
-  obj.respondToWindowWidth(480);
+  obj.triggerActions(480);
   assert.ok($('html').hasClass('bpx-iphone'));
-  obj.respondToWindowWidth(768);
+  obj.triggerActions(768);
   assert.ok($('html').hasClass('bpx-ipad-portrait'));
 });
 

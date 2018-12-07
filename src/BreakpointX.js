@@ -418,6 +418,7 @@ var BreakpointX = (function($, window) {
           }
         }
       }
+
       // Fire off all callbacks.
       for (var d in callbacks) {
         for (var bp in callbacks[d]) {
