@@ -8,7 +8,7 @@
 var QUnit = QUnit || {};
 QUnit.storage = {};
 var BreakpointX = BreakpointX || {};
-var breakpoints = { 'tiny': 241, 'mobile': 769, 'desktop': Infinity };
+var breakpoints = { tiny: 241, mobile: 769, desktop: Infinity };
 var obj = {};
 
 //
@@ -17,17 +17,28 @@ var obj = {};
 //
 QUnit.test('Assert classes are added to the html tag when options set.', function(assert) {
   assert.notOk($('html').hasClass('bpx-desktop'));
-  new BreakpointX({ 'desktop': Infinity }, { 'addClassesTo': 'html' });
+  new BreakpointX({ desktop: Infinity }, { addClassesTo: 'html' });
   assert.ok($('html').hasClass('bpx-desktop'));
 });
 
 QUnit.test('Assert reset sets internal pointers to last and current aliases.', function(assert) {
-  var width = $(window).width();
-  var alias = obj.alias(width);
+
+  // Empty the properties we're going to test.
+  obj.last = {};
+  obj.current = null;
+
+  // Call the method and make assertions.
   obj.reset();
-  assert.strictEqual(obj.last.alias, alias);
-  assert.strictEqual(obj.last.width, obj.value(alias));
-  assert.strictEqual(obj.current, alias);
+  var windowWidthBasedName = obj.alias($(window).width());
+
+  var value = obj.value(windowWidthBasedName);
+  assert.ok(value);
+  assert.strictEqual(obj.last.width[0], value[0]);
+  assert.strictEqual(obj.last.width[1], value[1]);
+
+  assert.ok(windowWidthBasedName);
+  assert.strictEqual(obj.last.alias, windowWidthBasedName);
+  assert.strictEqual(obj.current, windowWidthBasedName);
 });
 
 QUnit.test('Assert getBreakpointRay works', function(assert) {
@@ -81,13 +92,11 @@ QUnit.test('Assert reset clears actions.', function(assert) {
   assert.strictEqual(obj.actions.bigger.tiny.length, 1);
   assert.strictEqual(obj.actions.smaller.tiny.length, 1);
   assert.strictEqual(obj.actions.both.tiny.length, 1);
-
   obj.reset();
   assert.strictEqual(obj.actions.bigger.length, 0);
   assert.strictEqual(obj.actions.smaller.length, 0);
   assert.strictEqual(obj.actions.both.length, 0);
 });
-
 
 QUnit.test('Assert getSegmentByMediaQueryWorks', function(assert) {
   assert.deepEqual(obj.getSegmentByMediaQuery('(max-width:240px)').name, 'tiny');
@@ -219,7 +228,6 @@ QUnit.test('Assert alias method works.', function(assert) {
 
 QUnit.test('Assert two breakpoints alias works.', function(assert) {
   var bp = new BreakpointX({ 'mobile': 769, 'desktop': Infinity });
-
   assert.strictEqual(bp.alias(320), 'mobile');
   assert.strictEqual(bp.alias(768), 'mobile');
   assert.strictEqual(bp.alias(769), 'desktop');

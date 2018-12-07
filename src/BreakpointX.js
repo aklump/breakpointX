@@ -253,7 +253,7 @@ var BreakpointX = (function($, window) {
 
     // Register our own handler if we're to manipulate classes.
     if (this.settings.addClassesTo) {
-      self.add('both', this.aliases, this.cssHandler);
+      self.add('both', this.segmentNames, this.cssHandler);
     }
 
     if (self.actions.hasOwnProperty('bigger') || self.actions.hasOwnProperty('smaller') || self.actions.hasOwnProperty('both')) {
@@ -305,7 +305,6 @@ var BreakpointX = (function($, window) {
   };
 
   BreakpointX.prototype.callbacksHandler = function(width, force) {
-    return;
     var self = this,
       currentAlias = self.alias(width),
       crossed = currentAlias !== self.last.alias;
@@ -530,31 +529,33 @@ var BreakpointX = (function($, window) {
    * Register a callback to be executed when the window crosses one or more
    * breakpoints getting smaller, larger or in both directions.
    *
-   * @param {string} direction One of: smaller, larger, both
-   * @param {array} breakpoints E.g. [medium, large] These are aliases not
-   *   values.
-   * @param {Function} callback A callback to be executed.  CAllbacks receive:
+   * @param {string} direction
+   *   One of: smaller, larger, both
+   * @param {array} segmentNames
+   *   E.g. [medium, large]
+   * @param {Function} callback
+   *   A callback to be executed.  CAllbacks receive:
    *   - 0 The object moving from: {minWidth, maxWidth, name}
    *   - 1 The object moving to...
    *   - 2 The direction string.
    *   - The current BreakpointX object is available as this
    */
-  BreakpointX.prototype.add = function(direction, breakpoints, callback) {
+  BreakpointX.prototype.add = function(direction, segmentNames, callback) {
     var self = this;
     if (typeof self.actions[direction] === 'undefined') {
       throw ('Bad direction: ' + direction);
-    } else if (breakpoints.length === 0) {
-      throw ('Breakpoints must be an array of aliases.');
+    } else if (segmentNames.length === 0) {
+      throw ('segmentNames must be an array of aliases.');
     } else if (typeof callback !== 'function') {
       throw ('Callback must be a function');
     } else {
-      for (var i in breakpoints) {
-        var alias = breakpoints[i];
-        if (self.aliases.indexOf(alias) === -1) {
-          throw ('Unknown alias: "' + alias + '"');
+      for (var i in segmentNames) {
+        var name = segmentNames[i];
+        if (self.segmentNames.indexOf(name) === -1) {
+          throw ('Unknown name: "' + name + '"');
         }
-        self.actions[direction][alias] = self.actions[direction][alias] || [];
-        self.actions[direction][alias].push(callback);
+        self.actions[direction][name] = self.actions[direction][name] || [];
+        self.actions[direction][name].push(callback);
       }
     }
 
