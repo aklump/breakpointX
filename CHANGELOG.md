@@ -9,6 +9,7 @@
 * .settings.breakpoints was removed.
 * .breakpoints is now an array of breakpoint values.
 * Constructor arguments have changed; see documentation for new format.
+* addAction was removed.
 
 ## 0.5.0
 

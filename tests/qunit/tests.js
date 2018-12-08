@@ -13,46 +13,159 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
-QUnit.test('Assert classes are added to the html tag when options set on change.', function(assert) {
-  var obj = new BreakpointX([480, 768], ['mobile', 'iphone', 'ipad-portrait'], {
+QUnit.test('Callback arguments are correct on cross', function(assert) {
+  var obj= new BreakpointX([300, 600], ['small', 'medium', 'large']);
+  obj.addBreakpointCrossActionIncreasingWidth(600, function(segment, direction, breakpoint, pSegment) {
+    assert.strictEqual(segment.name, 'large');
+    assert.strictEqual(direction, 'bigger');
+    assert.strictEqual(breakpoint, 600);
+    assert.strictEqual(pSegment.name, 'small');
+  })
+    .triggerActions(200)
+    .onWindowResize(700);
+});
+
+QUnit.test('Callback arguments are correct on init', function(assert) {
+  var obj= new BreakpointX([500], ['small', 'large']);
+  obj.addCrossAction(function(segment, direction, breakpoint, pSegment) {
+    assert.strictEqual(segment.name, 'small');
+    assert.strictEqual(direction, undefined);
+    assert.strictEqual(breakpoint, null);
+    assert.strictEqual(pSegment.name, null);
+  })
+    .triggerActions(400);
+});
+
+QUnit.test('We dont have double trigger onload at 479; based on demo.', function(assert) {
+  var callCount = 0;
+  var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
     addClassesTo: 'html'
   });
-  obj.triggerActions(0);
-  assert.ok($('html').hasClass('bpx-mobile'));
-  obj.triggerActions(480);
-  assert.ok($('html').hasClass('bpx-iphone'));
-  obj.triggerActions(768);
-  assert.ok($('html').hasClass('bpx-ipad-portrait'));
+  bpx
+    .addCrossAction(function(segment, direction, breakpoint, from) {
+      callCount++
+    })
+    .triggerActions(479);
+  assert.strictEqual(callCount, 1);
 });
+
+QUnit.test('We dont have double trigger onload at 1024; based on demo.', function(assert) {
+  var callCount = 0;
+  var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
+    addClassesTo: 'html'
+  });
+  bpx
+    .addCrossAction(function(to, direction, breakpoint, from) {
+      callCount++
+    })
+    .triggerActions(1024);
+  assert.strictEqual(callCount, 1);
+});
+
+QUnit.test('We dont have double trigger onload at 1023; based on demo.', function(assert) {
+  var callCount = 0;
+  var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
+    addClassesTo: 'html'
+  });
+  bpx
+    .addCrossAction(function(to, direction, breakpoint, from) {
+      callCount++
+    })
+    .triggerActions(1023);
+  assert.strictEqual(callCount, 1);
+});
+
+QUnit.test('We dont have double trigger onload at 480; based on demo.', function(assert) {
+  var callCount = 0;
+  var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
+    addClassesTo: 'html'
+  });
+  bpx
+    .addCrossAction(function(to, direction, breakpoint, from) {
+      callCount++
+    })
+    .triggerActions(480);
+  assert.strictEqual(callCount, 1);
+});
+
+QUnit.test('We dont have double trigger onload at 768; based on demo.', function(assert) {
+  var callCount = 0;
+  var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
+    addClassesTo: 'html'
+  });
+  bpx
+    .addCrossAction(function(to, direction, breakpoint, from) {
+      callCount++
+    })
+    .triggerActions(768);
+  assert.strictEqual(callCount, 1);
+});
+
+QUnit.test('Assert we trigger two breakpoint callbacks when jumping over both.', function(assert) {
+  var bp1CallCount = 0;
+  var bp2CallCount = 0;
+  var obj = new BreakpointX([400, 800]);
+  obj.addBreakpointCrossAction(400, function() {
+    bp1CallCount++;
+  }).addBreakpointCrossAction(800, function() {
+    bp2CallCount++;
+  })
+    .triggerActions(0);
+  assert.strictEqual(bp1CallCount, 1);
+  assert.strictEqual(bp2CallCount, 0);
+
+  obj.onWindowResize(1000);
+  assert.strictEqual(bp1CallCount, 2);
+  assert.strictEqual(bp2CallCount, 1);
+
+  obj.onWindowResize(1);
+  assert.strictEqual(bp1CallCount, 3);
+  assert.strictEqual(bp2CallCount, 2);
+
+  console.log(obj);
+});
+
+QUnit.test('Make sure we trigger cross when quickly jumping over two breakpoints', function(assert) {
+  var calledCount = 0;
+  var bpx = new BreakpointX([500, 900], ['small', 'medium', 'large'], {
+    addClassesTo: 'html'
+  });
+  bpx.addBreakpointCrossAction(900, function(segment, breakpoint, direction, pSegment) {
+    calledCount++;
+  })
+    .triggerActions(960)
+    .onWindowResize(100);
+  assert.strictEqual(calledCount, 2);
+});
+
+QUnit.test('Make sure the middle css class does not remain if we go quickly from large to small', function(assert) {
+  var obj = new BreakpointX([500, 900], ['small', 'medium', 'large'], {
+    addClassesTo: 'html'
+  });
+  obj
+    .onWindowResize(200)
+    .onWindowResize(700)
+    .onWindowResize(1000);
+  assert.strictEqual($('html').attr('class'), 'bpx-large bpx-bigger');
+
+  obj.onWindowResize(200);
+  assert.strictEqual($('html').attr('class'), 'bpx-small bpx-smaller');
+});
+
 
 QUnit.test('May not register an action to a non-breakpoint.', function(assert) {
   assert.throws(function() {
     var b = new BreakpointX([768]);
-    b.addWidthCrossesBreakpointAction('bogus');
+    b.addBreakpointCrossAction('bogus');
   });
 });
 
 QUnit.test('May not register an action to an unregistered breakpoint.', function(assert) {
   assert.throws(function() {
     var b = new BreakpointX([768]);
-    b.addWidthCrossesBreakpointAction(223);
+    b.addBreakpointCrossAction(223);
   });
 });
-
-
-QUnit.test('Assert code example works.', function(assert) {
-  var bp = new BreakpointX([240, 768]);
-  assert.strictEqual(bp.getSegment(240).name, '240-767');
-  assert.strictEqual(bp.getSegment(240)['@media'], '(min-width:240px) and (max-width:767px)');
-  var called = assert.async();
-  bp.addAction('smaller', 768, function() {
-    called();
-  });
-  bp
-    .respondToWindowWidth(1080)
-    .respondToWindowWidth(200);
-});
-
 
 QUnit.test('Providing integer to constructor throws', function(assert) {
   assert.throws(function() {
@@ -72,13 +185,13 @@ QUnit.test('Assert getSegmentWorks', function(assert) {
   assert.deepEqual(obj.getSegment(10).name, 'tiny');
   assert.deepEqual(obj.getSegment('tiny').name, 'tiny');
   assert.deepEqual(obj.getSegment('(max-width:240px)').name, 'tiny');
-  assert.deepEqual(obj.getSegment('(max-width:240)').name, undefined);
-  assert.deepEqual(obj.getSegment('bogus').name, undefined);
-  assert.deepEqual(obj.getSegment(-1).name, undefined);
+  assert.deepEqual(obj.getSegment('(max-width:240)').name, null);
+  assert.deepEqual(obj.getSegment('bogus').name, null);
+  assert.deepEqual(obj.getSegment(-1).name, null);
 });
 
 QUnit.test('Assert getSegment works with bad number', function(assert) {
-  assert.deepEqual(obj.getSegment(-1).name, undefined);
+  assert.deepEqual(obj.getSegment(-1).name, null);
 });
 
 
@@ -121,26 +234,6 @@ QUnit.test('Assert that breakpoints as an array of values works.', function(asse
   assert.strictEqual(bp.getSegment(2560)['@media'], '(min-width:1080px)');
 });
 
-QUnit.test('Assert reset clears actions.', function(assert) {
-  var called = false;
-  obj.addAction('both', ['tiny'], function() {
-    called = true;
-  });
-  obj.addAction('bigger', ['tiny'], function() {
-    called = true;
-  });
-  obj.addAction('smaller', ['tiny'], function() {
-    called = true;
-  });
-  assert.strictEqual(obj.actions.bigger.tiny.length, 1);
-  assert.strictEqual(obj.actions.smaller.tiny.length, 1);
-  assert.strictEqual(obj.actions.both.tiny.length, 1);
-  obj.reset();
-  assert.strictEqual(obj.actions.bigger.length, 0);
-  assert.strictEqual(obj.actions.smaller.length, 0);
-  assert.strictEqual(obj.actions.both.length, 0);
-});
-
 QUnit.test('Assert getSegmentWorks', function(assert) {
   assert.deepEqual(obj.getSegment('(max-width:240px)').name, 'tiny');
   assert.deepEqual(obj.getSegment('(max-width: 240px)').name, 'tiny');
@@ -166,7 +259,8 @@ QUnit.test('Assert getSegment using name works', function(assert) {
 });
 
 QUnit.test('Assert getSegmentWorks using point', function(assert) {
-  assert.deepEqual(obj.getSegment(-1).name, undefined);
+  assert.deepEqual(obj.getSegment(Infinity).name, 'desktop');
+  assert.deepEqual(obj.getSegment(-1).name, null);
   assert.deepEqual(obj.getSegment(0).name, 'tiny');
   assert.deepEqual(obj.getSegment(100).name, 'tiny');
   assert.deepEqual(obj.getSegment(240).name, 'tiny');
@@ -175,7 +269,6 @@ QUnit.test('Assert getSegmentWorks using point', function(assert) {
   assert.deepEqual(obj.getSegment(768).name, 'mobile');
   assert.deepEqual(obj.getSegment(769).name, 'desktop');
   assert.deepEqual(obj.getSegment(1080).name, 'desktop');
-  assert.deepEqual(obj.getSegment(Infinity).name, 'desktop');
 });
 
 QUnit.test('Assert a breakpoint of 0 throws', function(assert) {
@@ -186,7 +279,7 @@ QUnit.test('Assert a breakpoint of 0 throws', function(assert) {
 
 QUnit.test('test the @media property on the getSegment method.', function(assert) {
   var bp = new BreakpointX([480, 768], ['small', 'mobile', 'desktop']);
-  assert.strictEqual(bp.getSegment(-1)['@media'], undefined);
+  assert.strictEqual(bp.getSegment(-1)['@media'], null);
   assert.strictEqual(bp.getSegment('small')['@media'], '(max-width:479px)');
   assert.strictEqual(bp.getSegment('mobile')['@media'], '(min-width:480px) and (max-width:767px)');
   assert.strictEqual(bp.getSegment('desktop')['@media'], '(min-width:768px)');
@@ -261,13 +354,13 @@ QUnit.test('Assert two breakpoints alias works.', function(assert) {
   assert.strictEqual(bp.getSegment(0).name, 'mobile');
 });
 
-QUnit.test('Assert non-function to add() throws error.', function(assert) {
+QUnit.test('Assert non-function when adding action throws error.', function(assert) {
   assert.throws(function() {
     obj.addAction('both', ['tiny'], 'tree');
   });
 });
 
-QUnit.test('Assert empty breakpoints to add() throws error.', function(assert) {
+QUnit.test('Assert empty breakpoints when adding action throws error.', function(assert) {
   assert.throws(function() {
     obj.addAction('both', [], function() {
       var called = true;
@@ -275,7 +368,7 @@ QUnit.test('Assert empty breakpoints to add() throws error.', function(assert) {
   });
 });
 
-QUnit.test('Assert bad direction to add() throws error.', function(assert) {
+QUnit.test('Assert bad direction when adding action throws error.', function(assert) {
   assert.throws(function() {
     obj.addAction('hungry', ['tiny'], function() {
       var called = true;
@@ -283,28 +376,175 @@ QUnit.test('Assert bad direction to add() throws error.', function(assert) {
   });
 });
 
-QUnit.test('Assert addAction \'both\' works.', function(assert) {
-  assert.strictEqual(obj.actions.both.length, 0);
-  obj.addAction('both', ['tiny'], function() {
-    called = true;
+QUnit.test('Assert classes are added to the html tag for each segment using triggerActions.', function(assert) {
+  var obj = new BreakpointX([480, 768], ['mobile', 'iphone', 'ipad-portrait'], {
+    addClassesTo: 'html'
   });
-  assert.strictEqual(obj.actions.both.tiny.length, 1);
+  obj.triggerActions(0);
+  assert.ok($('html').hasClass('bpx-mobile'));
+  obj.triggerActions(200);
+  assert.ok($('html').hasClass('bpx-mobile'));
+  obj.triggerActions(479);
+  assert.ok($('html').hasClass('bpx-mobile'));
+  obj.triggerActions(480);
+  assert.ok($('html').hasClass('bpx-iphone'));
+  obj.triggerActions(527);
+  assert.ok($('html').hasClass('bpx-iphone'));
+  obj.triggerActions(767);
+  assert.ok($('html').hasClass('bpx-iphone'));
+  obj.triggerActions(768);
+  assert.ok($('html').hasClass('bpx-ipad-portrait'));
+  obj.triggerActions(1024);
+  assert.ok($('html').hasClass('bpx-ipad-portrait'));
+  obj.triggerActions(Infinity);
+  assert.ok($('html').hasClass('bpx-ipad-portrait'));
 });
 
-QUnit.test('Assert addAction \'bigger\' works.', function(assert) {
-  assert.strictEqual(obj.actions.bigger.length, 0);
-  obj.addAction('bigger', ['tiny'], function() {
-    called = true;
-  });
-  assert.strictEqual(obj.actions.bigger.tiny.length, 1);
+QUnit.test('Assert reset clears actions', function(assert) {
+  var calledCount = 0;
+  obj.addCrossAction(function() {
+    calledCount++;
+  }).triggerActions();
+  obj.reset();
+  obj.triggerActions();
+  assert.strictEqual(calledCount, 1);
 });
 
-QUnit.test('Assert addAction \'smaller\' works.', function(assert) {
-  assert.strictEqual(obj.actions.smaller.length, 0);
-  obj.addAction('smaller', ['tiny'], function() {
-    called = true;
-  });
-  assert.strictEqual(obj.actions.smaller.tiny.length, 1);
+QUnit.test('Test action added with addBreakpointCrossAction fires the callbacks as expected on window width change.', function(assert) {
+  var calledCount = 0;
+  var obj = new BreakpointX([480, 768, 1024]);
+  obj
+    .addBreakpointCrossAction(480, function() {
+      calledCount++;
+    });
+  assert.strictEqual(calledCount, 0);
+  obj
+    .onWindowResize(200);
+  assert.strictEqual(calledCount, 1);
+  obj
+    .onWindowResize(500)
+    .onWindowResize(200);
+  assert.strictEqual(calledCount, 3);
+});
+
+QUnit.test('Test action added with addBreakpointCrossActionIncreasingWidth fires the callbacks as expected on window width change using triggerActions.', function(assert) {
+  var calledCount = 0;
+  var obj = new BreakpointX([480, 768, 1024]);
+  obj
+    .addBreakpointCrossActionIncreasingWidth(480, function() {
+      calledCount++;
+    })
+    .triggerActions(200);
+  assert.strictEqual(calledCount, 0);
+  obj
+    .onWindowResize(500)
+    .onWindowResize(200);
+  assert.strictEqual(calledCount, 1);
+});
+
+QUnit.test('Test action added with addBreakpointCrossActionIncreasingWidth fires the callbacks as expected on window width change using triggerActions.', function(assert) {
+  var calledCount = 0;
+  var obj = new BreakpointX([480, 768, 1024]);
+  obj
+    .addBreakpointCrossActionIncreasingWidth(480, function() {
+      calledCount++;
+    })
+    .triggerActions(700);
+  assert.strictEqual(calledCount, 1);
+  obj
+    .onWindowResize(200)
+    .onWindowResize(500)
+    .onWindowResize(200);
+  assert.strictEqual(calledCount, 2);
+});
+
+
+QUnit.test('Test action added with addBreakpointCrossActionDecreasingWidth fires the callbacks as expected on window width change using triggerActions.', function(assert) {
+  var calledCount = 0;
+  var obj = new BreakpointX([480, 768, 1024]);
+  obj
+    .addBreakpointCrossActionDecreasingWidth(480, function() {
+      calledCount++;
+    })
+    .triggerActions(200);
+  assert.strictEqual(calledCount, 1);
+  obj
+    .onWindowResize(500)
+    .onWindowResize(200);
+  assert.strictEqual(calledCount, 2);
+});
+
+QUnit.test('Test action added with addBreakpointCrossActionDecreasingWidth fires the callbacks as expected on window width change using triggerActions.', function(assert) {
+  var calledCount = 0;
+  var obj = new BreakpointX([480, 768, 1024]);
+  obj
+    .addBreakpointCrossActionDecreasingWidth(480, function() {
+      calledCount++;
+    })
+    .triggerActions(700);
+  assert.strictEqual(calledCount, 0);
+  obj
+    .onWindowResize(200)
+    .onWindowResize(500)
+    .onWindowResize(200);
+  assert.strictEqual(calledCount, 2);
+});
+
+QUnit.test('Test action added with addBreakpointCrossAction fires the callbacks as expected on window width change using triggerActions.', function(assert) {
+  var calledCount = 0;
+  var obj = new BreakpointX([480, 768, 1024]);
+  obj
+    .addBreakpointCrossAction(480, function() {
+      calledCount++;
+    })
+    .triggerActions(200);
+  assert.strictEqual(calledCount, 1);
+  obj
+    .onWindowResize(500)
+    .onWindowResize(200);
+  assert.strictEqual(calledCount, 3);
+});
+
+QUnit.test('Test addBreakpointCrossAction', function(assert) {
+  var calledCount = 0;
+  var bpx = new BreakpointX([480, 768, 1024]);
+  bpx
+    .addBreakpointCrossAction(768, function(a, b, c, d) {
+      calledCount++;
+    })
+    .triggerActions(700);
+  assert.strictEqual(calledCount, 1);
+  bpx
+    .onWindowResize(900)
+    .onWindowResize(900)
+    .onWindowResize(700);
+  assert.strictEqual(calledCount, 3);
+  bpx
+    .onWindowResize(1200)
+    .onWindowResize(1500);
+
+  assert.strictEqual(calledCount, 4);
+});
+
+QUnit.test('Test addBreakpointCrossAction', function(assert) {
+  var calledCount = 0;
+  var bpx = new BreakpointX([480, 768, 1024], ['a', 'b', 'c', 'd']);
+  bpx
+    .addBreakpointCrossAction(1024, function() {
+      calledCount++;
+    });
+  bpx
+    .triggerActions(200)
+    .onWindowResize(500)
+    .onWindowResize(900)
+    .onWindowResize(1200)
+    .onWindowResize(1000)
+    .onWindowResize(900)
+    .onWindowResize(700)
+    .onWindowResize(479)
+    .onWindowResize(1200)
+    .onWindowResize(20);
+  assert.strictEqual(calledCount, 4);
 });
 
 QUnit.test('imageWidthForRayComputesBasedOnSettingsValue with no named segment.', function(assert) {
@@ -328,8 +568,7 @@ QUnit.test('getSegmentForTiny', function(assert) {
   assert.deepEqual(segment.type, 'segment');
   assert.deepEqual(segment.name, 'tiny');
   assert.deepEqual(segment.from, 0);
-  assert.deepEqual(segment.to, 241);
-  assert.deepEqual(segment.breakpoint, 241);
+  assert.deepEqual(segment.to, 240);
   assert.deepEqual(segment.pixelWidth, 240);
   assert.deepEqual(segment.imageWidth, 240);
   assert.deepEqual(segment['@media'], '(max-width:240px)');
@@ -341,7 +580,6 @@ QUnit.test('getSegmentForDesktop', function(assert) {
   assert.deepEqual(segment.name, 'desktop');
   assert.deepEqual(segment.from, 769);
   assert.deepEqual(segment.to, Infinity);
-  assert.deepEqual(segment.breakpoint, undefined, 'segment.breakpoint is undefined');
   assert.deepEqual(segment.pixelWidth, Infinity);
   assert.ok(segment.imageWidth > segment.from);
   assert.deepEqual(segment['@media'], '(min-width:769px)');
@@ -352,8 +590,7 @@ QUnit.test('getSegmentForMobile', function(assert) {
   assert.deepEqual(segment.type, 'segment');
   assert.deepEqual(segment.name, 'mobile');
   assert.deepEqual(segment.from, 241);
-  assert.deepEqual(segment.to, 769);
-  assert.deepEqual(segment.breakpoint, 769);
+  assert.deepEqual(segment.to, 768);
   assert.deepEqual(segment.pixelWidth, 768);
   assert.deepEqual(segment.imageWidth, 768);
   assert.deepEqual(segment['@media'], '(min-width:241px) and (max-width:768px)');

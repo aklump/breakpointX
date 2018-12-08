@@ -12,32 +12,22 @@
  */
 /**
  *
- * Each breakpoint setting consists of a minimum width (and an alias; the alias
- * will be created for you if you pass an array rather than an object to
- * init()). Each viewport is the span of the breakpoint minimum width to one
- * pixel less than the next-larger breakpoint's minimum width.  The largest
- * breakpoint has no maximum width. The first breakpoint should most always be
- * 0.
- *
  * Access the current segment using this.getSegmentByWindow()
  *
  * @code
  *   var bp = new BreakpointX([240, 768], ['small', 'medium', 'large']);
  *   bp
- *   .addAction('smaller', ['large'], function () {
- *     console.log('Now you\'re in medium!');
+ *   .addBreakpointCrossActionDecreasingWidth(768, function () {
+ *     console.log("Now you're in medium!");
  *   })
- *   .addAction('smaller', ['small'], function () {
- *     console.log('Now you\'re in small!');
+ *   .addBreakpointCrossActionDecreasingWidth(240, function () {
+ *     console.log("Now you're in small!");
  *   })
- *   .addAction('bigger', ['large'], function () {
- *     console.log('Now you\'re in large!');
+ *   .addBreakpointCrossActionIncreasingWidth(768, function () {
+ *     console.log("Now you're in large!");
  *   })
- *   .addAction('both', ['large', 'small'], function(from, to, direction) {
- *     var bp = to.breakpoint;
- *     var message "You moved from "+ from.type +" " + from.name;
- *     console.log('Moved from segment '++' across breakpoint '++' to '+
- *   to.type +' ' + to.name);
+ *   .addCrossAction(function(segment, direction, breakpoint, previousSegment) {
+ *     ...
  *   });
  *
  * @endcode
@@ -128,11 +118,29 @@ var BreakpointX = (function($, window) {
    *   True if value is a breakpoint and not a name or media query.
    */
   function valueIsPoint(value) {
-    return value === Infinity || parseInt(value, 10);
+    return value === Infinity || parseInt(value, 10) == value;
   }
 
   function valueIsMediaQuery(value) {
     return typeof value === 'string' && value.indexOf('-width:') >= 0;
+  }
+
+  /**
+   * Helper function to add an action.
+   */
+  function addActionByDirectionAndBreakpoint(direction, breakpoint, callable) {
+    var segment = this.getSegment(breakpoint);
+    if (valueIsPoint(breakpoint)) {
+      if (breakpoint !== segment.from) {
+        throw new Error('You tried to add an action to an unregistered breakpoint "' + breakpoint + '"; you must use one of: ' + this.breakpoints.join(', '));
+      }
+    } else {
+      throw new Error('The provided breakpoint "' + breakpoint + '" is not recognized.');
+    }
+    this.actions[direction][breakpoint] = this.actions[direction][breakpoint] || [];
+    this.actions[direction][breakpoint].push(callable);
+
+    return this;
   }
 
   /**
@@ -237,7 +245,7 @@ var BreakpointX = (function($, window) {
      *
      * @type {int}
      */
-    resizeThrottle: 200,
+    resizeThrottle: 250,
 
     /**
      * A number greater or equal 1 used to compute the width of the images used
@@ -245,7 +253,7 @@ var BreakpointX = (function($, window) {
      *
      * @type {float}
      */
-    breakpointRayImageWidthRatio: 1.4
+    breakpointRayImageWidthRatio: 1.4,
   };
 
   /**
@@ -257,7 +265,7 @@ var BreakpointX = (function($, window) {
    *   than the lowest value indicated in this object, will be considered a part
    *   of the lowest breakpoint.
    *
-   * @return {this}
+   * @return {BreakpointX}
    *
    * Given this code...
    * @code
@@ -302,23 +310,14 @@ var BreakpointX = (function($, window) {
 
     // Make sure that breakpoint values are integers in pixels and listed in
     // ascending order; calculate the maxWidth values.
-    var sortable = [];
-    for (var name in breakpointSettings) {
-      var breakpointValue = breakpointSettings[name];
+    var leftBreakpointValue = 0;
+    for (var segmentName in breakpointSettings) {
+      var breakpointValue = breakpointSettings[segmentName],
+        type = 'ray';
       if (breakpointValue !== Infinity) {
+        type = 'segment';
         breakpointValue = parseInt(breakpointValue, 10);
       }
-      sortable.push([name, breakpointValue]);
-    }
-    sortable.sort(function(a, b) {
-      return a[1] - b[1];
-    });
-    var leftBreakpointValue = 0;
-    for (i in sortable) {
-      i *= 1;
-      var segmentName = sortable[i][0],
-        breakpointValue = sortable[i][1],
-        type = breakpointValue === Infinity ? 'ray' : 'segment';
       segmentData[segmentName] = {
         name: segmentName,
         type: type,
@@ -338,17 +337,16 @@ var BreakpointX = (function($, window) {
 
     // Register our own handler if we're to manipulate classes.
     if (this.settings.addClassesTo) {
-      for (var i in this.breakpoints) {
-        self.addWidthCrossesBreakpointAction(this.breakpoints[i], actionApplyCss);
-      }
+      self
+        .addCrossAction(actionApplyCss)
+        .triggerActions();
     }
 
-    respondToWindowWidth.call(this);
     var throttleTimeout = null;
     $(window).resize(function() {
       clearTimeout(throttleTimeout);
       throttleTimeout = setTimeout(function() {
-        respondToWindowWidth.call(this);
+        self.onWindowResize();
       }, self.settings.resizeThrottle);
     });
 
@@ -356,79 +354,69 @@ var BreakpointX = (function($, window) {
   };
 
   /**
-   * Trigger all actions based on a width or the current window.
+   * Handler for a window resize event.
+   *
+   * This can be called directly to simulate user actions, e.g. when testing.
    *
    * @param int width
    *   Optional.  Omit to use the current window width.
-   * @returns {*}
+   * @returns {BreakpointX}
    */
-  BreakpointX.prototype.triggerActions = function(width) {
-    previousCallbackData.segment = this.getSegment(null);
-    return respondToWindowWidth.call(this, width);
-  };
-
-  function respondToWindowWidth(width) {
+  BreakpointX.prototype.onWindowResize = function(width) {
     var self = this,
-      pointValue = width || this.getWindowWidth(),
-      segment = self.getSegment(pointValue),
+      activeWindowWidth = valueIsPoint(width) ? width : this.getWindowWidth(),
+      segment = self.getSegment(activeWindowWidth),
       pSegment = previousCallbackData.segment,
-      crossed = segment.name !== pSegment.name,
-      callbacks = [];
-    if (crossed || !pSegment.name) {
-      var callbacks = {},
-        direction = null,
-        breakpoint = null;
-      if (pSegment.name) {
-        direction = crossed ? (pointValue > pSegment.from ? 'bigger' : 'smaller') : null;
-      }
-      if (direction) {
-        callbacks.push(self.actions[direction]);
-        breakpoint = direction === 'smaller' ? pSegment.from : segment.from;
-      }
+      hasCrossedBreakpoint = pSegment.name && segment.name !== pSegment.name,
+      callbacks = false,
+      breakpoint = null;
 
-      if (!breakpoint) {
-        // This is the first run, when we have no previous info, thus not cross.
-        var currentWindowSegment = this.getSegmentByWindow();
-        for (var d in this.actions) {
-          if (!this.actions[d].length) {
-            continue;
-          }
-          for (var bp in this.actions[d]) {
-            var breakpoint = this.getSegment(bp).from,
-              addToCallbacks = false,
-              addSmaller = currentWindowSegment.to + 1 === breakpoint,
-              addBigger = breakpoint === currentWindowSegment.from;
-
-            switch (d) {
-              case 'smaller':
-                addToCallbacks = addSmaller;
-                break;
-              case 'bigger':
-                addToCallbacks = addBigger;
-                break;
-              case 'both':
-                addToCallbacks = addSmaller || addBigger;
-                break;
-            }
-
-            if (addToCallbacks) {
-              callbacks[d] = callbacks[d] || [];
-              callbacks[d][breakpoint] = this.actions[d][bp];
-            }
+    if (!pSegment.name) {
+      // This is the first run, when we have no previous info, thus not cross.
+      var activeWindowSegment = self.getSegment(activeWindowWidth);
+      for (var d in self.actions) {
+        if (!self.actions[d].length) {
+          continue;
+        }
+        for (var bp in self.actions[d]) {
+          var from = self.getSegment(bp).from,
+            addSmaller = activeWindowSegment.to + 1 === from,
+            addBigger = from === activeWindowSegment.from,
+            applyCallbacks = (d === 'smaller' && addSmaller)
+              || (d === 'bigger' && addBigger)
+              || (d === 'both' && (addSmaller || addBigger));
+          if (applyCallbacks) {
+            callbacks = callbacks || [];
+            callbacks['bp' + activeWindowSegment.from] = self.actions[d][bp];
           }
         }
       }
-
-      // Fire off all callbacks.
-      for (var d in callbacks) {
-        for (var bp in callbacks[d]) {
-          for (var i in callbacks[d][bp]) {
-            callbacks[d][bp][i].call(self, segment, direction, breakpoint, pSegment);
+    } else if (hasCrossedBreakpoint) {
+      callbacks = callbacks || [];
+      var direction = activeWindowWidth > pSegment.from ? 'bigger' : 'smaller';
+      breakpoint = direction === 'smaller' ? pSegment.from : segment.from;
+      var low = Math.min(pSegment.from, segment.from);
+      var high = Math.max(pSegment.from, segment.from);
+      var directions = ['both', direction];
+      for (var i in directions) {
+        for (var j in self.breakpoints) {
+          var bp = self.breakpoints[j];
+          if (low <= bp && bp <= high && self.actions[directions[i]][bp]) {
+            callbacks['bp' + bp] = self.actions[directions[i]][bp];
           }
         }
       }
+    }
 
+    if (callbacks) {
+      for (var bp in callbacks) {
+        for (var i in callbacks[bp]) {
+          callbacks[bp][i].call(self, segment, direction, breakpoint, pSegment);
+        }
+      }
+    }
 
+    if (callbacks || !previousCallbackData.segment.name) {
       previousCallbackData = {
         breakpoint: breakpoint,
         direction: direction,
@@ -440,10 +428,42 @@ var BreakpointX = (function($, window) {
   };
 
   /**
+   * Trigger action callbacks to fire immediately.
+   *
+   * This differs from onWindowResize, in that this function will always fire
+   * events, whereas onWindowResize, will take into account
+   * previousCallbackData, and will thus sometimes not fire actions.  This
+   * method can be called after adding actions if you wish to initialize them
+   * and not wait for a resize event.
+   *
+   * An example is that if you want an event to fire on page load, you would
+   * need to chain this method on to the add* method:
+   *
+   * @code
+   *   var bpx = new BreakpointX([500]);
+   *   bpx
+   *   .addCrossAction(function(){
+   *      // Do something immediately.
+   *   })
+   *   .triggerActions();
+   * @endcode
+   *
+   * @param int width
+   *   The width used to decide which actions will be triggered.  This is
+   *   optional.  Omit to use the current window width.
+   *
+   * @returns {BreakpointX}
+   */
+  BreakpointX.prototype.triggerActions = function(width) {
+    previousCallbackData.segment = this.getSegment(null);
+    return this.onWindowResize(width);
+  };
+
+  /**
    * Return the width of the current window.
    *
    * This method is faster than using jQuery.
-   * @returns {*}
+   * @returns {int}
    */
   BreakpointX.prototype.getWindowWidth = function() {
     var width, e = window, a = 'inner';
@@ -458,7 +478,7 @@ var BreakpointX = (function($, window) {
   /**
    * Clears all callbacks
    *
-   * @return {this}
+   * @return {BreakpointX}
    */
   BreakpointX.prototype.reset = function() {
     this.actions = {
@@ -474,6 +494,11 @@ var BreakpointX = (function($, window) {
     return this;
   };
 
+  /**
+   * Get the segment (ray) to the right of the highest breakpoint.
+   *
+   * @returns {{}}
+   */
   BreakpointX.prototype.getBreakpointRay = function() {
     var name = this.segmentNames[this.segmentNames.length - 1];
     return this.getSegment(name);
@@ -489,7 +514,7 @@ var BreakpointX = (function($, window) {
    */
   BreakpointX.prototype.getSegment = function(data) {
     if (valueIsPoint(data)) {
-      var point = parseInt(data, 10);
+      var point = data === Infinity ? Infinity : parseInt(data, 10);
       data = null;
       for (var name in segmentData) {
         var segment = segmentData[name];
@@ -528,74 +553,61 @@ var BreakpointX = (function($, window) {
     return this.getSegment(width);
   };
 
-  BreakpointX.prototype.addWidthCrossesBreakpointAction = function(breakpoint, callable) {
-    var segment = this.getSegment(breakpoint);
-    var direction = 'both';
-    if (valueIsPoint(breakpoint)) {
-      if (breakpoint !== segment.from) {
-        throw new Error('You tried to add an action to an unregistered breakpoint "' + breakpoint + '"; you must use one of: ' + this.breakpoints.join(', '));
-      }
-    } else {
-      throw new Error('The provided breakpoint "' + breakpoint + '" is not recognized.');
+
+  /**
+   * Add a callback anytime, any breakpoint is crossed, in any direction.
+   *
+   * @param callable
+   * @returns {BreakpointX}
+   */
+  BreakpointX.prototype.addCrossAction = function(callable) {
+    for (var i in this.breakpoints) {
+      this.actions['both'][this.breakpoints[i]] = this.actions['both'][this.breakpoints[i]] || [];
+      this.actions['both'][this.breakpoints[i]].push(callable);
     }
-    this.actions[direction][breakpoint] = this.actions[direction][breakpoint] || [];
-    this.actions[direction][breakpoint].push(callable);
     return this;
-  };
-
-  BreakpointX.prototype.addWidthBecomesLessThanAction = function(breakpoint, callable) {
-    var segment = this.getSegment(breakpoint),
-      point = segment.from;
-
-    console.log(segment);
-  };
-  BreakpointX.prototype.addWidthBecomesGreaterThanAction = function(breakpoint, callable) {
-    var segment = this.getSegment(breakpoint),
-      point = segment.from;
-
-    console.log(segment);
   };
 
   /**
-   * Register a callback to be executed when the window crosses one or more
-   * breakpoints getting smaller, larger or in both directions.
+   * Add callback for single breakpoint is crossed in either direction.
    *
-   * @param {string} direction
-   *   One of: smaller, larger, both
-   * @param {array} segmentNames
-   *   E.g. [medium, large]
-   * @param {Function} callback
-   *   A callback to be executed.  Callbacks receive:
-   *   - 0 The object moving from: {minWidth, maxWidth, name}
-   *   - 1 The object moving to...
-   *   - 2 The direction string.
-   *   - The current BreakpointX object is available as this
+   * @param int breakpoint
+   *   The breakpoint value.
+   * @param callable
+   *   A function to call
+   *
+   * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addAction = function(direction) {
-    var self = this,
-      breakpoints = this.breakpoints,
-      callback;
-    if (arguments.length === 2) {
-      callback = arguments[1];
-    } else if (arguments.length === 3) {
-      breakpoints = arguments[1];
-      callback = arguments[2];
-    }
-    if (typeof self.actions[direction] === undefined) {
-      throw ('The direction you provided is not understood: ' + direction);
-    } else if (breakpoints.length === 0) {
-      throw ('You must provide at least one breakpoint in an array as the second argument.');
-    } else if (typeof callback !== 'function') {
-      throw ('The provided value for the callback is not a function.');
-    } else {
-      for (var i in breakpoints) {
-        var name = this.getSegment(breakpoints[i]).to;
-        self.actions[direction][name] = self.actions[direction][name] || [];
-        self.actions[direction][name].push(callback);
-      }
-    }
+  BreakpointX.prototype.addBreakpointCrossAction = function(breakpoint, callable) {
+    return addActionByDirectionAndBreakpoint.call(this, 'both', breakpoint, callable);
+  };
 
-    return this;
+  /**
+   * Add callback for a single breakpoint crossing when getting smaller.
+   *
+   * @param int breakpoint
+   *   The breakpoint value.
+   * @param callable
+   *   A function to call
+   *
+   * @returns {BreakpointX}
+   */
+  BreakpointX.prototype.addBreakpointCrossActionDecreasingWidth = function(breakpoint, callable) {
+    return addActionByDirectionAndBreakpoint.call(this, 'smaller', breakpoint, callable);
+  };
+
+  /**
+   * Add callback for a single breakpoint crossing when getting bigger.
+   *
+   * @param int breakpoint
+   *   The breakpoint value.
+   * @param callable
+   *   A function to call
+   *
+   * @returns {BreakpointX}
+   */
+  BreakpointX.prototype.addBreakpointCrossActionIncreasingWidth = function(breakpoint, callable) {
+    return addActionByDirectionAndBreakpoint.call(this, 'bigger', breakpoint, callable);
   };
 
   return BreakpointX;

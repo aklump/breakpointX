@@ -13,17 +13,17 @@
 <script src="src/BreakpointX.js"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    var bpx = new BreakpointX([480, 768], ['mobpxile', 'iphone', 'ipad-portrait'], {
+    var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
       addClassesTo: 'html'
     });
     bpx
-      .addWidthCrossesBreakpointAction(768, function(to, direction, breakpoint, from) {
+      .addCrossAction(function(to, direction, breakpoint, from) {
         console.log('direction:', direction);
         console.log('breakpoint:', breakpoint);
         console.log('from:', from);
         console.log('to:', to);
       })
-      .triggerActions()
+      .triggerActions();
   });
 </script>
 </body>
