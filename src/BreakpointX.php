@@ -38,13 +38,6 @@ class BreakpointX {
   protected $_settings = [];
 
   /**
-   * Holds internal segment data.
-   *
-   * @var array
-   */
-  protected $segmentData;
-
-  /**
    * Hold the default options for settings.
    *
    * @var array
@@ -64,7 +57,7 @@ class BreakpointX {
    *   - $settings An array of additional settings to merge in.
    *     - breakpointRayImageWidthRatio
    */
-  public function __construct(array $breakpoints) {
+  public function __construct(array $breakpoints = []) {
     $args = func_get_args();
     $settings = [];
     if (func_num_args() === 3) {
@@ -93,21 +86,6 @@ class BreakpointX {
       }
       $this->segmentNames[] = "$last-Infinity";
     }
-
-    $this->segmentData = [];
-    $last = 0;
-    foreach ($this->segmentNames as $i => $segment_name) {
-      $this->segmentData[$segment_name] = [
-        'name' => $segment_name,
-        'type' => ($type = empty($this->breakpoints[$i]) ? 'ray' : 'segment'),
-        'from' => $last,
-        'to' => ($to = $type === 'segment' ? $this->breakpoints[$i] - 1 : NULL),
-        '@media' => $this->_query($last, $to),
-        'width' => $to,
-        'imageWidth' => $type === 'segment' ? $to : intval($last * $this->_settings['breakpointRayImageWidthRatio']),
-      ];
-      $last = $type === 'segment' ? $this->breakpoints[$i] : NULL;
-    }
   }
 
   /**
@@ -125,37 +103,58 @@ class BreakpointX {
   }
 
   public function getSegment($data) {
+
+    $segment_name = NULL;
+    $breakpoint = NULL;
     if ($this->valueIsPoint($data)) {
-      foreach ($this->segmentData as $segment) {
-        if ($segment['from'] <= $data && $data <= $segment['to']) {
-          $data = $segment['name'];
+      foreach ($this->breakpoints as $i => $bp) {
+        if ($bp > $data) {
+          $segment_name = $this->segmentNames[$i];
           break;
         }
-        elseif ($segment['to'] === NULL && $data >= $segment['from']) {
-          $data = $segment['name'];
-          break;
-        }
+        $segment_name = $this->segmentNames[$i + 1];
       }
     }
     elseif ($this->valueIsMediaQuery($data)) {
-      $segments = array_filter($this->segmentData, function ($item) use ($data) {
-        return $data === $item['@media'];
-      });
-      if (count($segments)) {
-        $data = $segments[0]['name'];
+      $previous = NULL;
+      foreach ($this->breakpoints as $bp) {
+        if ($previous) {
+          $query = $this->_query($previous, $bp);
+          if ($query === $data) {
+            break;
+          }
+        }
+        $previous = $bp;
       }
     }
-
-    if (isset($this->segmentData[$data])) {
-      return $this->segmentData[$data];
+    else {
+      $segment_name = $data;
     }
 
-    return [
-      'name' => NULL,
-      'from' => NULL,
-      'to' => NULL,
-      '@media' => NULL,
-    ];
+    $segment = array_fill_keys([
+      '@media',
+      'from',
+      'imageWidth',
+      'name',
+      'to',
+      'type',
+      'width',
+    ], NULL);
+
+    if ($segment_name) {
+      $i = array_search($segment_name, $this->segmentNames);
+      $prev_bp = empty($this->breakpoints[$i - 1]) ? NULL : $this->breakpoints[$i - 1];
+      $next_bp = empty($this->breakpoints[$i]) ? NULL : $this->breakpoints[$i];
+      $segment['type'] = empty($next_bp) ? 'ray' : 'segment';
+      $segment['to'] = $next_bp ? $next_bp - 1 : NULL;
+      $segment['from'] = $prev_bp ? $prev_bp : 0;
+      $segment['@media'] = $this->_query($segment['from'], $segment['to']);
+      $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
+      $segment['name'] = $segment_name;
+      $segment['width'] = $segment['to'];
+    }
+
+    return $segment;
   }
 
   /**
@@ -165,7 +164,7 @@ class BreakpointX {
    *   The segment to the right of the highest breakpoint.
    */
   public function getRay() {
-    return end($this->segmentData);
+    return $this->getSegment(end($this->segmentNames));
   }
 
   protected function valueIsPoint($value) {
@@ -186,14 +185,32 @@ class BreakpointX {
    *
    * @return string
    */
-  protected function _query($lower_breakpoint, $upper_breakpoint = NULL) {
-    if ($lower_breakpoint == 0) {
-      return "(max-width:{$upper_breakpoint}px)";
+  protected function _query($min, $max = NULL) {
+    if ($min == 0) {
+      return "(max-width:{$max}px)";
     }
-    elseif (is_null($upper_breakpoint)) {
-      return "(min-width:{$lower_breakpoint}px)";
+    elseif (is_null($max)) {
+      return "(min-width:{$min}px)";
     }
 
-    return "(min-width:{$lower_breakpoint}px) and (max-width:{$upper_breakpoint}px)";
+    return "(min-width:{$min}px) and (max-width:{$max}px)";
+  }
+
+  /**
+   * Create a breakpoint and segment name based on a target device.
+   *
+   * @param string $name
+   *   The device name, this becomes the segment name to the right of the
+   *   breakpoint created by the device width.
+   * @param int $screen_width
+   *   The width of the device; this becomes a breakpoint.
+   */
+  public function addDevice($name, $screen_width) {
+    $this->breakpoints[] = $screen_width;
+    sort($this->breakpoints);
+    if ($this->segmentNames[0] === '0-Infinity') {
+      $this->segmentNames[0] = str_replace('Infinity', $screen_width - 1, $this->segmentNames[0]);
+    }
+    $this->segmentNames[] = $name;
   }
 }

@@ -8,15 +8,6 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
-  public function testWeCanReadTheSettings() {
-    $settings = $this->obj->settings();
-    $this->assertArrayHasKey('breakpointRayImageWidthRatio', $settings);
-  }
-
-  public function testFirst() {
-    $this->assertSame("0-479", $this->obj->getSegment(0)['name']);
-  }
-
   public function testFirstSegmentIsCorrect() {
     $segment = $this->obj->getSegment(100);
     $this->assertSame('0-479', $segment['name']);
@@ -26,6 +17,35 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame('(max-width:479px)', $segment['@media']);
     $this->assertSame(479, $segment['width']);
     $this->assertSame(479, $segment['imageWidth']);
+  }
+
+  public function testAddDevice() {
+    $obj = new BreakpointX();
+    $obj->addDevice('iphone-tall', 480);
+    $obj->addDevice('ipad-tall', 768);
+    $obj->addDevice('ipad-wide', 1024);
+
+    $this->assertSame([480, 768, 1024], $obj->breakpoints);
+    $this->assertSame([
+      '0-479',
+      'iphone-tall',
+      'ipad-tall',
+      'ipad-wide',
+    ], $obj->segmentNames);
+    $this->assertSame('0-479', $obj->getSegment(479)['name']);
+    $this->assertSame('iphone-tall', $obj->getSegment(480)['name']);
+    $this->assertSame('ipad-tall', $obj->getSegment(768)['name']);
+    $this->assertSame('ipad-wide', $obj->getSegment(1024)['name']);
+    $this->assertSame('ipad-wide', $obj->getSegment(1025)['name']);
+  }
+
+  public function testWeCanReadTheSettings() {
+    $settings = $this->obj->settings();
+    $this->assertArrayHasKey('breakpointRayImageWidthRatio', $settings);
+  }
+
+  public function testFirst() {
+    $this->assertSame("0-479", $this->obj->getSegment(0)['name']);
   }
 
   public function testSecondSegmentIsCorrect() {
