@@ -155,41 +155,8 @@ var BreakpointX = (function($, window) {
    * @constructor
    */
   function BreakpointX(breakpoints) {
-    if (breakpoints.length < 1) {
-      throw new Error('You must include at least one breakpoint; you\'ve included none.');
-    }
-    var segmentNames = [];
-    var settings = {};
-    breakpoints = breakpoints.slice().sort(function(a, b) {
-      return a - b;
-    });
-    if (breakpoints[0] === 0) {
-      throw new Error('You must not include a breakpoint of 0.');
-    }
-    // breakpoints = breakpoints ? breakpoints.slice().sort() : [];
-    breakpointSettings = breakpoints;
-    if (arguments.length === 3) {
-      settings = $.extend({}, arguments[2]);
-      segmentNames = arguments[1].slice();
-    } else if (arguments.length === 2) {
-      segmentNames = arguments[1];
-      if (!segmentNames instanceof Array) {
-        segmentNames = [];
-        settings = $.extend({}, segmentNames);
-      }
-    }
-    if (segmentNames.length) {
-      if (segmentNames.length - 1 !== breakpoints.length) {
-        throw new Error('You must have one more segment name than you have breakpoints; you need ' + (breakpoints.length + 1) + ' segment names.');
-      }
-      var breakpointSettings = {};
-      for (var i in segmentNames) {
-        breakpointSettings[segmentNames[i]] = breakpoints[i] || Infinity;
-      }
-    }
 
     this.version = '__version';
-    this.settings = $.extend({}, this.options, settings);
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -206,10 +173,91 @@ var BreakpointX = (function($, window) {
      */
     this.breakpoints = [];
 
-    segmentData = {};
+    if (breakpoints.length < 1) {
+      throw new Error('You must include at least one breakpoint; you\'ve included none.');
+    }
+    var settings = {},
+      self = this;
 
-    this.reset();
-    init.call(this, breakpointSettings);
+    // Ensure breakpoints are sorted ascending; we will always assume the
+    // segment names are in the correct sort, and never touch them.  Also we
+    // clone the breakpoints array so as not to mutate by accident.
+    self.breakpoints = breakpoints.slice().sort(function(a, b) {
+      return a - b;
+    });
+    if (self.breakpoints[0] === 0) {
+      throw new Error('You must not include a breakpoint of 0.');
+    }
+    if (arguments.length === 3) {
+      settings = $.extend({}, arguments[2]);
+      self.segmentNames = arguments[1].slice();
+    } else if (arguments.length === 2) {
+      if (arguments[1] instanceof Array) {
+        self.segmentNames = arguments[1].slice();
+      } else {
+        self.segmentNames = [];
+        settings = $.extend({}, self.segmentNames);
+      }
+    }
+    if (self.segmentNames.length && self.segmentNames.length - 1 !== self.breakpoints.length) {
+      throw new Error('You must have one more segment name than you have breakpoints; you need ' + (self.breakpoints.length + 1) + ' segment names.');
+    }
+    self.settings = $.extend({}, self.options, settings);
+    self.reset();
+
+    // Auto-name missing segment names.
+    if (!self.segmentNames.length) {
+      var last = 0;
+      for (var i in self.breakpoints) {
+        var breakpoint = self.breakpoints[i];
+        self.segmentNames.push(last + '-' + (breakpoint - 1));
+        last = breakpoint;
+      }
+      self.segmentNames.push(last + '-Infinity');
+    }
+
+    // Make sure that breakpoint values are integers in pixels and listed in
+    // ascending order; calculate the maxWidth values.
+    var leftBreakpointValue = 0;
+    segmentData = {};
+    for (var i in self.segmentNames) {
+      var segmentName = self.segmentNames[i],
+        breakpointValue = self.breakpoints[i] || Infinity,
+        type = 'ray';
+      if (breakpointValue !== Infinity) {
+        type = 'segment';
+        breakpointValue = parseInt(breakpointValue, 10);
+      }
+      segmentData[segmentName] = {
+        name: segmentName,
+        type: type,
+        from: leftBreakpointValue,
+        to: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
+        width: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
+        '@media': getMediaQuery(leftBreakpointValue, breakpointValue),
+
+        // Images for this segment should have this width.
+        imageWidth: type === 'segment' ? breakpointValue - 1 : parseInt(leftBreakpointValue * self.settings.breakpointRayImageWidthRatio, 10),
+      };
+      leftBreakpointValue = breakpointValue;
+    }
+
+    // Register our own handler if we're to manipulate classes.
+    if (self.settings.addClassesTo) {
+      self
+        .addCrossAction(actionApplyCss)
+        .triggerActions();
+    }
+
+    var throttleTimeout = null;
+    $(window).resize(function() {
+      clearTimeout(throttleTimeout);
+      throttleTimeout = setTimeout(function() {
+        self.onWindowResize();
+      }, self.settings.resizeThrottle);
+    });
+
+    return self;
   }
 
   /**
@@ -254,103 +302,6 @@ var BreakpointX = (function($, window) {
      * @type {float}
      */
     breakpointRayImageWidthRatio: 1.4,
-  };
-
-  /**
-   * Register the allowed breakpoints.
-   *
-   * @param  {object} breakpoints
-   *   Each object element is comprised of an alias and a pixel value, where
-   *   the pixel value is the width where the breakpoint begins.  Any value less
-   *   than the lowest value indicated in this object, will be considered a part
-   *   of the lowest breakpoint.
-   *
-   * @return {BreakpointX}
-   *
-   * Given this code...
-   * @code
-   *   var bp = new BreakpointX([241, 769], ['small', 'medium', 'large']);
-   *   bp.getSegment(240).name === 'small';
-   *   bp.getSegment(320).name === 'medium';
-   *   bp.getSegment(321).name === 'medium';
-   *   bp.getSegment(768).name === 'medium';
-   *   bp.getSegment(769).name === 'large';
-
-   * @endcode
-   *
-   * ... the following will be true:
-   *
-   */
-  function init(breakpointSettings) {
-    var self = this;
-
-    // Convert numeric keys to media queries.
-    var converted = {};
-    if (breakpointSettings instanceof Array) {
-      breakpointSettings.unshift(0);
-      if (breakpointSettings[breakpointSettings.length - 1] !== Infinity) {
-        breakpointSettings.push(Infinity);
-      }
-      var next;
-      for (var i in breakpointSettings) {
-        next = i * 1 + 1;
-        var autoname = [
-          breakpointSettings[i],
-          (breakpointSettings[next] - 1) || Infinity
-        ].join('-');
-        if (breakpointSettings[next]) {
-          converted[autoname] = breakpointSettings[next];
-        }
-      }
-      breakpointSettings = converted;
-    }
-    if (typeof breakpointSettings !== 'object') {
-      throw ('The breakpoint settings must be either an array of breakpoint values, or an object with segment names and breakpoint values.');
-    }
-
-    // Make sure that breakpoint values are integers in pixels and listed in
-    // ascending order; calculate the maxWidth values.
-    var leftBreakpointValue = 0;
-    for (var segmentName in breakpointSettings) {
-      var breakpointValue = breakpointSettings[segmentName],
-        type = 'ray';
-      if (breakpointValue !== Infinity) {
-        type = 'segment';
-        breakpointValue = parseInt(breakpointValue, 10);
-      }
-      segmentData[segmentName] = {
-        name: segmentName,
-        type: type,
-        from: leftBreakpointValue,
-        to: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
-        width: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
-        '@media': getMediaQuery(leftBreakpointValue, breakpointValue),
-
-        // Images for this segment should have this width.
-        imageWidth: type === 'segment' ? breakpointValue - 1 : parseInt(leftBreakpointValue * self.settings.breakpointRayImageWidthRatio, 10),
-      };
-      self.segmentNames.push(segmentName);
-      breakpointValue !== Infinity && self.breakpoints.push(breakpointValue);
-      leftBreakpointValue = breakpointValue;
-    }
-    self.reset();
-
-    // Register our own handler if we're to manipulate classes.
-    if (this.settings.addClassesTo) {
-      self
-        .addCrossAction(actionApplyCss)
-        .triggerActions();
-    }
-
-    var throttleTimeout = null;
-    $(window).resize(function() {
-      clearTimeout(throttleTimeout);
-      throttleTimeout = setTimeout(function() {
-        self.onWindowResize();
-      }, self.settings.resizeThrottle);
-    });
-
-    return self;
   };
 
   /**

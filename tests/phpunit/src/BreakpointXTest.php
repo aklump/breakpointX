@@ -8,6 +8,10 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+  public function testWeCanReadTheSettings() {
+    $settings = $this->obj->settings();
+    $this->assertArrayHasKey('breakpointRayImageWidthRatio', $settings);
+  }
 
   public function testFirst() {
     $this->assertSame("0-479", $this->obj->getSegment(0)['name']);

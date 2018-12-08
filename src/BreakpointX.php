@@ -14,13 +14,42 @@ class BreakpointX {
 
   public $version = '__version';
 
+  /**
+   * An indexed array of segment names.
+   *
+   * There is always one more than the number of breakpoints.
+   *
+   * @var array
+   */
   public $segmentNames;
 
+  /**
+   * An indexed array of breakpoint values.
+   *
+   * @var array
+   */
   public $breakpoints;
 
+  /**
+   * Holds the current settings being used.
+   *
+   * @var array|mixed
+   */
+  protected $_settings = [];
+
+  /**
+   * Holds internal segment data.
+   *
+   * @var array
+   */
   protected $segmentData;
 
-  protected $settings = [
+  /**
+   * Hold the default options for settings.
+   *
+   * @var array
+   */
+  protected $options = [
     'breakpointRayImageWidthRatio' => 1.4,
   ];
 
@@ -30,7 +59,8 @@ class BreakpointX {
    * @param array $breakpoints
    *   An array of integers defining the breakpoints.
    * @param ....
-   *   - $segmentNames An array of strings naming segments around the breakpoints
+   *   - $segmentNames An array of strings naming segments around the
+   *   breakpoints
    *   - $settings An array of additional settings to merge in.
    *     - breakpointRayImageWidthRatio
    */
@@ -50,7 +80,7 @@ class BreakpointX {
         $settings = $last;
       }
     }
-    $this->settings = $settings + $this->settings;
+    $this->_settings = $settings + $this->options;
     $this->breakpoints = array_map('intval', $breakpoints);
     sort($this->breakpoints);
 
@@ -74,10 +104,24 @@ class BreakpointX {
         'to' => ($to = $type === 'segment' ? $this->breakpoints[$i] - 1 : NULL),
         '@media' => $this->_query($last, $to),
         'width' => $to,
-        'imageWidth' => $type === 'segment' ? $to : intval($last * $this->settings['breakpointRayImageWidthRatio']),
+        'imageWidth' => $type === 'segment' ? $to : intval($last * $this->_settings['breakpointRayImageWidthRatio']),
       ];
       $last = $type === 'segment' ? $this->breakpoints[$i] : NULL;
     }
+  }
+
+  /**
+   * Public accessor for the current settings (read-only).
+   *
+   * To write settings you must pass an array as the last argument of the
+   * contstructor.
+   *
+   * @see ::options For the default values and valid keys.
+   *
+   * @return array
+   */
+  public function settings() {
+    return $this->_settings;
   }
 
   public function getSegment($data) {
