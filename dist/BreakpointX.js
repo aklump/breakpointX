@@ -237,7 +237,7 @@ var BreakpointX = (function($, window) {
         // This is calculated 1px less than the breakpoint and
         // represents the maximum number of pixels that fit into this segment
         // before the breakpoint is crossed.
-        pixelWidth: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
+        width: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
         breakpoint: breakpointValue === Infinity ? undefined : breakpointValue,
         '@media': _query(leftBreakpointValue, breakpointValue),
 

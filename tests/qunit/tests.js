@@ -567,7 +567,7 @@ QUnit.test('getSegmentForTiny', function(assert) {
   assert.deepEqual(segment.name, 'tiny');
   assert.deepEqual(segment.from, 0);
   assert.deepEqual(segment.to, 240);
-  assert.deepEqual(segment.pixelWidth, 240);
+  assert.deepEqual(segment.width, 240);
   assert.deepEqual(segment.imageWidth, 240);
   assert.deepEqual(segment['@media'], '(max-width:240px)');
 });
@@ -578,7 +578,7 @@ QUnit.test('getSegmentForDesktop', function(assert) {
   assert.deepEqual(segment.name, 'desktop');
   assert.deepEqual(segment.from, 769);
   assert.deepEqual(segment.to, Infinity);
-  assert.deepEqual(segment.pixelWidth, Infinity);
+  assert.deepEqual(segment.width, Infinity);
   assert.ok(segment.imageWidth > segment.from);
   assert.deepEqual(segment['@media'], '(min-width:769px)');
 });
@@ -589,7 +589,7 @@ QUnit.test('getSegmentForMobile', function(assert) {
   assert.deepEqual(segment.name, 'mobile');
   assert.deepEqual(segment.from, 241);
   assert.deepEqual(segment.to, 768);
-  assert.deepEqual(segment.pixelWidth, 768);
+  assert.deepEqual(segment.width, 768);
   assert.deepEqual(segment.imageWidth, 768);
   assert.deepEqual(segment['@media'], '(min-width:241px) and (max-width:768px)');
 });

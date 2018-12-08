@@ -323,7 +323,7 @@ var BreakpointX = (function($, window) {
         type: type,
         from: leftBreakpointValue,
         to: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
-        pixelWidth: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
+        width: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
         '@media': getMediaQuery(leftBreakpointValue, breakpointValue),
 
         // Images for this segment should have this width.
