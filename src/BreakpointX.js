@@ -17,13 +17,13 @@
  * @code
  *   var bp = new BreakpointX([240, 768], ['small', 'medium', 'large']);
  *   bp
- *   .addBreakpointCrossActionDecreasingWidth(768, function () {
+ *   .addBreakpointCrossActionDecreasingOnly(768, function () {
  *     console.log("Now you're in medium!");
  *   })
- *   .addBreakpointCrossActionDecreasingWidth(240, function () {
+ *   .addBreakpointCrossActionDecreasingOnly(240, function () {
  *     console.log("Now you're in small!");
  *   })
- *   .addBreakpointCrossActionIncreasingWidth(768, function () {
+ *   .addBreakpointCrossActionIncreasingOnly(768, function () {
  *     console.log("Now you're in large!");
  *   })
  *   .addCrossAction(function(segment, direction, breakpoint, previousSegment) {
@@ -592,7 +592,7 @@ var BreakpointX = (function($, window) {
    *
    * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addBreakpointCrossActionDecreasingWidth = function(breakpoint, callable) {
+  BreakpointX.prototype.addBreakpointCrossActionDecreasingOnly = function(breakpoint, callable) {
     return addActionByDirectionAndBreakpoint.call(this, 'smaller', breakpoint, callable);
   };
 
@@ -606,7 +606,7 @@ var BreakpointX = (function($, window) {
    *
    * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addBreakpointCrossActionIncreasingWidth = function(breakpoint, callable) {
+  BreakpointX.prototype.addBreakpointCrossActionIncreasingOnly = function(breakpoint, callable) {
     return addActionByDirectionAndBreakpoint.call(this, 'bigger', breakpoint, callable);
   };
 
