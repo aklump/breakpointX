@@ -41,6 +41,8 @@
  *   })
  * @endcode
  */
+var jQuery = jQuery || require('jquery');
+var window = window || {};
 var BreakpointX = (function($, window) {
 
   /**

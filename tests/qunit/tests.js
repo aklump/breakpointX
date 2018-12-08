@@ -6,7 +6,7 @@
  * @{
  */
 QUnit.storage = {};
-var BreakpointX = BreakpointX || {};
+var BreakpointX = BreakpointX || require('../../src/BreakpointX.js');
 var obj = {};
 var objArgs = {
   breakpoints: [241, 769],
@@ -14,7 +14,7 @@ var objArgs = {
 };
 
 QUnit.test('Callback arguments are correct on cross', function(assert) {
-  var obj= new BreakpointX([300, 600], ['small', 'medium', 'large']);
+  var obj = new BreakpointX([300, 600], ['small', 'medium', 'large']);
   obj.addBreakpointCrossActionIncreasingOnly(600, function(segment, direction, breakpoint, pSegment) {
     assert.strictEqual(segment.name, 'large');
     assert.strictEqual(direction, 'bigger');
@@ -26,7 +26,7 @@ QUnit.test('Callback arguments are correct on cross', function(assert) {
 });
 
 QUnit.test('Callback arguments are correct on init', function(assert) {
-  var obj= new BreakpointX([500], ['small', 'large']);
+  var obj = new BreakpointX([500], ['small', 'large']);
   obj.addCrossAction(function(segment, direction, breakpoint, pSegment) {
     assert.strictEqual(segment.name, 'small');
     assert.strictEqual(direction, undefined);
@@ -43,7 +43,7 @@ QUnit.test('We dont have double trigger onload at 479; based on demo.', function
   });
   bpx
     .addCrossAction(function(segment, direction, breakpoint, from) {
-      callCount++
+      callCount++;
     })
     .triggerActions(479);
   assert.strictEqual(callCount, 1);
@@ -56,7 +56,7 @@ QUnit.test('We dont have double trigger onload at 1024; based on demo.', functio
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
-      callCount++
+      callCount++;
     })
     .triggerActions(1024);
   assert.strictEqual(callCount, 1);
@@ -69,7 +69,7 @@ QUnit.test('We dont have double trigger onload at 1023; based on demo.', functio
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
-      callCount++
+      callCount++;
     })
     .triggerActions(1023);
   assert.strictEqual(callCount, 1);
@@ -82,7 +82,7 @@ QUnit.test('We dont have double trigger onload at 480; based on demo.', function
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
-      callCount++
+      callCount++;
     })
     .triggerActions(480);
   assert.strictEqual(callCount, 1);
@@ -95,7 +95,7 @@ QUnit.test('We dont have double trigger onload at 768; based on demo.', function
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
-      callCount++
+      callCount++;
     })
     .triggerActions(768);
   assert.strictEqual(callCount, 1);
