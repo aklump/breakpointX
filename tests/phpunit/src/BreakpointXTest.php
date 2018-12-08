@@ -72,7 +72,7 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testLast() {
-    $this->assertSame("768-Infinity", $this->obj->getBreakpointRay()['name']);
+    $this->assertSame("768-Infinity", $this->obj->getRay()['name']);
   }
 
   public function testConstructWithNamedAliases() {

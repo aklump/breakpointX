@@ -448,22 +448,30 @@ var BreakpointX = (function($, window) {
   };
 
   /**
-   * Get the segment (ray) to the right of the highest breakpoint.
+   * Get the final "segment" to the right of the highest breakpoint.
    *
    * @returns {{}}
    */
-  BreakpointX.prototype.getBreakpointRay = function() {
+  BreakpointX.prototype.getRay = function() {
     var name = this.segmentNames[this.segmentNames.length - 1];
     return this.getSegment(name);
   };
 
-
   /**
-   * Utility function to get a segment from value, name or media query.
+   * Utility function to get a segment (or ray) by value, name or media query.
+   *
+   * Technically speaking the last "segment" is a ray, but for simplicity you
+   * may use this function to return the ray as well.  You can also use
+   * ::getRay() to get the last "segment".  Take notice of the 'type' key which
+   * will be either 'ray' or 'segment'.
+   *
+   * To get the leftmost segment use ::getSegment(0).
    *
    * @param int|string data
    *   Can be point value, segment name or media query.
    * @returns {{}}
+   *
+   * @see ::getRay()
    */
   BreakpointX.prototype.getSegment = function(data) {
     if (valueIsPoint(data)) {

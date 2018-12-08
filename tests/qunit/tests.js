@@ -201,11 +201,11 @@ QUnit.test('Assert classes are added to the html tag when options set.',
     assert.ok($('html').hasClass('bpx-website'));
   });
 
-QUnit.test('Assert getBreakpointRay works', function(assert) {
-  assert.strictEqual(obj.getBreakpointRay().name, 'desktop');
+QUnit.test('Assert getRay works', function(assert) {
+  assert.strictEqual(obj.getRay().name, 'desktop');
 
   obj = new BreakpointX([480, 768, 1080]);
-  assert.strictEqual(obj.getBreakpointRay().name, '1080-Infinity');
+  assert.strictEqual(obj.getRay().name, '1080-Infinity');
 });
 
 QUnit.test('Assert that breakpoints as an array of values works.', function(assert) {

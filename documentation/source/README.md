@@ -6,7 +6,7 @@
 
 This project provides a means to define horizontal breakpoints, which will fire JS callbacks when the browser width crosses said breakpoints.  It also allows for CSS classes to be applied to designated elements which reflect the current breakpoint.  It can be used when you need to do anything in Javascript based on window resizing.  The server-side component is useful if you're using a PHP-based CMS for coordinating breakpoints.
 
-A breakpoint is defined as a single point along the horizontal axis.  To the left lies a breakpoint segment, and to the right of the hightest value breakpoint lies the breakpoint ray.  To the right of all but the highest value breakpoint, likes a breakpoint segment.  See the section below _Breakpoint Theory_.
+A breakpoint is defined as a single point along the horizontal axis.  To the left lies a breakpoint segment, and to the right of the highest value breakpoint lies the breakpoint ray.  To the right of all but the highest value breakpoint, likes a breakpoint segment.  See the section below _Breakpoint Theory_.
 
 **Visit <https://aklump.github.io/breakpointX/> for full documentation.**
 

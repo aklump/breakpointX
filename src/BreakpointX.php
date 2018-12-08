@@ -164,7 +164,7 @@ class BreakpointX {
    * @return array
    *   The segment to the right of the highest breakpoint.
    */
-  public function getBreakpointRay() {
+  public function getRay() {
     return end($this->segmentData);
   }
 
