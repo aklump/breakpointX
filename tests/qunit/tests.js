@@ -30,10 +30,14 @@ QUnit.test(
       .addSegmentByMedia('(min-width:960px) and (max-width:1079px)')
       .addSegmentByMedia('min-width:1080px');
     assert.deepEqual(obj.breakpoints, [768, 960, 1080]);
-    assert.deepEqual(obj.segmentNames, ['0-767', '768-959', '960-1079', '1080-infinity']);
+    assert.deepEqual(obj.segmentNames, [
+      '0-767',
+      '768-959',
+      '960-1079',
+      '1080-infinity',
+    ]);
   }
 );
-
 
 QUnit.test(
   'Assert addSegmentByMedia creates segments and breakpoints without ()',
