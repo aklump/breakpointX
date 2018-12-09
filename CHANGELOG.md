@@ -5,11 +5,11 @@
 * .current was removed.
 * use .getSegmentByWindow() instead of .current.
 * use .getSegment(0) instead of .alias('first').
-* use .getBreakpointRay() instead of .alias('last').
+* use .getRay() instead of .alias('last').
 * .settings.breakpoints was removed.
 * .breakpoints is now an array of breakpoint values.
 * Constructor arguments have changed; see documentation for new format.
-* addAction was removed.
+* addAction was replaced with multiple methods; see code for `add*` methods.
 
 ## 0.5.0
 

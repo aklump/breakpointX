@@ -7,145 +7,168 @@ namespace AKlump\BreakpointX;
  *
  * A server-side compliment to BreakpointX.js
  *
- * @version 0.5
+ * @version 0.5.0
  * @package AKlump\BreakpointX
  */
 class BreakpointX {
 
-  public $version = '0.5';
+  public $version = '0.5.0';
 
-  public $aliases;
+  /**
+   * An indexed array of segment names.
+   *
+   * There is always one more than the number of breakpoints.
+   *
+   * @var array
+   */
+  public $segmentNames;
 
+  /**
+   * An indexed array of breakpoint values.
+   *
+   * @var array
+   */
   public $breakpoints;
 
-  protected $settings = [];
+  /**
+   * Holds the current settings being used.
+   *
+   * @var array|mixed
+   */
+  protected $_settings = [];
+
+  /**
+   * Hold the default options for settings.
+   *
+   * @var array
+   */
+  protected $options = [
+    'breakpointRayImageWidthRatio' => 1.4,
+  ];
 
   /**
    * BreakpointX constructor.
+   *
+   * @param array $breakpoints
+   *   An array of integers defining the breakpoints.
+   * @param ....
+   *   - $segmentNames An array of strings naming segments around the
+   *   breakpoints
+   *   - $settings An array of additional settings to merge in.
+   *     - breakpointRayImageWidthRatio
    */
-  public function __construct(array $breakpoints) {
-    $this->init($breakpoints);
+  public function __construct(array $breakpoints = []) {
+    $args = func_get_args();
+    $settings = [];
+    if (func_num_args() === 3) {
+      $settings = array_pop($args);
+      $this->segmentNames = array_pop($args);
+    }
+    elseif (func_num_args() === 2) {
+      $last = array_pop($args);
+      if (is_numeric(key($last))) {
+        $this->segmentNames = $last;
+      }
+      else {
+        $settings = $last;
+      }
+    }
+    $this->_settings = $settings + $this->options;
+    $this->breakpoints = array_map('intval', $breakpoints);
+    sort($this->breakpoints);
+
+    // Convert numeric keys to media queries.
+    $last = 0;
+    if (empty($this->segmentNames)) {
+      foreach ($this->breakpoints as $breakpoint) {
+        $this->segmentNames[] = "$last-" . ($breakpoint - 1);
+        $last = $breakpoint;
+      }
+      $this->segmentNames[] = "$last-Infinity";
+    }
   }
 
   /**
-   * Return the value of a settings.
+   * Public accessor for the current settings (read-only).
    *
-   * Most importantly, to get the breakpoint setting used to instantiate.
+   * To write settings you must pass an array as the last argument of the
+   * contstructor.
    *
-   * @code
-   *   $obj->getSetting('breakpoints');
-   * @endcode
-   *
-   * @param mixed $default Optional, a default value other than null.
+   * @see ::options For the default values and valid keys.
    *
    * @return array
    */
-  public function getSetting($setting, $default = NULL) {
-    return isset($this->settings[$setting]) ? $this->settings[$setting] : $default;
+  public function settings() {
+    return $this->_settings;
   }
 
-  public function init($breakpoints) {
-    asort($breakpoints);
-    $this->settings['breakpoints'] = $breakpoints;
-
-    //
-    //
-    // Convert numeric keys to media queries.
-    //
-    if (is_numeric(key($breakpoints))) {
-      foreach (array_keys($breakpoints) as $i) {
-        $next_bp_index = $i + 1;
-        $query = $this->_query(
-          $breakpoints[$i],
-          (isset($breakpoints[$next_bp_index]) ? $breakpoints[$next_bp_index] : NULL)
-        );
-        $converted[$query] = $breakpoints[$i];
+  public function getSegment($data) {
+    $segment_name = $data;
+    if ($this->valueIsPoint($data)) {
+      foreach ($this->breakpoints as $i => $bp) {
+        if ($bp > $data) {
+          $segment_name = $this->segmentNames[$i];
+          break;
+        }
+        $segment_name = $this->segmentNames[$i + 1];
       }
-      $breakpoints = $converted;
     }
-
-    $this->aliases = [];
-    $sortable = [];
-    foreach (array_keys($breakpoints) as $alias) {
-      $pixels = intval($breakpoints[$alias]);
-      $sortable[] = [$alias, $pixels];
-    }
-
-    usort($sortable, function ($a, $b) {
-      return $a[1] - $b[1];
-    });
-    foreach (array_keys($sortable) as $i) {
-      $i *= 1;
-      $minWidth = $sortable[$i][1];
-      $alias = $sortable[$i][0];
-      $this->aliases[] = $alias;
-      $maxWidth = isset($sortable[$i + 1]) ? $sortable[$i + 1][1] - 1 : NULL;
-      $this->breakpoints[$alias] = [$minWidth, $maxWidth];
-    }
-  }
-
-  /**
-   * Return the pixel value of a breakpoint alias.
-   *
-   * @param  {string} alias E.g. 'large'
-   *
-   * @return {array} [min, max]
-   */
-  public function value($alias) {
-    return isset($this->breakpoints[$alias]) ? $this->breakpoints[$alias] : NULL;
-  }
-
-  /**
-   * Return the media query string for an alias.
-   *
-   * @param string alias
-   *   The alias name
-   *
-   * @return string
-   *   The media query string, e.g. 'min-width: 769px'.
-   */
-  public function query($alias) {
-    list($lower_breakpoint, $upper_breakpoint) = $this->value($alias);
-    $upper_breakpoint = is_null($upper_breakpoint) ? NULL : ++$upper_breakpoint;
-
-    return $this->_query($lower_breakpoint, $upper_breakpoint);
-  }
-
-  /**
-   * Return the alias of a pixel width.
-   *
-   * Special width keys are:
-   *   - 'first' Returns the alias of the smallest breakpoint.
-   *   - 'last' Returns the alias of the widest breakpoint.
-   *
-   * Any pixel value within a viewport will yield the same alias, e.g.
-   * 750, 760, 768 would all yield "tablet" if "tablet" was set up with 768
-   * as the width.
-   *
-   * Be aware that a value larger than the highest defined breakpoint will
-   * still return the hightest defined breakpoint alias.
-   *
-   * @return string
-   */
-  public function alias($width) {
-    if ($width === 'first') {
-      return reset($this->aliases);
-    }
-    if ($width === 'last') {
-      return end($this->aliases);
-    }
-
-    $found = NULL;
-    foreach (array_keys($this->breakpoints) as $alias) {
-      $bp = $this->breakpoints[$alias][0];
-      $found = $found ? $found : $alias;
-      if ($width < $bp) {
-        return $found;
+    elseif ($this->valueIsMediaQuery($data)) {
+      $min = NULL;
+      $breakpoints = $this->breakpoints;
+      $breakpoints[] = NULL;
+      foreach ($breakpoints as $i => $bp) {
+        $max = $bp ? $bp - 1 : $bp;
+        $query = $this->_query($min, $max);
+        if (str_replace(' ', '', $query) === str_replace(' ', '', $data)) {
+          $segment_name = $this->segmentNames[$i];
+          break;
+        }
+        $min = $bp;
       }
-      $found = $alias;
+    }
+    $segment = array_fill_keys([
+      '@media',
+      'from',
+      'imageWidth',
+      'name',
+      'to',
+      'type',
+      'width',
+    ], NULL);
+
+    $i = array_search($segment_name, $this->segmentNames);
+    if ($segment_name && $i !== FALSE) {
+      $prev_bp = empty($this->breakpoints[$i - 1]) ? NULL : $this->breakpoints[$i - 1];
+      $next_bp = empty($this->breakpoints[$i]) ? NULL : $this->breakpoints[$i];
+      $segment['type'] = empty($next_bp) ? 'ray' : 'segment';
+      $segment['from'] = $prev_bp ? $prev_bp : 0;
+      $segment['to'] = $next_bp ? $next_bp - 1 : NULL;
+      $segment['@media'] = $this->_query($segment['from'], $segment['to']);
+      $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
+      $segment['name'] = $segment_name;
+      $segment['width'] = $segment['to'];
     }
 
-    return $found;
+    return $segment;
+  }
+
+  /**
+   * Get the last segment (ray) after the highest breakpoint.
+   *
+   * @return array
+   *   The segment to the right of the highest breakpoint.
+   */
+  public function getRay() {
+    return $this->getSegment(end($this->segmentNames));
+  }
+
+  protected function valueIsPoint($value) {
+    return is_numeric($value);
+  }
+
+  protected function valueIsMediaQuery($value) {
+    return strstr($value, '-width:');
   }
 
   /**
@@ -158,15 +181,37 @@ class BreakpointX {
    *
    * @return string
    */
-  protected function _query($lower_breakpoint, $upper_breakpoint = NULL) {
-    !is_null($upper_breakpoint) && --$upper_breakpoint;
-    if ($lower_breakpoint == 0) {
-      return "max-width:{$upper_breakpoint}px";
+  protected function _query($min, $max = NULL) {
+    if ($min == 0) {
+      return "(max-width:{$max}px)";
     }
-    elseif (is_null($upper_breakpoint)) {
-      return "min-width:{$lower_breakpoint}px";
+    elseif (is_null($max)) {
+      return "(min-width:{$min}px)";
     }
 
-    return "(min-width:{$lower_breakpoint}px) and (max-width:{$upper_breakpoint}px)";
+    return "(min-width:{$min}px) and (max-width:{$max}px)";
+  }
+
+  /**
+   * Create a breakpoint and segment name based on a target device.
+   *
+   * @param string $name
+   *   The device name, this becomes the segment name to the right of the
+   *   breakpoint created by the device width.
+   * @param int $screen_width
+   *   The width of the device; this becomes a breakpoint.
+   *
+   * @return \AKlump\BreakpointX\BreakpointX
+   */
+  public function addDevice($name, $screen_width) {
+    $this->breakpoints[] = $screen_width;
+    sort($this->breakpoints);
+    if ($this->segmentNames[0] === '0-Infinity') {
+      $this->segmentNames[0] = '0-' . ($screen_width - 1);
+    }
+    $i = array_search($screen_width, $this->breakpoints);
+    array_splice($this->segmentNames, $i + 1, 1, $name);
+
+    return $this;
   }
 }

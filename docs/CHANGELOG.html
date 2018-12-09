@@ -25,7 +25,22 @@
   <h1>CHANGELOG</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
 
-<section><h2>0.5.0</h2>
+<section><h2>0.6.0</h2>
+
+<ul>
+<li>Removed deprecatated functions from 0.5.0.</li>
+<li>.last became .previousCallbackData and format changes.</li>
+<li>.current was removed.</li>
+<li>use .getSegmentByWindow() instead of .current.</li>
+<li>use .getSegment(0) instead of .alias('first').</li>
+<li>use .getRay() instead of .alias('last').</li>
+<li>.settings.breakpoints was removed.</li>
+<li>.breakpoints is now an array of breakpoint values.</li>
+<li>Constructor arguments have changed; see documentation for new format.</li>
+<li>addAction was replaced with multiple methods; see code for <code>add*</code> methods.</li>
+</ul>
+
+<h2>0.5.0</h2>
 
 <ol>
 <li><p>The way breakpoints are defined has changed.  The old syntax:</p>
@@ -59,7 +74,7 @@
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.5 &bull; Last Updated: Thu, 06 Dec 2018 19:22:23 -0800</p>
+    <p class="legaleeze center">Version: 0.5.0 &bull; Last Updated: Sat, 08 Dec 2018 17:38:46 -0800</p>
   </div>
 </footer>
 
