@@ -4,7 +4,7 @@
 
 ## Summary
 
-This project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will write CSS classes to designated elements.  It provides a PHP class with a simliar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.
+This project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will apply CSS classes to designated elements.  It provides a PHP class with a similar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.
 
 A breakpoint is defined as a single point along the horizontal axis.  To the left lies a segment, and to the right of the highest value breakpoint lies the ray.  To the right of all but the highest value breakpoint, likes a segment.  See the section below _Breakpoint Theory_.
 
@@ -127,7 +127,7 @@ While this is foremost a Javascript project, there is a PHP class that may be he
 
 ## Requirements
 
-* jQuery >= 1.4
+* jQuery
 
 ## Contributing
 
