@@ -31,15 +31,136 @@
 
 <h2>Summary</h2>
 
-<p>This project provides a means to define horizontal breakpoints, which will fire JS callbacks when the browser width crosses said breakpoints.  It also allows for CSS classes to be applied to designated elements which reflect the current breakpoint.  It can be used when you need to do anything in Javascript based on window resizing.  The server-side component is useful if you're using a PHP-based CMS for coordinating breakpoints.</p>
+<p>This project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will write CSS classes to designated elements.  It provides a PHP class with a simliar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.</p>
 
 <p>A breakpoint is defined as a single point along the horizontal axis.  To the left lies a segment, and to the right of the highest value breakpoint lies the ray.  To the right of all but the highest value breakpoint, likes a segment.  See the section below <em>Breakpoint Theory</em>.</p>
 
 <p><strong>Visit <a href="https://aklump.github.io/breakpointX/">https://aklump.github.io/breakpointX/</a> for full documentation.</strong></p>
 
-<h2>Quick Start</h2>
+<h2>Installation</h2>
 
 <p>Install using <code>yarn add @aklump/breakpointx</code> or <code>npm i @aklump/breakpointx</code></p>
+
+<h2>Quick Start</h2>
+
+<pre><code>var bp = new BreakpointX([480, 768]);
+</code></pre>
+
+<p><img src="images/basic.png" alt="Basic Usage" /></p>
+
+<p>Get segment info using any point along the axis:</p>
+
+<pre><code>bp.getSegment(200);
+bp.getSegment(480);
+bp.getSegment(1000);
+</code></pre>
+
+<h3>Named Segments</h3>
+
+<p>It can be helpful to name your segments:</p>
+
+<pre><code>var obj = new BreakpointX([480, 768], ['small', 'medium', 'large']);
+</code></pre>
+
+<p><img src="images/named.png" alt="Basic Usage" /></p>
+
+<p>Then you can also retrieve segment info using a name, which includes items such as the width, from point, to point, media query, image width, name, and more.</p>
+
+<p><img src="images/console.jpg" alt="segment dump" /></p>
+
+<pre><code>bp.getSegment(300);
+bp.getSegment('small');
+
+var name = bp.getSegment('small').name;
+var query = bp.getSegment('small')['@media'];
+var imageWidth = bp.getSegment(300).imageWidth;
+</code></pre>
+
+<h2>CSS Classes</h2>
+
+<p>To cause CSS classes to be written on an element, pass the appropriate settings, where <code>addClassesTo</code> is a jQuery selector or object.  It becomes a property of the instance as <code>.$el</code>, so it can be accessed in callbacks, if necessary.</p>
+
+<pre><code>// Breakpoints only with settings.
+var obj = new BreakpointX([768], ['mobile', 'desktop'], {
+  addClassesTo: 'html',
+  classPrefix: 'bpx-',
+});
+</code></pre>
+
+<p>The element will look like this when the browser gets larger and crosses 768px.</p>
+
+<pre><code>&lt;html class="bpx-desktop bpx-bigger"&gt;
+</code></pre>
+
+<p>Or when crossing 768px getting smaller.</p>
+
+<pre><code>&lt;html class="bpx-mobile bpx-smaller"&gt;
+</code></pre>
+
+<h2>Callbacks When Breakpoints Are Crossed</h2>
+
+<p>When the window width changes, and a breakpoint is hit or crossed, callbacks can be registered to fire as a result. <code>this</code> points to the BreakpointX instance.</p>
+
+<pre><code>// When the window crosses any breakpoint in either direction
+bp.addCrossAction(function(segment, direction, breakpoint, previousSegment) {
+  ... do something in response.
+});
+
+// When the window crosses 768 in either direction
+bp.addBreakpointCrossAction(function(segment, direction, breakpoint, previousSegment) {
+  ... do something in response.
+});
+
+// When the window crosses 768 getting smaller
+bp.addBreakpointCrossActionDecreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+  ... do something in response.
+});
+
+// When the window crosses 768 getting bigger
+bp.addBreakpointCrossActionIncreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+  ... do something in response.
+});
+</code></pre>
+
+<h2>In Terms of Devices</h2>
+
+<p>Here is an example which demonstrates how you might construct an instance when thinking in terms of physical devices.  It's given in PHP, however the JS methods are exactly the same.</p>
+
+<p><img src="images/devices.png" alt="Device-centric appproach" /></p>
+
+<pre><code>&lt;?php
+$obj = new BreakpointX();
+$obj
+  -&gt;addDevice('iphone', 480)
+  -&gt;addDevice('ipad', 768)
+  -&gt;addDevice('desktop', 1024)
+  -&gt;renameSegment(0, 'small');
+</code></pre>
+
+<h2>PHP Usage</h2>
+
+<p>While this is foremost a Javascript project, there is a PHP class that may be helpful to your use case.  Browser-related methods do not exist, but other methods share the same API as the JS object.  The class file is <em>dist/BreakpointX.php</em> or if installing with Node, <em>node_modules/@aklump/breakpointx/dist/BreakpointX.php</em>.</p>
+
+<pre><code>&lt;?php
+$bp = new BreakpointX([480, 768]);
+
+$name = $bp-&gt;getSegment(300)['name'];
+$query = $bp-&gt;getSegment(300)['@media'];
+$imageWidth = $bp-&gt;getSegment(300)['imageWidth'];
+</code></pre>
+
+<h3>Autoloading</h3>
+
+<p>For PSR autoloading, the namespace <code>AKlump\\BreakpointX</code> should map to <em>node_modules/@aklump/breakpointx/dist</em>.  Here's an example for a <em>composer.json</em> in the same directory as the <em>package.json</em> used to install BreakpointX.</p>
+
+<pre><code>{
+    "autoload": {
+        "psr-4": {
+            "AKlump\\BreakpointX\\": "node_modules/@aklump/breakpointx/dist"
+        }
+    }
+}
+</code></pre>
 
 <h2>Requirements</h2>
 
@@ -53,6 +174,8 @@
 
 <h2>Breakpoint Theory</h2>
 
+<p>This cheatsheet will familiarize you with the terms used in this project.</p>
+
 <p><img src="images/breakpoint-cheatsheet.png" alt="Cheatsheet" /></p>
 
 <p>Download this <a href="images/breakpoint-cheatsheet.pdf">Cheatsheet</a> by <a href="http://www.intheloftstudios.com">In the Loft Studios</a></p>
@@ -61,120 +184,8 @@
 
 <ul>
 <li>By definition a <em>breakpoint</em> does not have a width, nor does it have a minimum or a maximum; it's just a point.</li>
-<li>A CSS media query represents a <em>segment or ray</em> not a <em>breakpoint</em>.</li>
+<li>A CSS media query represents a <em>segment</em> or <em>ray</em> not a <em>breakpoint</em>.</li>
 </ul>
-
-<h2>Usage</h2>
-
-<pre><code>// Breakpoints only, using default settings.
-var obj = new BreakpointX(480, 768);
-
-// Breakpoints only with settings.
-var obj = new BreakpointX([480, 768], {
-  addClassesTo: 'html',
-  classPrefix: 'bpx-',
-  resizeThrottle: 200,
-  breakpointRayImageWidthRatio: 1.5,
-});
-
-// With named segments.
-var obj = new BreakpointX([480, 768], ['small', 'medium', 'large']);
-
-// Named segments and custom settings.
-var obj = new BreakpointX([480, 768], ['small', 'medium', 'large'], {
-  addClassesTo: 'html',
-  classPrefix: 'bpx-',
-  resizeThrottle: 200,
-  breakpointRayImageWidthRatio: 1.5,
-});
-</code></pre>
-
-<h3>Create a new instance, define breakpoints</h3>
-
-<pre><code>// Register three breakpoints that indicate the following:
-// - segment: 0px - 239px
-// - segment: 240px - 767px
-// - ray: 768px +
-var bp = new BreakpointX([240, 768]);
-</code></pre>
-
-<h3>Find the breakpoint by a horizontal, x value.</h3>
-
-<pre><code>var alias = bp.alias(240);
-// alias === '(min-width:240px) and (max-width: 767px)';
-
-var alias = bp.alias(200);
-// alias === 'max-width: 239px';
-
-var alias = bp.alias(300);
-// alias === '(min-width:240px) and (max-width: 767px)';
-
-var alias = bp.alias(1080);
-// alias === 'min-width: 768px';
-</code></pre>
-
-<h3>Register a callback to fire</h3>
-
-<pre><code>// When the window crosses 768 getting smaller
-bp.add('smaller', ['(min-width:240px) and (max-width: 767px)'], function () {
-  console.log('Now you\'re in (min-width:240px) and (max-width: 767px)!');
-});
-
-// When the window crosses 768 getting bigger
-bp.add('bigger', ['(min-width:240px) and (max-width: 767px)'], function () {
-  console.log('Now you\'re in (min-width:240px) and (max-width: 767px)!');
-});
-
-// When the window crosses any breakpoint in either direction
-bp.add('both', bp.aliases, function (from, to, direction) {
-  console.log('Now you\'re in: ' + to.name);
-  console.log('Window just got ' + direction);
-});
-</code></pre>
-
-<h3>Alternative: Create a new instance with named segments</h3>
-
-<p>When you construct an instance of <em>BreakpointX</em> using only numbers, you simply list the breakpoints and the names are autogenerated.  However, it is possible to name your segments and ray when you construct <em>BreakpointX</em> by passing an object instead.  The keys of the object are the segment names and the ray name, and the values are the breakpoints with a final value of <em>Infinity</em> to represent the ray.</p>
-
-<p>The following example defines:</p>
-
-<ul>
-<li>A ray named <em>small</em></li>
-<li>A breakpoint at 240px</li>
-<li>A segment named <em>medium</em></li>
-<li>A breakpoint at 768px</li>
-<li>A ray named <em>large</em></li>
-</ul>
-
-<p>Here is the code:</p>
-
-<pre><code>var bp = new BreakpointX([{small: 240, medium: 768, large: Infinity}]);
-</code></pre>
-
-<h3>Add a class to an element reflecting the current breakpoint</h3>
-
-<pre><code>var bp = new BreakpointX([{mobile: 768, desktop: Infinity}], {
-  addClassesTo: 'body'
-});
-</code></pre>
-
-<p>The body element will look like this when the browser gets larger and crosses 768px.</p>
-
-<pre><code>&lt;body class="bpx-desktop bpx-bigger"&gt;
-</code></pre>
-
-<h3>PHP</h3>
-
-<p>For PHP usage the namespace <code>AKlump\\BreakpointX</code> should map to <em>node_modules/@aklump/breakpointx/dist</em>.  Here's an example for <em>composer.json</em>.</p>
-
-<pre><code>{
-    "autoload": {
-        "psr-4": {
-            "AKlump\\BreakpointX\\": "node_modules/@aklump/breakpointx/dist"
-        }
-    }
-}
-</code></pre>
 </section>
 
 <div class="search__results">
@@ -189,7 +200,7 @@ bp.add('both', bp.aliases, function (from, to, direction) {
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.5.0 &bull; Last Updated: Sat, 08 Dec 2018 17:38:46 -0800</p>
+    <p class="legaleeze center">Version: 0.5.0 &bull; Last Updated: Sun, 09 Dec 2018 08:48:45 -0800</p>
   </div>
 </footer>
 

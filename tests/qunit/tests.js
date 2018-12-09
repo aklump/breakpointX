@@ -13,7 +13,15 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
-QUnit.test('Assert when addClassesTo is used the object is attached as .$el', function(assert) {
+QUnit.test('Assert when addClassesTo (object) is used the object is attached as .$el', function(assert) {
+  var obj = new BreakpointX([768], {
+    addClassesTo: $('html'),
+  });
+  assert.ok(obj.$el);
+  assert.strictEqual(obj.$el.get(0), $('html').get(0));
+});
+
+QUnit.test('Assert when addClassesTo (string) is used the object is attached as .$el', function(assert) {
   var obj = new BreakpointX([768], {
     addClassesTo: 'html',
   });

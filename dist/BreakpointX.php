@@ -84,7 +84,7 @@ class BreakpointX {
         $this->segmentNames[] = "$last-" . ($breakpoint - 1);
         $last = $breakpoint;
       }
-      $this->segmentNames[] = "$last-Infinity";
+      $this->segmentNames[] = "$last-infinity";
     }
   }
 
@@ -100,6 +100,13 @@ class BreakpointX {
    */
   public function settings() {
     return $this->_settings;
+  }
+
+  public function renameSegment($point_in_segment, $name) {
+    $i = array_search($this->getSegment($point_in_segment)['name'], $this->segmentNames);
+    $this->segmentNames[$i] = $name;
+
+    return $this;
   }
 
   public function getSegment($data) {
@@ -206,7 +213,7 @@ class BreakpointX {
   public function addDevice($name, $screen_width) {
     $this->breakpoints[] = $screen_width;
     sort($this->breakpoints);
-    if ($this->segmentNames[0] === '0-Infinity') {
+    if ($this->segmentNames[0] === '0-infinity') {
       $this->segmentNames[0] = '0-' . ($screen_width - 1);
     }
     $i = array_search($screen_width, $this->breakpoints);
