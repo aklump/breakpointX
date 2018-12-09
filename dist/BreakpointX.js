@@ -1,5 +1,5 @@
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.6.3
+ * Breakpoint X (Crossing) jQuery Plugin v0.6.4
  * https://github.com/aklump/breakpointX#readme
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Sun Dec  9 14:10:01 PST 2018_string
+ * Date: Sun Dec  9 15:11:16 PST 2018_string
  */
 /**
  *
@@ -214,7 +214,7 @@ var BreakpointX = (function(window) {
      */
     this.el = null;
 
-    this.version = '0.6.3';
+    this.version = '0.6.4';
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -357,35 +357,25 @@ var BreakpointX = (function(window) {
   };
 
   BreakpointX.prototype.addSegmentByMedia = function(mediaQuery) {
-    // Parse the query and index the import data.
-    var min = mediaQuery.match(/min-width.+?(\d+)px/);
-    min = min ? min[1] * 1 : null;
-    var max = mediaQuery.match(/max-width.+?(\d+)px/);
-    max = max ? max[1] * 1 : null;
-    this.importData.push([min, max]);
-
-    // Now reimport.
+    var pixels = mediaQuery.match(/max-width.+?(\d+)px/);
+    pixels = pixels ? pixels[1] * 1 : null;
+    this.importData.push(pixels);
     var data = this.importData.sort(function(a, b) {
-      return a[1] - b[1];
+      return a - b;
     });
 
     this.breakpoints = [];
-    var prevMax = null;
+    var prevPoint = null;
     for (var d in data) {
-      var min = data[d][0];
-      var max = data[d][1];
-      var isLast = data.length === 1 || max - 1 === prevMax;
+      var bp = data[d];
+      var isLast = data.length === 1 || bp - 1 === prevPoint;
       if (isLast) {
-        min = max;
-        max = Infinity;
-      } else {
-        i = this.breakpoints.length;
-        var bp = max ? max + 1 : null;
-        this.breakpoints.push(bp);
+        bp = Infinity;
+      } else if (bp) {
+        this.breakpoints.push(bp + 1);
         this.breakpoints = this.breakpoints.sort(sortBreakpoints);
-        var i = this.breakpoints.indexOf(bp);
       }
-      prevMax = max;
+      prevPoint = bp;
     }
     generateSegmentNames.call(this);
 
