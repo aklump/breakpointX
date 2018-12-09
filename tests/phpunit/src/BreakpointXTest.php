@@ -8,6 +8,24 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+  public function testAssertGetSegmentMediaQueryWorks() {
+    $obj = new BreakpointX([241, 769], ['tiny', 'mobile', 'desktop']);
+    $this->assertSame($obj->getSegment('(min-width:769px)')['name'], 'desktop');
+    $this->assertSame($obj->getSegment('(min-width: 769px)')['name'], 'desktop');
+    $this->assertSame($obj->getSegment('( min-width: 769px )')['name'], 'desktop');
+    $this->assertSame($obj->getSegment('(max-width:240px)')['name'], 'tiny');
+    $this->assertSame($obj->getSegment('(max-width: 240px)')['name'], 'tiny');
+    $this->assertSame($obj->getSegment('( max-width: 240px )')['name'], 'tiny');
+    $this->assertSame($obj->getSegment('(min-width:241px) and (max-width:768px)')['name'], 'mobile');
+    $this->assertSame($obj->getSegment('(min-width:241px)and(max-width:768px)')['name'], 'mobile');
+    $this->assertSame($obj->getSegment(' (min-width:241px) and (max-width: 768px)')['name'], 'mobile');
+  }
+
+  public function testBreakpointsUsingStringWorks() {
+    $obj = new BreakpointX(['768px']);
+    $this->assertSame([768], $obj->breakpoints);
+  }
+
   public function testGetSegmentWithBogusName() {
     $this->assertNull($this->obj->getSegment('bogus')['name']);
   }
@@ -34,9 +52,10 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
   public function testAddDevice() {
     $obj = new BreakpointX();
-    $obj->addDevice('iphone-tall', 480);
-    $obj->addDevice('ipad-tall', 768);
-    $obj->addDevice('ipad-wide', 1024);
+    $obj
+      ->addDevice('iphone-tall', 480)
+      ->addDevice('ipad-tall', 768)
+      ->addDevice('ipad-wide', 1024);
 
     $this->assertSame([480, 768, 1024], $obj->breakpoints);
     $this->assertSame([

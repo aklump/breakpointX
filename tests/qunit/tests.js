@@ -13,6 +13,26 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
+QUnit.test('Assert addDevice works', function(assert) {
+  var obj = new BreakpointX();
+  obj
+    .addDevice('iphone-tall', 480)
+    .addDevice('ipad-tall', 768)
+    .addDevice('ipad-wide', 1024);
+  assert.deepEqual([480, 768, 1024], obj.breakpoints);
+  assert.deepEqual([
+    '0-479',
+    'iphone-tall',
+    'ipad-tall',
+    'ipad-wide',
+  ], obj.segmentNames);
+  assert.strictEqual('0-479', obj.getSegment(479).name);
+  assert.strictEqual('iphone-tall', obj.getSegment(480).name);
+  assert.strictEqual('ipad-tall', obj.getSegment(768).name);
+  assert.strictEqual('ipad-wide', obj.getSegment(1024).name);
+  assert.strictEqual('ipad-wide', obj.getSegment(1025).name);
+});
+
 QUnit.test('Callback arguments are correct on cross', function(assert) {
   var obj = new BreakpointX([300, 600], ['small', 'medium', 'large']);
   obj.addBreakpointCrossActionIncreasingOnly(600, function(segment, direction, breakpoint, pSegment) {
@@ -178,16 +198,6 @@ QUnit.test('Assert .breakpoints is populated and sorted.', function(assert) {
   assert.deepEqual(obj.breakpoints, [52, 100, 400, 1080]);
 });
 
-QUnit.test('Assert getSegmentWorks', function(assert) {
-  assert.deepEqual(obj.getSegment(0).name, 'tiny');
-  assert.deepEqual(obj.getSegment(10).name, 'tiny');
-  assert.deepEqual(obj.getSegment('tiny').name, 'tiny');
-  assert.deepEqual(obj.getSegment('(max-width:240px)').name, 'tiny');
-  assert.deepEqual(obj.getSegment('(max-width:240)').name, null);
-  assert.deepEqual(obj.getSegment('bogus').name, null);
-  assert.deepEqual(obj.getSegment(-1).name, null);
-});
-
 QUnit.test('Assert getSegment works with bad number', function(assert) {
   assert.deepEqual(obj.getSegment(-1).name, null);
 });
@@ -233,15 +243,25 @@ QUnit.test('Assert that breakpoints as an array of values works.', function(asse
 });
 
 QUnit.test('Assert getSegmentWorks', function(assert) {
+  assert.deepEqual(obj.getSegment('(min-width:769px)').name, 'desktop');
+  assert.deepEqual(obj.getSegment('(min-width: 769px)').name, 'desktop');
+  assert.deepEqual(obj.getSegment('( min-width: 769px )').name, 'desktop');
   assert.deepEqual(obj.getSegment('(max-width:240px)').name, 'tiny');
   assert.deepEqual(obj.getSegment('(max-width: 240px)').name, 'tiny');
   assert.deepEqual(obj.getSegment('( max-width: 240px )').name, 'tiny');
   assert.deepEqual(obj.getSegment('(min-width:241px) and (max-width:768px)').name, 'mobile');
   assert.deepEqual(obj.getSegment('(min-width:241px)and(max-width:768px)').name, 'mobile');
   assert.deepEqual(obj.getSegment(' (min-width:241px) and (max-width: 768px)').name, 'mobile');
-  assert.deepEqual(obj.getSegment('(min-width:769px)').name, 'desktop');
-  assert.deepEqual(obj.getSegment('(min-width: 769px)').name, 'desktop');
-  assert.deepEqual(obj.getSegment('( min-width: 769px )').name, 'desktop');
+});
+
+QUnit.test('Assert getSegmentWorks', function(assert) {
+  assert.deepEqual(obj.getSegment('(max-width:240)').name, null);
+  assert.deepEqual(obj.getSegment('bogus').name, null);
+  assert.deepEqual(obj.getSegment(-1).name, null);
+  assert.deepEqual(obj.getSegment(0).name, 'tiny');
+  assert.deepEqual(obj.getSegment(10).name, 'tiny');
+  assert.deepEqual(obj.getSegment('tiny').name, 'tiny');
+  assert.deepEqual(obj.getSegment('(max-width:240px)').name, 'tiny');
 });
 
 QUnit.test('Assert getSegmentByWindowWorks', function(assert) {
@@ -300,12 +320,6 @@ QUnit.test('Assert classes are not added to the html tag when addClassesTo is no
     new BreakpointX([obj.getWindowWidth() - 1], ['small', 'large']);
     assert.notOk($('html').hasClass('bpx-website'));
   });
-
-QUnit.test('Assert instantiation without args throws error.', function(assert) {
-  assert.throws(function() {
-    var bp = new BreakpointX();
-  });
-});
 
 QUnit.test('Assert breakpoints out of order are put into asc order.', function(assert) {
   var bp = new BreakpointX([769, 320], ['tiny', 'mobile', 'desktop']);
@@ -558,7 +572,7 @@ QUnit.test('imageWidthForRayComputesBasedOnSettingsValue', function(assert) {
     breakpointRayImageWidthRatio: 1.5
   });
   var segment = obj.getSegment('desktop');
-  assert.equal(segment.imageWidth, 1153);
+  assert.equal(segment.imageWidth, 1154);
 });
 
 QUnit.test('getSegmentForTiny', function(assert) {

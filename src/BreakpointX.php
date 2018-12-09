@@ -114,16 +114,17 @@ class BreakpointX {
       }
     }
     elseif ($this->valueIsMediaQuery($data)) {
-      $previous = NULL;
-      foreach ($this->breakpoints as $i => $bp) {
-        if ($previous) {
-          $query = $this->_query($previous, $bp - 1);
-          if (str_replace(' ', '', $query) === str_replace(' ', '', $data)) {
-            $segment_name = $this->segmentNames[$i];
-            break;
-          }
+      $min = NULL;
+      $breakpoints = $this->breakpoints;
+      $breakpoints[] = NULL;
+      foreach ($breakpoints as $i => $bp) {
+        $max = $bp ? $bp - 1 : $bp;
+        $query = $this->_query($min, $max);
+        if (str_replace(' ', '', $query) === str_replace(' ', '', $data)) {
+          $segment_name = $this->segmentNames[$i];
+          break;
         }
-        $previous = $bp;
+        $min = $bp;
       }
     }
     $segment = array_fill_keys([
@@ -199,13 +200,18 @@ class BreakpointX {
    *   breakpoint created by the device width.
    * @param int $screen_width
    *   The width of the device; this becomes a breakpoint.
+   *
+   * @return \AKlump\BreakpointX\BreakpointX
    */
   public function addDevice($name, $screen_width) {
     $this->breakpoints[] = $screen_width;
     sort($this->breakpoints);
     if ($this->segmentNames[0] === '0-Infinity') {
-      $this->segmentNames[0] = str_replace('Infinity', $screen_width - 1, $this->segmentNames[0]);
+      $this->segmentNames[0] = '0-' . ($screen_width - 1);
     }
-    $this->segmentNames[] = $name;
+    $i = array_search($screen_width, $this->breakpoints);
+    array_splice($this->segmentNames, $i + 1, 1, $name);
+
+    return $this;
   }
 }

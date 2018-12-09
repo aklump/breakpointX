@@ -53,15 +53,6 @@ var BreakpointX = (function($, window) {
   var previousCallbackData = {};
 
   /**
-   * Stores the segment information.
-   *
-   * Use ::getSegment for public access.
-   *
-   * @type {{}}
-   */
-  var segmentData = {};
-
-  /**
    * Helper function to determine the media query by raw data.
    *
    * @param int lower_breakpoint The lower breakpoint value.
@@ -69,20 +60,30 @@ var BreakpointX = (function($, window) {
    * @returns {string}
    * @private
    */
-  function getMediaQuery(leftBreakpointValue, breakpointValue) {
-    var type = breakpointValue === Infinity ? 'ray' : 'segment';
+  function getMediaQuery(min, max) {
+    var type = max === Infinity ? 'ray' : 'segment';
     var queries = [];
     if (type === 'ray') {
-      queries.push('min-width:' + leftBreakpointValue);
+      queries.push('min-width:' + min);
     } else {
-      if (leftBreakpointValue === 0) {
-        queries.push('max-width:' + (breakpointValue - 1));
+      if (min === 0) {
+        queries.push('max-width:' + max);
       } else {
-        queries.push('min-width:' + leftBreakpointValue);
-        queries.push('max-width:' + (breakpointValue - 1));
+        queries.push('min-width:' + min);
+        queries.push('max-width:' + max);
       }
     }
     return '(' + queries.join('px) and (') + 'px)';
+  }
+
+  /**
+   * Function callback for sorting breakpoints.
+   * @param a
+   * @param b
+   * @returns {number}
+   */
+  function sortBreakpoints(a, b) {
+    return a - b;
   }
 
   /**
@@ -120,7 +121,9 @@ var BreakpointX = (function($, window) {
    *   True if value is a breakpoint and not a name or media query.
    */
   function valueIsPoint(value) {
-    return value === Infinity || parseInt(value, 10) == value;
+    if (value === Infinity) return true;
+    var intval = parseInt(value, 10);
+    return intval >= 0 && intval == value;
   }
 
   function valueIsMediaQuery(value) {
@@ -175,20 +178,21 @@ var BreakpointX = (function($, window) {
      */
     this.breakpoints = [];
 
-    if (breakpoints.length < 1) {
-      throw new Error('You must include at least one breakpoint; you\'ve included none.');
-    }
     var settings = {},
       self = this;
 
     // Ensure breakpoints are sorted ascending; we will always assume the
     // segment names are in the correct sort, and never touch them.  Also we
     // clone the breakpoints array so as not to mutate by accident.
-    self.breakpoints = breakpoints.slice().sort(function(a, b) {
-      return a - b;
-    });
-    if (self.breakpoints[0] === 0) {
-      throw new Error('You must not include a breakpoint of 0.');
+    if (breakpoints) {
+      self.breakpoints = breakpoints.slice().map(function(item) {
+        return parseInt(item, 10);
+      }).sort(sortBreakpoints);
+      if (self.breakpoints[0] === 0) {
+        throw new Error('You must not include a breakpoint of 0.');
+      }
+    } else {
+      self.breakpoints = [];
     }
     if (arguments.length === 3) {
       settings = $.extend({}, arguments[2]);
@@ -216,32 +220,6 @@ var BreakpointX = (function($, window) {
         last = breakpoint;
       }
       self.segmentNames.push(last + '-Infinity');
-    }
-
-    // Make sure that breakpoint values are integers in pixels and listed in
-    // ascending order; calculate the maxWidth values.
-    var leftBreakpointValue = 0;
-    segmentData = {};
-    for (var i in self.segmentNames) {
-      var segmentName = self.segmentNames[i],
-        breakpointValue = self.breakpoints[i] || Infinity,
-        type = 'ray';
-      if (breakpointValue !== Infinity) {
-        type = 'segment';
-        breakpointValue = parseInt(breakpointValue, 10);
-      }
-      segmentData[segmentName] = {
-        name: segmentName,
-        type: type,
-        from: leftBreakpointValue,
-        to: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
-        width: breakpointValue === Infinity ? Infinity : breakpointValue - 1,
-        '@media': getMediaQuery(leftBreakpointValue, breakpointValue),
-
-        // Images for this segment should have this width.
-        imageWidth: type === 'segment' ? breakpointValue - 1 : parseInt(leftBreakpointValue * self.settings.breakpointRayImageWidthRatio, 10),
-      };
-      leftBreakpointValue = breakpointValue;
     }
 
     // Register our own handler if we're to manipulate classes.
@@ -304,6 +282,18 @@ var BreakpointX = (function($, window) {
      * @type {float}
      */
     breakpointRayImageWidthRatio: 1.4,
+  };
+
+  BreakpointX.prototype.addDevice = function(name, screenWidth) {
+    this.breakpoints.push(screenWidth);
+    this.breakpoints = this.breakpoints.sort(sortBreakpoints);
+    if (this.segmentNames[0] === '0-Infinity') {
+      this.segmentNames[0] = '0-' + (screenWidth - 1);
+    }
+    var i = this.breakpoints.indexOf(screenWidth);
+    this.segmentNames.splice(i + 1, 1, name);
+
+    return this;
   };
 
   /**
@@ -474,34 +464,58 @@ var BreakpointX = (function($, window) {
    * @see ::getRay()
    */
   BreakpointX.prototype.getSegment = function(data) {
+    var segmentName = null;
     if (valueIsPoint(data)) {
-      var point = data === Infinity ? Infinity : parseInt(data, 10);
-      data = null;
-      for (var name in segmentData) {
-        var segment = segmentData[name];
-        if (segment.from <= point && point <= segment.to) {
-          data = name;
-          break;
-        } else if (segment.to === Infinity && point >= segment.from) {
-          data = name;
+      for (var i in this.breakpoints) {
+        var bp = this.breakpoints[i];
+        if (bp > data) {
+          segmentName = this.segmentNames[i];
           break;
         }
+        segmentName = this.segmentNames[(i * 1 + 1)];
       }
     } else if (valueIsMediaQuery(data)) {
-      for (var name in segmentData) {
-        var segment = segmentData[name];
-        if (segment && segment['@media'].replace(/ /g, '') === data.replace(/ /g, '')) {
-          // Clone the object we return so it can't be manipulated externally.
-          return $.extend({}, segment);
+      var min = 0;
+      var breakpoints = this.breakpoints.slice();
+      breakpoints.push(Infinity);
+      for (var i in breakpoints) {
+        var bp = this.breakpoints[i];
+        var max = bp ? bp - 1 : Infinity;
+        var query = getMediaQuery(min, max);
+        if (query.replace(/ /g, '') === data.replace(/ /g, '')) {
+          segmentName = this.segmentNames[i];
+          break;
         }
+        min = bp;
       }
+    } else {
+      segmentName = data;
     }
-    return segmentData[data] || {
-      name: null,
-      from: null,
-      to: null,
+
+    var segment = {
       '@media': null,
+      from: null,
+      imageWidth: null,
+      name: null,
+      to: null,
+      type: null,
+      width: null,
     };
+
+    var i = this.segmentNames.indexOf(segmentName);
+    if (segmentName && i >= 0) {
+      var prevBp = this.breakpoints[i - 1] || null;
+      var nextBp = this.breakpoints[i] || null;
+      segment.type = nextBp ? 'segment' : 'ray';
+      segment.from = prevBp || 0;
+      segment.to = nextBp ? nextBp - 1 : Infinity;
+      segment['@media'] = getMediaQuery(segment.from, segment.to);
+      segment.imageWidth = segment.type === 'segment' ? segment.to : Math.round(segment.from * this.settings.breakpointRayImageWidthRatio);
+      segment.name = segmentName;
+      segment.width = segment.to;
+    }
+
+    return segment;
   };
 
   /**

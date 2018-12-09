@@ -1,3 +1,16 @@
+## 0.6.0
+
+* Removed deprecatated functions from 0.5.0.
+* .last became .previousCallbackData and format changes.
+* .current was removed.
+* use .getSegmentByWindow() instead of .current.
+* use .getSegment(0) instead of .alias('first').
+* use .getRay() instead of .alias('last').
+* .settings.breakpoints was removed.
+* .breakpoints is now an array of breakpoint values.
+* Constructor arguments have changed; see documentation for new format.
+* addAction was replaced with multiple methods; see code for `add*` methods.
+
 ## 0.5.0
 
 1. The way breakpoints are defined has changed.  The old syntax:
