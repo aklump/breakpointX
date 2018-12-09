@@ -57,6 +57,13 @@ var BreakpointX = (function(window) {
   var previousCallbackData = {};
 
   /**
+   * Holds pending data, yet to be converted to segments/breakpoints.
+   *
+   * @type {Array}
+   */
+  var segmentSourceData = [];
+
+  /**
    * Helper function to determine the media query by raw data.
    *
    * @param int lower_breakpoint The lower breakpoint value.
@@ -173,9 +180,9 @@ var BreakpointX = (function(window) {
       if (breakpoint !== segment.from) {
         throw new Error(
           'You tried to add an action to an unregistered breakpoint "' +
-            breakpoint +
-            '"; you must use one of: ' +
-            this.breakpoints.join(', ')
+          breakpoint +
+          '"; you must use one of: ' +
+          this.breakpoints.join(', ')
         );
       }
     } else {
@@ -260,8 +267,8 @@ var BreakpointX = (function(window) {
     ) {
       throw new Error(
         'You must have one more segment name than you have breakpoints; you need ' +
-          (self.breakpoints.length + 1) +
-          ' segment names.'
+        (self.breakpoints.length + 1) +
+        ' segment names.'
       );
     }
     self.settings = extend({}, self.options, settings);
@@ -269,13 +276,7 @@ var BreakpointX = (function(window) {
 
     // Auto-name missing segment names.
     if (!self.segmentNames.length) {
-      var last = 0;
-      for (var i in self.breakpoints) {
-        var breakpoint = self.breakpoints[i];
-        self.segmentNames.push(last + '-' + (breakpoint - 1));
-        last = breakpoint;
-      }
-      self.segmentNames.push(last + '-infinity');
+      generateSegmentNames.call(this);
     }
 
     // Register our own handler if we're to manipulate classes.
@@ -349,6 +350,57 @@ var BreakpointX = (function(window) {
 
     return this;
   };
+
+  BreakpointX.prototype.addSegmentByMedia = function(mediaQuery) {
+
+    // Parse the query and index the import data.
+    var min = mediaQuery.match(/min-width.+?(\d+)px/);
+    min = min ? min[1] * 1 : null;
+    var max = mediaQuery.match(/max-width.+?(\d+)px/);
+    max = max ? max[1] * 1 : null;
+    segmentSourceData.push([min, max]);
+
+    // Now reimport.
+    var data = segmentSourceData.sort(function(a, b) {
+      return a[1] - b[1];
+    });
+
+    this.breakpoints = [];
+    var prevMax = null;
+    for (var d in data) {
+      var min = data[d][0];
+      var max = data[d][1];
+      var isLast = data.length === 1 || (max - 1 === prevMax);
+      if (isLast) {
+        min = max;
+        max = Infinity;
+      } else {
+        i = this.breakpoints.length;
+        var bp = max ? max + 1 : null;
+        this.breakpoints.push(bp);
+        this.breakpoints = this.breakpoints.sort(sortBreakpoints);
+        var i = this.breakpoints.indexOf(bp);
+      }
+      prevMax = max;
+    }
+    generateSegmentNames.call(this);
+
+    return this;
+  };
+
+  /**
+   * Rewrite all segment names with auto values.
+   */
+  function generateSegmentNames() {
+    this.segmentNames = [];
+    var last = 0;
+    for (var i in this.breakpoints) {
+      var breakpoint = this.breakpoints[i];
+      this.segmentNames.push(last + '-' + (breakpoint - 1));
+      last = breakpoint;
+    }
+    this.segmentNames.push(last + '-infinity');
+  }
 
   /**
    * Handler for a window resize event.
@@ -572,8 +624,8 @@ var BreakpointX = (function(window) {
         segment.type === 'segment'
           ? segment.to
           : Math.round(
-              segment.from * this.settings.breakpointRayImageWidthRatio
-            );
+          segment.from * this.settings.breakpointRayImageWidthRatio
+          );
       segment.name = segmentName;
       segment.width = segment.to;
     }

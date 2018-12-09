@@ -102,6 +102,16 @@ Here is an example which demonstrates how you might construct an instance when t
       ->addDevice('desktop', 1024)
       ->renameSegment(0, 'small');
 
+## In terms of Media Queries
+
+You can also generate an object if you have a list of media queries representing the segments and ray.  The queries do not need to be in any specific order:
+
+    var obj = new BreakpointX();
+    obj
+      .addSegmentByMedia('(max-width:768px)') // This is the ray.
+      .addSegmentByMedia('(min-width:480px) and (max-width:767px)')
+      .addSegmentByMedia('(max-width:479px)');
+
 ## PHP Usage
 
 While this is foremost a Javascript project, there is a PHP class that may be helpful to your use case.  Browser-related methods do not exist, but other methods share the same API as the JS object.  The class file is _dist/BreakpointX.php_ or if installing with Node, _node_modules/@aklump/breakpointx/dist/BreakpointX.php_.
