@@ -13,20 +13,20 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
-QUnit.test('Assert when addClassesTo (object) is used the object is attached as .$el', function(assert) {
+QUnit.test('Assert when addClassesTo (object) is used the object is attached as .el', function(assert) {
   var obj = new BreakpointX([768], {
-    addClassesTo: $('html'),
+    addClassesTo: document.documentElement,
   });
-  assert.ok(obj.$el);
-  assert.strictEqual(obj.$el.get(0), $('html').get(0));
+  assert.ok(obj.el);
+  assert.strictEqual(obj.el, document.documentElement);
 });
 
-QUnit.test('Assert when addClassesTo (string) is used the object is attached as .$el', function(assert) {
+QUnit.test('Assert when addClassesTo (string) is used the object is attached as .el', function(assert) {
   var obj = new BreakpointX([768], {
-    addClassesTo: 'html',
+    addClassesTo: document.documentElement,
   });
-  assert.ok(obj.$el);
-  assert.strictEqual(obj.$el.get(0), $('html').get(0));
+  assert.ok(obj.el);
+  assert.strictEqual(obj.el, document.documentElement);
 });
 
 QUnit.test('Assert device and rename first segment', function(assert) {
@@ -96,7 +96,7 @@ QUnit.test('Callback arguments are correct on init', function(assert) {
 QUnit.test('We dont have double trigger onload at 479; based on demo.', function(assert) {
   var callCount = 0;
   var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   bpx
     .addCrossAction(function(segment, direction, breakpoint, from) {
@@ -109,7 +109,7 @@ QUnit.test('We dont have double trigger onload at 479; based on demo.', function
 QUnit.test('We dont have double trigger onload at 1024; based on demo.', function(assert) {
   var callCount = 0;
   var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
@@ -122,7 +122,7 @@ QUnit.test('We dont have double trigger onload at 1024; based on demo.', functio
 QUnit.test('We dont have double trigger onload at 1023; based on demo.', function(assert) {
   var callCount = 0;
   var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
@@ -135,7 +135,7 @@ QUnit.test('We dont have double trigger onload at 1023; based on demo.', functio
 QUnit.test('We dont have double trigger onload at 480; based on demo.', function(assert) {
   var callCount = 0;
   var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
@@ -148,7 +148,7 @@ QUnit.test('We dont have double trigger onload at 480; based on demo.', function
 QUnit.test('We dont have double trigger onload at 768; based on demo.', function(assert) {
   var callCount = 0;
   var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   bpx
     .addCrossAction(function(to, direction, breakpoint, from) {
@@ -183,7 +183,7 @@ QUnit.test('Assert we trigger two breakpoint callbacks when jumping over both.',
 QUnit.test('Make sure we trigger cross when quickly jumping over two breakpoints', function(assert) {
   var calledCount = 0;
   var bpx = new BreakpointX([500, 900], ['small', 'medium', 'large'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   bpx.addBreakpointCrossAction(900, function(segment, breakpoint, direction, pSegment) {
     calledCount++;
@@ -195,7 +195,7 @@ QUnit.test('Make sure we trigger cross when quickly jumping over two breakpoints
 
 QUnit.test('Make sure the middle css class does not remain if we go quickly from large to small', function(assert) {
   var obj = new BreakpointX([500, 900], ['small', 'medium', 'large'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   obj
     .onWindowResize(200)
@@ -244,7 +244,7 @@ QUnit.test('Assert classes are added to the html tag when options set.',
   function(assert) {
     assert.notOk($('html').hasClass('bpx-website'));
     new
-    BreakpointX([obj.getWindowWidth() - 1], ['small', 'website'], { addClassesTo: 'html' });
+    BreakpointX([obj.getWindowWidth() - 1], ['small', 'website'], { addClassesTo: document.documentElement });
     assert.ok($('html').hasClass('bpx-website'));
   });
 
@@ -427,7 +427,7 @@ QUnit.test('Assert bad direction when adding action throws error.', function(ass
 
 QUnit.test('Assert classes are added to the html tag for each segment using triggerActions.', function(assert) {
   var obj = new BreakpointX([480, 768], ['mobile', 'iphone', 'ipad-portrait'], {
-    addClassesTo: 'html'
+    addClassesTo: document.documentElement
   });
   obj.triggerActions(0);
   assert.ok($('html').hasClass('bpx-mobile'));

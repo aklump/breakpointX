@@ -48,11 +48,11 @@ Then you can also retrieve segment info using a name, which includes items such 
 
 ## CSS Classes
 
-To cause CSS classes to be written on an element, pass the appropriate settings, where `addClassesTo` is a jQuery selector or object.  It becomes a property of the instance as `.$el`, so it can be accessed in callbacks, if necessary.
+To cause CSS classes to be written on an element, pass the appropriate settings, where `addClassesTo` is a DOM object.  It becomes a property of the instance as `.el`, so it can be accessed in callbacks, if necessary.  The example shows adding classes to the `html` element.  If you're using jQuery you could do `addClassesTo: $('html').get(0)`.
 
     // Breakpoints only with settings.
     var obj = new BreakpointX([768], ['mobile', 'desktop'], {
-      addClassesTo: 'html',
+      addClassesTo: document.documentElement,
       classPrefix: 'bpx-',
     });
 

@@ -14,7 +14,7 @@
 <script type="text/javascript">
   $(document).ready(function() {
     var bpx = new BreakpointX([480, 768], ['small', 'medium', 'large'], {
-      addClassesTo: 'html'
+      addClassesTo: document.documentElement,
     });
 
     console.log(bpx.getSegment('small'));

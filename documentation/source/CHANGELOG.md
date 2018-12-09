@@ -1,5 +1,8 @@
 ## 0.6.0
 
+* Removed dependency on jQuery
+* `addClassesTo: 'html'` changes to `addClassesTo: document.documentElement`
+* addClassesTo now takes an element not a string or jQuery object.
 * Removed deprecatated functions from 0.5.0.
 * .last became .previousCallbackData and format changes.
 * .current was removed.

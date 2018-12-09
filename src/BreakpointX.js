@@ -100,16 +100,30 @@ var BreakpointX = (function($, window) {
    *   - both
    */
   function actionApplyCss(segment, direction, breakpoint, pSegment) {
-    var p = this.settings.classPrefix;
-    this.$el
-      .removeClass(p + 'smaller')
-      .removeClass(p + 'bigger')
-      .removeClass(p + pSegment.name)
-      .addClass(p + segment.name);
+    removeClass.call(this, 'smaller');
+    removeClass.call(this, 'bigger');
+    removeClass.call(this, pSegment.name);
+    addClass.call(this, segment.name);
     if (direction) {
-      this.$el.addClass(p + direction);
+      addClass.call(this, direction);
     }
   };
+
+  function removeClass(unprefixedClassName) {
+    var className = this.settings.classPrefix + unprefixedClassName;
+    if (this.el.classList)
+      this.el.classList.remove(className);
+    else
+      this.el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+  }
+
+  function addClass(unprefixedClassName) {
+    var className = this.settings.classPrefix + unprefixedClassName;
+    if (this.el.classList)
+      this.el.classList.add(className);
+    else
+      this.el.className += ' ' + className;
+  }
 
   /**
    * Determine if a value is a numeric point or not.
@@ -161,9 +175,9 @@ var BreakpointX = (function($, window) {
   function BreakpointX(breakpoints) {
 
     /**
-     * Holds the elements that will receive CSS classes, if set.
+     * Holds the element that will receive CSS classes, if set.
      */
-    this.$el = null;
+    this.el = null;
 
     this.version = '__version';
 
@@ -228,14 +242,14 @@ var BreakpointX = (function($, window) {
 
     // Register our own handler if we're to manipulate classes.
     if (self.settings.addClassesTo) {
-      self.$el = $(this.settings.addClassesTo);
+      self.el = this.settings.addClassesTo;
       self
         .addCrossAction(actionApplyCss)
         .triggerActions();
     }
 
     var throttleTimeout = null;
-    $(window).resize(function() {
+    window.addEventListener('resize', function() {
       clearTimeout(throttleTimeout);
       throttleTimeout = setTimeout(function() {
         self.onWindowResize();
@@ -247,13 +261,6 @@ var BreakpointX = (function($, window) {
 
   /**
    * Default options definition.
-   *
-   * Extend globally like this:
-   * @code
-   *   $.extend(BreakpointX.prototype.options, {
-   *     key: 'overridden'
-   *   });
-   * @endcode
    */
   BreakpointX.prototype.options = {
 

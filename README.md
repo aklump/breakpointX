@@ -52,7 +52,7 @@ To cause CSS classes to be written on an element, pass the appropriate settings,
 
     // Breakpoints only with settings.
     var obj = new BreakpointX([768], ['mobile', 'desktop'], {
-      addClassesTo: 'html',
+      addClassesTo: document.documentElement,
       classPrefix: 'bpx-',
     });
 
