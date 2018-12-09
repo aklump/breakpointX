@@ -1,11 +1,8 @@
 {
-    "scripts": {
-        "format": "node_modules/.bin/prettier --write \"**/*.{js,scss}\""
-    },
     "name": "@aklump/breakpointx",
     "title": "Breakpoint X (Crossing)",
     "version": "0.5.0",
-    "description": "Define responsive breakpoints, register callbacks when crossing, with optional css class handling.",
+    "description": "Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.",
     "main": "./dist/BreakpointX.js",
     "repository": {
         "type": "git",

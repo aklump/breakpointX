@@ -43,6 +43,12 @@
  */
 var window = window || {};
 var BreakpointX = (function(window) {
+  var var_bigger = 'bigger';
+  var var_smaller = 'smaller';
+  var var_both = 'both';
+  var var_min_width = 'min-width:';
+  var var_max_width = 'max-width:';
+
   /**
    * Stores data from the last callback fire.
    *
@@ -62,13 +68,13 @@ var BreakpointX = (function(window) {
     var type = max === Infinity ? 'ray' : 'segment';
     var queries = [];
     if (type === 'ray') {
-      queries.push('min-width:' + min);
+      queries.push(var_min_width + min);
     } else {
       if (min === 0) {
-        queries.push('max-width:' + max);
+        queries.push(var_max_width + max);
       } else {
-        queries.push('min-width:' + min);
-        queries.push('max-width:' + max);
+        queries.push(var_min_width + min);
+        queries.push(var_max_width + max);
       }
     }
     return '(' + queries.join('px) and (') + 'px)';
@@ -98,8 +104,8 @@ var BreakpointX = (function(window) {
    *   - both
    */
   function actionApplyCss(segment, direction, breakpoint, pSegment) {
-    removeClass.call(this, 'smaller');
-    removeClass.call(this, 'bigger');
+    removeClass.call(this, var_smaller);
+    removeClass.call(this, var_bigger);
     removeClass.call(this, pSegment.name);
     addClass.call(this, segment.name);
     if (direction) {
@@ -374,9 +380,9 @@ var BreakpointX = (function(window) {
             addSmaller = activeWindowSegment.to + 1 === from,
             addBigger = from === activeWindowSegment.from,
             applyCallbacks =
-              (d === 'smaller' && addSmaller) ||
-              (d === 'bigger' && addBigger) ||
-              (d === 'both' && (addSmaller || addBigger));
+              (d === var_smaller && addSmaller) ||
+              (d === var_bigger && addBigger) ||
+              (d === var_both && (addSmaller || addBigger));
           if (applyCallbacks) {
             callbacks = callbacks || [];
             callbacks['bp' + activeWindowSegment.from] = self.actions[d][bp];
@@ -385,11 +391,12 @@ var BreakpointX = (function(window) {
       }
     } else if (hasCrossedBreakpoint) {
       callbacks = callbacks || [];
-      var direction = activeWindowWidth > pSegment.from ? 'bigger' : 'smaller';
-      breakpoint = direction === 'smaller' ? pSegment.from : segment.from;
+      var direction =
+        activeWindowWidth > pSegment.from ? var_bigger : var_smaller;
+      breakpoint = direction === var_smaller ? pSegment.from : segment.from;
       var low = Math.min(pSegment.from, segment.from);
       var high = Math.max(pSegment.from, segment.from);
-      var directions = ['both', direction];
+      var directions = [var_both, direction];
       for (var i in directions) {
         for (var j in self.breakpoints) {
           var bp = self.breakpoints[j];
@@ -592,9 +599,9 @@ var BreakpointX = (function(window) {
    */
   BreakpointX.prototype.addCrossAction = function(callable) {
     for (var i in this.breakpoints) {
-      this.actions['both'][this.breakpoints[i]] =
-        this.actions['both'][this.breakpoints[i]] || [];
-      this.actions['both'][this.breakpoints[i]].push(callable);
+      this.actions[var_both][this.breakpoints[i]] =
+        this.actions[var_both][this.breakpoints[i]] || [];
+      this.actions[var_both][this.breakpoints[i]].push(callable);
     }
     return this;
   };
@@ -615,7 +622,7 @@ var BreakpointX = (function(window) {
   ) {
     return addActionByDirectionAndBreakpoint.call(
       this,
-      'both',
+      var_both,
       breakpoint,
       callable
     );
@@ -637,7 +644,7 @@ var BreakpointX = (function(window) {
   ) {
     return addActionByDirectionAndBreakpoint.call(
       this,
-      'smaller',
+      var_smaller,
       breakpoint,
       callable
     );
@@ -659,7 +666,7 @@ var BreakpointX = (function(window) {
   ) {
     return addActionByDirectionAndBreakpoint.call(
       this,
-      'bigger',
+      var_bigger,
       breakpoint,
       callable
     );
