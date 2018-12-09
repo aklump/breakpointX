@@ -41,9 +41,8 @@
  *   })
  * @endcode
  */
-var jQuery = jQuery || require('jquery');
 var window = window || {};
-var BreakpointX = (function($, window) {
+var BreakpointX = (function(window) {
 
   /**
    * Stores data from the last callback fire.
@@ -123,6 +122,22 @@ var BreakpointX = (function($, window) {
       this.el.classList.add(className);
     else
       this.el.className += ' ' + className;
+  }
+
+  function extend(out) {
+    out = out || {};
+
+    for (var i = 1; i < arguments.length; i++) {
+      if (!arguments[i])
+        continue;
+
+      for (var key in arguments[i]) {
+        if (arguments[i].hasOwnProperty(key))
+          out[key] = arguments[i][key];
+      }
+    }
+
+    return out;
   }
 
   /**
@@ -213,20 +228,20 @@ var BreakpointX = (function($, window) {
       self.breakpoints = [];
     }
     if (arguments.length === 3) {
-      settings = $.extend({}, arguments[2]);
+      settings = extend({}, arguments[2]);
       self.segmentNames = arguments[1].slice();
     } else if (arguments.length === 2) {
       if (arguments[1] instanceof Array) {
         self.segmentNames = arguments[1].slice();
       } else {
-        settings = $.extend({}, arguments[1]);
+        settings = extend({}, arguments[1]);
         self.segmentNames = [];
       }
     }
     if (self.segmentNames.length && self.segmentNames.length - 1 !== self.breakpoints.length) {
       throw new Error('You must have one more segment name than you have breakpoints; you need ' + (self.breakpoints.length + 1) + ' segment names.');
     }
-    self.settings = $.extend({}, self.options, settings);
+    self.settings = extend({}, self.options, settings);
     self.reset();
 
     // Auto-name missing segment names.
@@ -605,7 +620,7 @@ var BreakpointX = (function($, window) {
   };
 
   return BreakpointX;
-})(jQuery, window);
+})(window);
 
 if (typeof module === 'object' && module.exports) {
   module.exports = BreakpointX;
