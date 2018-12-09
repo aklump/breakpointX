@@ -13,6 +13,14 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
+QUnit.test('Assert when addClassesTo is used the object is attached as .$el', function(assert) {
+  var obj = new BreakpointX([768], {
+    addClassesTo: 'html',
+  });
+  assert.ok(obj.$el);
+  assert.strictEqual(obj.$el.get(0), $('html').get(0));
+});
+
 QUnit.test('Assert device and rename first segment', function(assert) {
   var obj = new BreakpointX();
   var segment = obj
@@ -59,7 +67,7 @@ QUnit.test('Callback arguments are correct on cross', function(assert) {
 });
 
 QUnit.test('Callback have instance as the "this" context', function(assert) {
-  var obj = new BreakpointX([500], );
+  var obj = new BreakpointX([500],);
   obj.addCrossAction(function(segment, direction, breakpoint, pSegment) {
     assert.strictEqual(obj, this);
   })
@@ -585,7 +593,7 @@ QUnit.test('imageWidthForRayComputesBasedOnSettingsValue with no named segment.'
     breakpointRayImageWidthRatio: 1.5
   });
   var segment = obj.getSegment('768-infinity');
-  assert.equal(segment.imageWidth, 1075);
+  assert.equal(segment.imageWidth, 1152);
 });
 
 QUnit.test('imageWidthForRayComputesBasedOnSettingsValue', function(assert) {

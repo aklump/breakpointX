@@ -100,15 +100,14 @@ var BreakpointX = (function($, window) {
    *   - both
    */
   function actionApplyCss(segment, direction, breakpoint, pSegment) {
-    var $el = $(this.settings.addClassesTo),
-      p = this.settings.classPrefix;
-    $el
+    var p = this.settings.classPrefix;
+    this.$el
       .removeClass(p + 'smaller')
       .removeClass(p + 'bigger')
       .removeClass(p + pSegment.name)
       .addClass(p + segment.name);
     if (direction) {
-      $el.addClass(p + direction);
+      this.$el.addClass(p + direction);
     }
   };
 
@@ -161,6 +160,11 @@ var BreakpointX = (function($, window) {
    */
   function BreakpointX(breakpoints) {
 
+    /**
+     * Holds the elements that will receive CSS classes, if set.
+     */
+    this.$el = null;
+
     this.version = '__version';
 
     /**
@@ -201,8 +205,8 @@ var BreakpointX = (function($, window) {
       if (arguments[1] instanceof Array) {
         self.segmentNames = arguments[1].slice();
       } else {
+        settings = $.extend({}, arguments[1]);
         self.segmentNames = [];
-        settings = $.extend({}, self.segmentNames);
       }
     }
     if (self.segmentNames.length && self.segmentNames.length - 1 !== self.breakpoints.length) {
@@ -224,6 +228,7 @@ var BreakpointX = (function($, window) {
 
     // Register our own handler if we're to manipulate classes.
     if (self.settings.addClassesTo) {
+      self.$el = $(this.settings.addClassesTo);
       self
         .addCrossAction(actionApplyCss)
         .triggerActions();
