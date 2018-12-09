@@ -9,7 +9,6 @@
         "url": "git+https://github.com/aklump/breakpointX.git"
     },
     "keywords": [
-        "ecosystem:jquery",
         "responsive",
         "breakpoints",
         "mobile-first",
