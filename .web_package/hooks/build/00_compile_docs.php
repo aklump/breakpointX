@@ -12,7 +12,7 @@ $build
   // This will adjust the path to the image, pulling it from docs.
   ->loadFile('README.md')
   ->replaceTokens([
-    'images/breakpoint-x.jpg' => 'docs/images/breakpoint-x.jpg',
+    'images/' => 'docs/images/',
   ])
   ->saveReplacingSourceFile()
   // Add some additional files to SCM that were generated and outside of the docs directory.

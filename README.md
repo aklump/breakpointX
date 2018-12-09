@@ -18,7 +18,7 @@ Install using `yarn add @aklump/breakpointx` or `npm i @aklump/breakpointx`
 
     var bp = new BreakpointX([480, 768]);
 
-![Basic Usage](images/basic.png)
+![Basic Usage](docs/images/basic.png)
 
 Get segment info using any point along the axis:
 
@@ -33,11 +33,11 @@ It can be helpful to name your segments:
 
     var obj = new BreakpointX([480, 768], ['small', 'medium', 'large']);
 
-![Basic Usage](images/named.png)
+![Basic Usage](docs/images/named.png)
 
 Then you can also retrieve segment info using a name, which includes items such as the width, from point, to point, media query, image width, name, and more.
 
-![segment dump](images/console.jpg)
+![segment dump](docs/images/console.jpg)
 
     bp.getSegment(300);
     bp.getSegment('small');
@@ -92,7 +92,7 @@ When the window width changes, and a breakpoint is hit or crossed, callbacks can
 
 Here is an example which demonstrates how you might construct an instance when thinking in terms of physical devices.  It's given in PHP, however the JS methods are exactly the same.
 
-![Device-centric appproach](images/devices.png)
+![Device-centric appproach](docs/images/devices.png)
 
     <?php
     $obj = new BreakpointX();
@@ -137,9 +137,9 @@ If you find this project useful... please consider [making a donation](https://w
 
 This cheatsheet will familiarize you with the terms used in this project.
 
-![Cheatsheet](images/breakpoint-cheatsheet.png)
+![Cheatsheet](docs/images/breakpoint-cheatsheet.png)
 
-Download this [Cheatsheet](images/breakpoint-cheatsheet.pdf) by [In the Loft Studios](http://www.intheloftstudios.com)
+Download this [Cheatsheet](docs/images/breakpoint-cheatsheet.pdf) by [In the Loft Studios](http://www.intheloftstudios.com)
 
 ### Common Mistakes
 
