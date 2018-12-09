@@ -234,8 +234,6 @@ var BreakpointX = (function(window) {
     var settings = {},
       self = this;
 
-    console.log(typeof arguments[0]);
-
     // Ensure breakpoints are sorted ascending; we will always assume the
     // segment names are in the correct sort, and never touch them.  Also we
     // clone the breakpoints array so as not to mutate by accident.
