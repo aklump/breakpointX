@@ -13,9 +13,11 @@
 <script src="src/BreakpointX.js"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    var bpx = new BreakpointX([480, 768, 1024], ['mobile', 'iphone', 'ipad-portrait', 'ipad-landscape'], {
+    var bpx = new BreakpointX([480, 768], ['small', 'medium', 'large'], {
       addClassesTo: 'html'
     });
+
+    console.log(bpx.getSegment('small'));
     bpx
       .addCrossAction(function(to, direction, breakpoint, from) {
         console.log('direction:', direction);
