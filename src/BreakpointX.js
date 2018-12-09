@@ -195,7 +195,6 @@ var BreakpointX = (function(window) {
    * @constructor
    */
   function BreakpointX() {
-
     /**
      * Stores data from the last callback fire.
      *
