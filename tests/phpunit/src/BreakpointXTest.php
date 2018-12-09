@@ -8,6 +8,19 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+  public function testGetSegmentWithBogusName() {
+    $this->assertNull($this->obj->getSegment('bogus')['name']);
+  }
+
+  public function testGetSegmentUsingMediaQuery() {
+    $segment = $this->obj->getSegment('(min-width:480px) and (max-width:767px)');
+    $this->assertSame('480-767', $segment['name']);
+    $segment = $this->obj->getSegment('(min-width:480px)and(max-width:767px)');
+    $this->assertSame('480-767', $segment['name']);
+    $segment = $this->obj->getSegment('(min-width: 480px) and (max-width: 767px)');
+    $this->assertSame('480-767', $segment['name']);
+  }
+
   public function testFirstSegmentIsCorrect() {
     $segment = $this->obj->getSegment(100);
     $this->assertSame('0-479', $segment['name']);

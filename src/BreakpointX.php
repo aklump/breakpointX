@@ -103,9 +103,7 @@ class BreakpointX {
   }
 
   public function getSegment($data) {
-
-    $segment_name = NULL;
-    $breakpoint = NULL;
+    $segment_name = $data;
     if ($this->valueIsPoint($data)) {
       foreach ($this->breakpoints as $i => $bp) {
         if ($bp > $data) {
@@ -117,20 +115,17 @@ class BreakpointX {
     }
     elseif ($this->valueIsMediaQuery($data)) {
       $previous = NULL;
-      foreach ($this->breakpoints as $bp) {
+      foreach ($this->breakpoints as $i => $bp) {
         if ($previous) {
-          $query = $this->_query($previous, $bp);
-          if ($query === $data) {
+          $query = $this->_query($previous, $bp - 1);
+          if (str_replace(' ', '', $query) === str_replace(' ', '', $data)) {
+            $segment_name = $this->segmentNames[$i];
             break;
           }
         }
         $previous = $bp;
       }
     }
-    else {
-      $segment_name = $data;
-    }
-
     $segment = array_fill_keys([
       '@media',
       'from',
@@ -141,13 +136,13 @@ class BreakpointX {
       'width',
     ], NULL);
 
-    if ($segment_name) {
-      $i = array_search($segment_name, $this->segmentNames);
+    $i = array_search($segment_name, $this->segmentNames);
+    if ($segment_name && $i !== FALSE) {
       $prev_bp = empty($this->breakpoints[$i - 1]) ? NULL : $this->breakpoints[$i - 1];
       $next_bp = empty($this->breakpoints[$i]) ? NULL : $this->breakpoints[$i];
       $segment['type'] = empty($next_bp) ? 'ray' : 'segment';
-      $segment['to'] = $next_bp ? $next_bp - 1 : NULL;
       $segment['from'] = $prev_bp ? $prev_bp : 0;
+      $segment['to'] = $next_bp ? $next_bp - 1 : NULL;
       $segment['@media'] = $this->_query($segment['from'], $segment['to']);
       $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
       $segment['name'] = $segment_name;
