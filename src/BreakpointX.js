@@ -43,7 +43,6 @@
  */
 var window = window || {};
 var BreakpointX = (function(window) {
-
   /**
    * Stores data from the last callback fire.
    *
@@ -106,34 +105,35 @@ var BreakpointX = (function(window) {
     if (direction) {
       addClass.call(this, direction);
     }
-  };
+  }
 
   function removeClass(unprefixedClassName) {
     var className = this.settings.classPrefix + unprefixedClassName;
-    if (this.el.classList)
-      this.el.classList.remove(className);
+    if (this.el.classList) this.el.classList.remove(className);
     else
-      this.el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+      this.el.className = el.className.replace(
+        new RegExp(
+          '(^|\\b)' + className.split(' ').join('|') + '(\\b|$)',
+          'gi'
+        ),
+        ' '
+      );
   }
 
   function addClass(unprefixedClassName) {
     var className = this.settings.classPrefix + unprefixedClassName;
-    if (this.el.classList)
-      this.el.classList.add(className);
-    else
-      this.el.className += ' ' + className;
+    if (this.el.classList) this.el.classList.add(className);
+    else this.el.className += ' ' + className;
   }
 
   function extend(out) {
     out = out || {};
 
     for (var i = 1; i < arguments.length; i++) {
-      if (!arguments[i])
-        continue;
+      if (!arguments[i]) continue;
 
       for (var key in arguments[i]) {
-        if (arguments[i].hasOwnProperty(key))
-          out[key] = arguments[i][key];
+        if (arguments[i].hasOwnProperty(key)) out[key] = arguments[i][key];
       }
     }
 
@@ -165,12 +165,20 @@ var BreakpointX = (function(window) {
     var segment = this.getSegment(breakpoint);
     if (valueIsPoint(breakpoint)) {
       if (breakpoint !== segment.from) {
-        throw new Error('You tried to add an action to an unregistered breakpoint "' + breakpoint + '"; you must use one of: ' + this.breakpoints.join(', '));
+        throw new Error(
+          'You tried to add an action to an unregistered breakpoint "' +
+            breakpoint +
+            '"; you must use one of: ' +
+            this.breakpoints.join(', ')
+        );
       }
     } else {
-      throw new Error('The provided breakpoint "' + breakpoint + '" is not recognized.');
+      throw new Error(
+        'The provided breakpoint "' + breakpoint + '" is not recognized.'
+      );
     }
-    this.actions[direction][breakpoint] = this.actions[direction][breakpoint] || [];
+    this.actions[direction][breakpoint] =
+      this.actions[direction][breakpoint] || [];
     this.actions[direction][breakpoint].push(callable);
 
     return this;
@@ -188,7 +196,6 @@ var BreakpointX = (function(window) {
    * @constructor
    */
   function BreakpointX(breakpoints) {
-
     /**
      * Holds the element that will receive CSS classes, if set.
      */
@@ -218,9 +225,12 @@ var BreakpointX = (function(window) {
     // segment names are in the correct sort, and never touch them.  Also we
     // clone the breakpoints array so as not to mutate by accident.
     if (breakpoints) {
-      self.breakpoints = breakpoints.slice().map(function(item) {
-        return parseInt(item, 10);
-      }).sort(sortBreakpoints);
+      self.breakpoints = breakpoints
+        .slice()
+        .map(function(item) {
+          return parseInt(item, 10);
+        })
+        .sort(sortBreakpoints);
       if (self.breakpoints[0] === 0) {
         throw new Error('You must not include a breakpoint of 0.');
       }
@@ -238,8 +248,15 @@ var BreakpointX = (function(window) {
         self.segmentNames = [];
       }
     }
-    if (self.segmentNames.length && self.segmentNames.length - 1 !== self.breakpoints.length) {
-      throw new Error('You must have one more segment name than you have breakpoints; you need ' + (self.breakpoints.length + 1) + ' segment names.');
+    if (
+      self.segmentNames.length &&
+      self.segmentNames.length - 1 !== self.breakpoints.length
+    ) {
+      throw new Error(
+        'You must have one more segment name than you have breakpoints; you need ' +
+          (self.breakpoints.length + 1) +
+          ' segment names.'
+      );
     }
     self.settings = extend({}, self.options, settings);
     self.reset();
@@ -258,9 +275,7 @@ var BreakpointX = (function(window) {
     // Register our own handler if we're to manipulate classes.
     if (self.settings.addClassesTo) {
       self.el = this.settings.addClassesTo;
-      self
-        .addCrossAction(actionApplyCss)
-        .triggerActions();
+      self.addCrossAction(actionApplyCss).triggerActions();
     }
 
     var throttleTimeout = null;
@@ -278,7 +293,6 @@ var BreakpointX = (function(window) {
    * Default options definition.
    */
   BreakpointX.prototype.options = {
-
     /**
      * Optional, a jquery selector or object where classes will be added.
      *
@@ -359,9 +373,10 @@ var BreakpointX = (function(window) {
           var from = self.getSegment(bp).from,
             addSmaller = activeWindowSegment.to + 1 === from,
             addBigger = from === activeWindowSegment.from,
-            applyCallbacks = (d === 'smaller' && addSmaller)
-              || (d === 'bigger' && addBigger)
-              || (d === 'both' && (addSmaller || addBigger));
+            applyCallbacks =
+              (d === 'smaller' && addSmaller) ||
+              (d === 'bigger' && addBigger) ||
+              (d === 'both' && (addSmaller || addBigger));
           if (applyCallbacks) {
             callbacks = callbacks || [];
             callbacks['bp' + activeWindowSegment.from] = self.actions[d][bp];
@@ -443,7 +458,9 @@ var BreakpointX = (function(window) {
    * @returns {int}
    */
   BreakpointX.prototype.getWindowWidth = function() {
-    var width, e = window, a = 'inner';
+    var width,
+      e = window,
+      a = 'inner';
     if (!('innerWidth' in window)) {
       a = 'client';
       e = document.documentElement || document.body;
@@ -459,13 +476,13 @@ var BreakpointX = (function(window) {
    */
   BreakpointX.prototype.reset = function() {
     this.actions = {
-      'bigger': [],
-      'smaller': [],
-      'both': []
+      bigger: [],
+      smaller: [],
+      both: [],
     };
     previousCallbackData = {
       segment: this.getSegment(null),
-      direction: null
+      direction: null,
     };
 
     return this;
@@ -506,7 +523,7 @@ var BreakpointX = (function(window) {
           segmentName = this.segmentNames[i];
           break;
         }
-        segmentName = this.segmentNames[(i * 1 + 1)];
+        segmentName = this.segmentNames[i * 1 + 1];
       }
     } else if (valueIsMediaQuery(data)) {
       var min = 0;
@@ -544,7 +561,12 @@ var BreakpointX = (function(window) {
       segment.from = prevBp || 0;
       segment.to = nextBp ? nextBp - 1 : Infinity;
       segment['@media'] = getMediaQuery(segment.from, segment.to);
-      segment.imageWidth = segment.type === 'segment' ? segment.to : Math.round(segment.from * this.settings.breakpointRayImageWidthRatio);
+      segment.imageWidth =
+        segment.type === 'segment'
+          ? segment.to
+          : Math.round(
+              segment.from * this.settings.breakpointRayImageWidthRatio
+            );
       segment.name = segmentName;
       segment.width = segment.to;
     }
@@ -562,7 +584,6 @@ var BreakpointX = (function(window) {
     return this.getSegment(width);
   };
 
-
   /**
    * Add a callback anytime, any breakpoint is crossed, in any direction.
    *
@@ -571,7 +592,8 @@ var BreakpointX = (function(window) {
    */
   BreakpointX.prototype.addCrossAction = function(callable) {
     for (var i in this.breakpoints) {
-      this.actions['both'][this.breakpoints[i]] = this.actions['both'][this.breakpoints[i]] || [];
+      this.actions['both'][this.breakpoints[i]] =
+        this.actions['both'][this.breakpoints[i]] || [];
       this.actions['both'][this.breakpoints[i]].push(callable);
     }
     return this;
@@ -587,8 +609,16 @@ var BreakpointX = (function(window) {
    *
    * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addBreakpointCrossAction = function(breakpoint, callable) {
-    return addActionByDirectionAndBreakpoint.call(this, 'both', breakpoint, callable);
+  BreakpointX.prototype.addBreakpointCrossAction = function(
+    breakpoint,
+    callable
+  ) {
+    return addActionByDirectionAndBreakpoint.call(
+      this,
+      'both',
+      breakpoint,
+      callable
+    );
   };
 
   /**
@@ -601,8 +631,16 @@ var BreakpointX = (function(window) {
    *
    * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addBreakpointCrossActionDecreasingOnly = function(breakpoint, callable) {
-    return addActionByDirectionAndBreakpoint.call(this, 'smaller', breakpoint, callable);
+  BreakpointX.prototype.addBreakpointCrossActionDecreasingOnly = function(
+    breakpoint,
+    callable
+  ) {
+    return addActionByDirectionAndBreakpoint.call(
+      this,
+      'smaller',
+      breakpoint,
+      callable
+    );
   };
 
   /**
@@ -615,8 +653,16 @@ var BreakpointX = (function(window) {
    *
    * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addBreakpointCrossActionIncreasingOnly = function(breakpoint, callable) {
-    return addActionByDirectionAndBreakpoint.call(this, 'bigger', breakpoint, callable);
+  BreakpointX.prototype.addBreakpointCrossActionIncreasingOnly = function(
+    breakpoint,
+    callable
+  ) {
+    return addActionByDirectionAndBreakpoint.call(
+      this,
+      'bigger',
+      breakpoint,
+      callable
+    );
   };
 
   return BreakpointX;

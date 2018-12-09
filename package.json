@@ -1,4 +1,7 @@
 {
+    "scripts": {
+        "format": "node_modules/.bin/prettier --write \"**/*.{js,scss}\""
+    },
     "name": "@aklump/breakpointx",
     "title": "Breakpoint X (Crossing)",
     "version": "0.5.0",
@@ -21,8 +24,9 @@
     },
     "homepage": "https://github.com/aklump/breakpointX#readme",
     "devDependencies": {
-        "qunit": "^2.8.0",
         "jquery": ">=3.0.0",
+        "prettier": "1.15.3",
+        "qunit": "^2.8.0",
         "uglify-js": "^3.4.9"
     }
 }
