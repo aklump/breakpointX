@@ -50,20 +50,6 @@ var BreakpointX = (function(window) {
   var var_max_width = 'max-width:';
 
   /**
-   * Stores data from the last callback fire.
-   *
-   * @type {{}}
-   */
-  var previousCallbackData = {};
-
-  /**
-   * Holds pending data, yet to be converted to segments/breakpoints.
-   *
-   * @type {Array}
-   */
-  var segmentSourceData = [];
-
-  /**
    * Helper function to determine the media query by raw data.
    *
    * @param int lower_breakpoint The lower breakpoint value.
@@ -209,6 +195,21 @@ var BreakpointX = (function(window) {
    * @constructor
    */
   function BreakpointX() {
+
+    /**
+     * Stores data from the last callback fire.
+     *
+     * @type {{}}
+     */
+    this.pCallback = {};
+
+    /**
+     * Holds pending data, yet to be converted to segments/breakpoints.
+     *
+     * @type {Array}
+     */
+    this.importData = [];
+
     /**
      * Holds the element that will receive CSS classes, if set.
      */
@@ -362,10 +363,10 @@ var BreakpointX = (function(window) {
     min = min ? min[1] * 1 : null;
     var max = mediaQuery.match(/max-width.+?(\d+)px/);
     max = max ? max[1] * 1 : null;
-    segmentSourceData.push([min, max]);
+    this.importData.push([min, max]);
 
     // Now reimport.
-    var data = segmentSourceData.sort(function(a, b) {
+    var data = this.importData.sort(function(a, b) {
       return a[1] - b[1];
     });
 
@@ -419,7 +420,7 @@ var BreakpointX = (function(window) {
     var self = this,
       activeWindowWidth = valueIsPoint(width) ? width : this.getWindowWidth(),
       segment = self.getSegment(activeWindowWidth),
-      pSegment = previousCallbackData.segment,
+      pSegment = this.pCallback.segment,
       hasCrossedBreakpoint = pSegment.name && segment.name !== pSegment.name,
       callbacks = false,
       breakpoint = null;
@@ -471,8 +472,8 @@ var BreakpointX = (function(window) {
       }
     }
 
-    if (callbacks || !previousCallbackData.segment.name) {
-      previousCallbackData = {
+    if (callbacks || !this.pCallback.segment.name) {
+      this.pCallback = {
         breakpoint: breakpoint,
         direction: direction,
         segment: segment,
@@ -487,7 +488,7 @@ var BreakpointX = (function(window) {
    *
    * This differs from onWindowResize, in that this function will always fire
    * events, whereas onWindowResize, will take into account
-   * previousCallbackData, and will thus sometimes not fire actions.  This
+   * this.pCallback, and will thus sometimes not fire actions.  This
    * method can be called after adding actions if you wish to initialize them
    * and not wait for a resize event.
    *
@@ -510,7 +511,7 @@ var BreakpointX = (function(window) {
    * @returns {BreakpointX}
    */
   BreakpointX.prototype.triggerActions = function(width) {
-    previousCallbackData.segment = this.getSegment(null);
+    this.pCallback.segment = this.getSegment(null);
     return this.onWindowResize(width);
   };
 
@@ -543,7 +544,7 @@ var BreakpointX = (function(window) {
       smaller: [],
       both: [],
     };
-    previousCallbackData = {
+    this.pCallback = {
       segment: this.getSegment(null),
       direction: null,
     };

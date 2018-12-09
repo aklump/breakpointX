@@ -21,6 +21,21 @@ QUnit.test('Assert we can instantiate with just settings object.', function(
 });
 
 QUnit.test(
+  'Assert addSegmentByMedia creates segments and breakpoints without ()',
+  function(assert) {
+    var obj = new BreakpointX();
+    obj
+      .addSegmentByMedia('max-width: 768px')
+      .addSegmentByMedia('(min-width:480px)and(max-width:767px)')
+      .addSegmentByMedia('max-width: 479px)');
+    assert.deepEqual(obj.breakpoints, [480, 768]);
+    assert.deepEqual(obj.segmentNames, ['0-479', '480-767', '768-infinity']);
+
+    assert.strictEqual('480-767', obj.getSegment(500).name);
+  }
+);
+
+QUnit.test(
   'Assert addSegmentByMedia creates segments and breakpoints and out of order.',
   function(assert) {
     var obj = new BreakpointX();
