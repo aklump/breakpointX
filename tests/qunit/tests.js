@@ -13,6 +13,19 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
+QUnit.test('Assert device and rename first segment', function(assert) {
+  var obj = new BreakpointX();
+  var segment = obj
+    .addDevice('desktop', 768)
+    .renameSegment(0, 'mobile')
+    .getSegment('mobile');
+  assert.strictEqual('mobile', segment.name);
+  assert.deepEqual([768], obj.breakpoints);
+  assert.deepEqual(['mobile', 'desktop'], obj.segmentNames);
+  assert.strictEqual('mobile', obj.getSegment(400).name);
+});
+
+
 QUnit.test('Assert addDevice works', function(assert) {
   var obj = new BreakpointX();
   obj
@@ -43,6 +56,14 @@ QUnit.test('Callback arguments are correct on cross', function(assert) {
   })
     .triggerActions(200)
     .onWindowResize(700);
+});
+
+QUnit.test('Callback have instance as the "this" context', function(assert) {
+  var obj = new BreakpointX([500], );
+  obj.addCrossAction(function(segment, direction, breakpoint, pSegment) {
+    assert.strictEqual(obj, this);
+  })
+    .triggerActions(400);
 });
 
 QUnit.test('Callback arguments are correct on init', function(assert) {
@@ -215,7 +236,7 @@ QUnit.test('Assert getRay works', function(assert) {
   assert.strictEqual(obj.getRay().name, 'desktop');
 
   obj = new BreakpointX([480, 768, 1080]);
-  assert.strictEqual(obj.getRay().name, '1080-Infinity');
+  assert.strictEqual(obj.getRay().name, '1080-infinity');
 });
 
 QUnit.test('Assert that breakpoints as an array of values works.', function(assert) {
@@ -224,7 +245,7 @@ QUnit.test('Assert that breakpoints as an array of values works.', function(asse
     '0-479',
     '480-767',
     '768-1079',
-    '1080-Infinity',
+    '1080-infinity',
   ]);
   assert.strictEqual(bp.getSegment(0)['@media'], '(max-width:479px)');
   assert.strictEqual(bp.getSegment(100)['@media'], '(max-width:479px)');
@@ -563,7 +584,7 @@ QUnit.test('imageWidthForRayComputesBasedOnSettingsValue with no named segment.'
   obj = new BreakpointX([768], {
     breakpointRayImageWidthRatio: 1.5
   });
-  var segment = obj.getSegment('768-Infinity');
+  var segment = obj.getSegment('768-infinity');
   assert.equal(segment.imageWidth, 1075);
 });
 

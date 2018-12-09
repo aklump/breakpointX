@@ -8,6 +8,18 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+  public function testAssertDeviceAndRenameFirstSegment() {
+    $obj = new BreakpointX();
+    $segment = $obj
+      ->addDevice('desktop', 768)
+      ->renameSegment(0, 'mobile')
+      ->getSegment('mobile');
+    $this->assertSame('mobile', $segment['name']);
+    $this->assertSame([768], $obj->breakpoints);
+    $this->assertSame(['mobile', 'desktop'], $obj->segmentNames);
+    $this->assertSame('mobile', $obj->getSegment(400)['name']);
+  }
+
   public function testAssertGetSegmentMediaQueryWorks() {
     $obj = new BreakpointX([241, 769], ['tiny', 'mobile', 'desktop']);
     $this->assertSame($obj->getSegment('(min-width:769px)')['name'], 'desktop');
@@ -93,7 +105,7 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
   public function testThirdSegmentIsCorrect() {
     $segment = $this->obj->getSegment(800);
-    $this->assertSame('768-Infinity', $segment['name']);
+    $this->assertSame('768-infinity', $segment['name']);
     $this->assertSame('ray', $segment['type']);
     $this->assertSame(768, $segment['from']);
     $this->assertSame(NULL, $segment['to']);
@@ -124,7 +136,7 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testLast() {
-    $this->assertSame("768-Infinity", $this->obj->getRay()['name']);
+    $this->assertSame("768-infinity", $this->obj->getRay()['name']);
   }
 
   public function testConstructWithNamedAliases() {
@@ -141,7 +153,7 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame([
       '0-479',
       '480-767',
-      '768-Infinity',
+      '768-infinity',
     ], $this->obj->segmentNames);
   }
 

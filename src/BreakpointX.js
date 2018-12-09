@@ -219,7 +219,7 @@ var BreakpointX = (function($, window) {
         self.segmentNames.push(last + '-' + (breakpoint - 1));
         last = breakpoint;
       }
-      self.segmentNames.push(last + '-Infinity');
+      self.segmentNames.push(last + '-infinity');
     }
 
     // Register our own handler if we're to manipulate classes.
@@ -284,10 +284,17 @@ var BreakpointX = (function($, window) {
     breakpointRayImageWidthRatio: 1.4,
   };
 
+  BreakpointX.prototype.renameSegment = function(pointInSegment, name) {
+    var segment = this.getSegment(pointInSegment),
+      i = this.segmentNames.indexOf(segment.name);
+    this.segmentNames[i] = name;
+    return this;
+  };
+
   BreakpointX.prototype.addDevice = function(name, screenWidth) {
     this.breakpoints.push(screenWidth);
     this.breakpoints = this.breakpoints.sort(sortBreakpoints);
-    if (this.segmentNames[0] === '0-Infinity') {
+    if (this.segmentNames[0] === '0-infinity') {
       this.segmentNames[0] = '0-' + (screenWidth - 1);
     }
     var i = this.breakpoints.indexOf(screenWidth);

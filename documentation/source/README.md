@@ -4,7 +4,7 @@
 
 ## Summary
 
-This project provides a means to define horizontal breakpoints, which will fire JS callbacks when the browser width crosses said breakpoints.  It also allows for CSS classes to be applied to designated elements which reflect the current breakpoint.  It can be used when you need to do anything in Javascript based on window resizing.  The server-side component is useful if you're using a PHP-based CMS for coordinating breakpoints.
+This project provides a means to define breakpoints along the horizontal axis of the window, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will write CSS classes to designated elements.  It provides a PHP class with a simliar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.
 
 A breakpoint is defined as a single point along the horizontal axis.  To the left lies a segment, and to the right of the highest value breakpoint lies the ray.  To the right of all but the highest value breakpoint, likes a segment.  See the section below _Breakpoint Theory_.
 
@@ -24,6 +24,8 @@ If you find this project useful... please consider [making a donation](https://w
 
 ## Breakpoint Theory
 
+This cheatsheet will familiarize you with the terms used in this project.
+
 ![Cheatsheet](images/breakpoint-cheatsheet.png)
 
 Download this [Cheatsheet](images/breakpoint-cheatsheet.pdf) by [In the Loft Studios](http://www.intheloftstudios.com)
@@ -31,101 +33,103 @@ Download this [Cheatsheet](images/breakpoint-cheatsheet.pdf) by [In the Loft Stu
 ### Common Mistakes
 
 * By definition a _breakpoint_ does not have a width, nor does it have a minimum or a maximum; it's just a point.
-* A CSS media query represents a _segment or ray_ not a _breakpoint_.
+* A CSS media query represents a _segment_ or _ray_ not a _breakpoint_.
 
 ## Usage
 
-    // Breakpoints only, using default settings.
-    var obj = new BreakpointX(480, 768);
+![Basic Usage](images/basic.png)
+
+    var bp = new BreakpointX([480, 768]);
+
+Then you can retrieve segment info, which includes items such as the width, from point, to point, media query, image width, name, and more.
+
+    bp.getSegment(200);
+    bp.getSegment(480);
+    bp.getSegment(1000);
     
-    // Breakpoints only with settings.
-    var obj = new BreakpointX([480, 768], {
-      addClassesTo: 'html',
-      classPrefix: 'bpx-',
-      resizeThrottle: 200,
-      breakpointRayImageWidthRatio: 1.5,
-    });
-    
-    // With named segments.
+    var name = bp.getSegment(300).name;
+    var query = bp.getSegment(300)['@media'];
+    var imageWidth = bp.getSegment(300).imageWidth;
+
+### Named Segments
+
+It can be helpful to name your segments:
+
+![Basic Usage](images/named.png)
+
     var obj = new BreakpointX([480, 768], ['small', 'medium', 'large']);
-    
-    // Named segments and custom settings.
-    var obj = new BreakpointX([480, 768], ['small', 'medium', 'large'], {
+
+Then you can use the names to get segment info:
+
+    bp.getSegment('small')['@media']
+
+### CSS Classes
+
+To cause CSS classes to be written on an element, pass the appropriate settings, where `addClassesTo` is a jQuery selector.
+
+    // Breakpoints only with settings.
+    var obj = new BreakpointX([768], ['mobile', 'desktop'], {
       addClassesTo: 'html',
       classPrefix: 'bpx-',
-      resizeThrottle: 200,
-      breakpointRayImageWidthRatio: 1.5,
     });
 
-### Create a new instance, define breakpoints
+The element will look like this when the browser gets larger and crosses 768px.
 
-    // Register three breakpoints that indicate the following:
-    // - segment: 0px - 239px
-    // - segment: 240px - 767px
-    // - ray: 768px +
-    var bp = new BreakpointX([240, 768]);
+    <html class="bpx-desktop bpx-bigger">
 
-### Find the breakpoint by a horizontal, x value.
+### Callbacks When Breakpoints Are Crossed
 
-    var alias = bp.alias(240);
-    // alias === '(min-width:240px) and (max-width: 767px)';
+When the window width changes, and a breakpoint is hit or crossed, callbacks can be registered to fire as a result. `this` points to the BreakpointX instance.
 
-    var alias = bp.alias(200);
-    // alias === 'max-width: 239px';
+    // When the window crosses any breakpoint in either direction
+    bp.addCrossAction(function(segment, direction, breakpoint, previousSegment) {
+      ... do something in response.
+    });
 
-    var alias = bp.alias(300);
-    // alias === '(min-width:240px) and (max-width: 767px)';
-
-    var alias = bp.alias(1080);
-    // alias === 'min-width: 768px';
-
-### Register a callback to fire
+    // When the window crosses 768 in either direction
+    bp.addBreakpointCrossAction(function(segment, direction, breakpoint, previousSegment) {
+      ... do something in response.
+    });
 
     // When the window crosses 768 getting smaller
-    bp.add('smaller', ['(min-width:240px) and (max-width: 767px)'], function () {
-      console.log('Now you\'re in (min-width:240px) and (max-width: 767px)!');
+    bp.addBreakpointCrossActionDecreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+      ... do something in response.
     });
 
     // When the window crosses 768 getting bigger
-    bp.add('bigger', ['(min-width:240px) and (max-width: 767px)'], function () {
-      console.log('Now you\'re in (min-width:240px) and (max-width: 767px)!');
+    bp.addBreakpointCrossActionIncreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+      ... do something in response.
     });
 
-    // When the window crosses any breakpoint in either direction
-    bp.add('both', bp.aliases, function (from, to, direction) {
-      console.log('Now you\'re in: ' + to.name);
-      console.log('Window just got ' + direction);
-    });
+### In Terms of Devices
 
-### Alternative: Create a new instance with named segments
+Here is an example which demonstrates how you might construct an instance when thinking in terms of physical devices.  It's given in PHP, however the JS methods are exactly the same.
 
-When you construct an instance of _BreakpointX_ using only numbers, you simply list the breakpoints and the names are autogenerated.  However, it is possible to name your segments and ray when you construct _BreakpointX_ by passing an object instead.  The keys of the object are the segment names and the ray name, and the values are the breakpoints with a final value of _Infinity_ to represent the ray.
+![Device-centric appproach](images/devices.png)
 
-The following example defines:
+    <?php
+    $obj = new BreakpointX();
+    $obj
+      ->addDevice('iphone', 480)
+      ->addDevice('ipad', 768)
+      ->addDevice('desktop', 1024)
+      ->renameSegment(0, 'small');
 
-* A ray named _small_
-* A breakpoint at 240px
-* A segment named _medium_
-* A breakpoint at 768px
-* A ray named _large_
 
-Here is the code:
+## PHP Support
 
-    var bp = new BreakpointX([{small: 240, medium: 768, large: Infinity}]);
+While this is foremost a Javascript project, there is a PHP class that may be helpful to your use case.  Browser-related methods do not exist, but other methods share the same API as the JS object.  The class file is _node_modules/@aklump/breakpointx/dist/BreakpointX.php_.
 
-### Add a class to an element reflecting the current breakpoint
+    <?php
+    $bp = new BreakpointX([480, 768]);
+    
+    $name = $bp->getSegment(300)['name'];
+    $query = $bp->getSegment(300)['@media'];
+    $imageWidth = $bp->getSegment(300)['imageWidth'];
 
-    var bp = new BreakpointX([{mobile: 768, desktop: Infinity}], {
-      addClassesTo: 'body'
-    });
+### Autoloading
 
-The body element will look like this when the browser gets larger and crosses 768px.
-
-    <body class="bpx-desktop bpx-bigger">
-
-### PHP
-
-For PHP usage the namespace `AKlump\\BreakpointX` should map to _node_modules/@aklump/breakpointx/dist_.  Here's an example for _composer.json_.
+ For PSR autoloading the namespace `AKlump\\BreakpointX` should map to _node_modules/@aklump/breakpointx/dist_.  Here's an example for _composer.json_.
 
     {
         "autoload": {
