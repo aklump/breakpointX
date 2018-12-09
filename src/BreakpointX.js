@@ -180,9 +180,9 @@ var BreakpointX = (function(window) {
       if (breakpoint !== segment.from) {
         throw new Error(
           'You tried to add an action to an unregistered breakpoint "' +
-            breakpoint +
-            '"; you must use one of: ' +
-            this.breakpoints.join(', ')
+          breakpoint +
+          '"; you must use one of: ' +
+          this.breakpoints.join(', ')
         );
       }
     } else {
@@ -208,7 +208,7 @@ var BreakpointX = (function(window) {
    *
    * @constructor
    */
-  function BreakpointX(breakpoints) {
+  function BreakpointX() {
     /**
      * Holds the element that will receive CSS classes, if set.
      */
@@ -234,21 +234,26 @@ var BreakpointX = (function(window) {
     var settings = {},
       self = this;
 
+    console.log(typeof arguments[0]);
+
     // Ensure breakpoints are sorted ascending; we will always assume the
     // segment names are in the correct sort, and never touch them.  Also we
     // clone the breakpoints array so as not to mutate by accident.
-    if (breakpoints) {
-      self.breakpoints = breakpoints
-        .slice()
-        .map(function(item) {
-          return parseInt(item, 10);
-        })
-        .sort(sortBreakpoints);
-      if (self.breakpoints[0] === 0) {
-        throw new Error('You must not include a breakpoint of 0.');
+    if (arguments.length > 0) {
+      if (arguments[0] instanceof Array) {
+        self.breakpoints = arguments[0].slice()
+          .map(function(item) {
+            return parseInt(item, 10);
+          })
+          .sort(sortBreakpoints);
+        if (self.breakpoints[0] === 0) {
+          throw new Error('You must not include a breakpoint of 0.');
+        }
+      } else if (typeof arguments[0] === 'object') {
+        settings = extend({}, arguments[0]);
+      } else {
+        throw new Error('Invalid constructor args.');
       }
-    } else {
-      self.breakpoints = [];
     }
     if (arguments.length === 3) {
       settings = extend({}, arguments[2]);
@@ -262,13 +267,14 @@ var BreakpointX = (function(window) {
       }
     }
     if (
+      self.breakpoints.length &&
       self.segmentNames.length &&
       self.segmentNames.length - 1 !== self.breakpoints.length
     ) {
       throw new Error(
         'You must have one more segment name than you have breakpoints; you need ' +
-          (self.breakpoints.length + 1) +
-          ' segment names.'
+        (self.breakpoints.length + 1) +
+        ' segment names.'
       );
     }
     self.settings = extend({}, self.options, settings);
@@ -623,8 +629,8 @@ var BreakpointX = (function(window) {
         segment.type === 'segment'
           ? segment.to
           : Math.round(
-              segment.from * this.settings.breakpointRayImageWidthRatio
-            );
+          segment.from * this.settings.breakpointRayImageWidthRatio
+          );
       segment.name = segmentName;
       segment.width = segment.to;
     }

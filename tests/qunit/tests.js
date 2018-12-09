@@ -13,6 +13,11 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
+QUnit.test('Assert we can instantiate with just settings object.', function(assert) {
+  var obj = new BreakpointX({ resizeThrottle: 175 });
+  assert.strictEqual(obj.settings.resizeThrottle, 175);
+});
+
 QUnit.test(
   'Assert addSegmentByMedia creates segments and breakpoints and out of order.',
   function(assert) {
