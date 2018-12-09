@@ -1,5 +1,5 @@
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.6.1
+ * Breakpoint X (Crossing) jQuery Plugin v0.6.2
  * https://github.com/aklump/breakpointX#readme
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Sun Dec  9 13:18:41 PST 2018_string
+ * Date: Sun Dec  9 13:54:50 PST 2018_string
  */
 /**
  *
@@ -208,13 +208,13 @@ var BreakpointX = (function(window) {
    *
    * @constructor
    */
-  function BreakpointX(breakpoints) {
+  function BreakpointX() {
     /**
      * Holds the element that will receive CSS classes, if set.
      */
     this.el = null;
 
-    this.version = '0.6.1';
+    this.version = '0.6.2';
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -234,21 +234,27 @@ var BreakpointX = (function(window) {
     var settings = {},
       self = this;
 
+    console.log(typeof arguments[0]);
+
     // Ensure breakpoints are sorted ascending; we will always assume the
     // segment names are in the correct sort, and never touch them.  Also we
     // clone the breakpoints array so as not to mutate by accident.
-    if (breakpoints) {
-      self.breakpoints = breakpoints
-        .slice()
-        .map(function(item) {
-          return parseInt(item, 10);
-        })
-        .sort(sortBreakpoints);
-      if (self.breakpoints[0] === 0) {
-        throw new Error('You must not include a breakpoint of 0.');
+    if (arguments.length > 0) {
+      if (arguments[0] instanceof Array) {
+        self.breakpoints = arguments[0]
+          .slice()
+          .map(function(item) {
+            return parseInt(item, 10);
+          })
+          .sort(sortBreakpoints);
+        if (self.breakpoints[0] === 0) {
+          throw new Error('You must not include a breakpoint of 0.');
+        }
+      } else if (typeof arguments[0] === 'object') {
+        settings = extend({}, arguments[0]);
+      } else {
+        throw new Error('Invalid constructor args.');
       }
-    } else {
-      self.breakpoints = [];
     }
     if (arguments.length === 3) {
       settings = extend({}, arguments[2]);
@@ -262,6 +268,7 @@ var BreakpointX = (function(window) {
       }
     }
     if (
+      self.breakpoints.length &&
       self.segmentNames.length &&
       self.segmentNames.length - 1 !== self.breakpoints.length
     ) {
