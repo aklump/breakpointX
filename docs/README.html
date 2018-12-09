@@ -31,7 +31,7 @@
 
 <h2>Summary</h2>
 
-<p>This project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will write CSS classes to designated elements.  It provides a PHP class with a simliar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.</p>
+<p>This zero-dependency project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will apply CSS classes to designated elements.  It provides a PHP class with a similar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.</p>
 
 <p>A breakpoint is defined as a single point along the horizontal axis.  To the left lies a segment, and to the right of the highest value breakpoint lies the ray.  To the right of all but the highest value breakpoint, likes a segment.  See the section below <em>Breakpoint Theory</em>.</p>
 
@@ -78,11 +78,11 @@ var imageWidth = bp.getSegment(300).imageWidth;
 
 <h2>CSS Classes</h2>
 
-<p>To cause CSS classes to be written on an element, pass the appropriate settings, where <code>addClassesTo</code> is a jQuery selector or object.  It becomes a property of the instance as <code>.$el</code>, so it can be accessed in callbacks, if necessary.</p>
+<p>To cause CSS classes to be written on an element, pass the appropriate settings, where <code>addClassesTo</code> is a DOM object.  It becomes a property of the instance as <code>.el</code>, so it can be accessed in callbacks, if necessary.  The example shows adding classes to the <code>html</code> element.  If you're using jQuery you could do <code>addClassesTo: $('html').get(0)</code>.</p>
 
 <pre><code>// Breakpoints only with settings.
 var obj = new BreakpointX([768], ['mobile', 'desktop'], {
-  addClassesTo: 'html',
+  addClassesTo: document.documentElement,
   classPrefix: 'bpx-',
 });
 </code></pre>
@@ -162,12 +162,6 @@ $imageWidth = $bp-&gt;getSegment(300)['imageWidth'];
 }
 </code></pre>
 
-<h2>Requirements</h2>
-
-<ul>
-<li>jQuery >= 1.4</li>
-</ul>
-
 <h2>Contributing</h2>
 
 <p>If you find this project useful... please consider <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=4E5KZHDQCEUV8&amp;item_name=Gratitude%20for%20aklump%2Fbreakpoint_x">making a donation</a>.</p>
@@ -200,7 +194,7 @@ $imageWidth = $bp-&gt;getSegment(300)['imageWidth'];
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.5.0 &bull; Last Updated: Sun, 09 Dec 2018 08:59:27 -0800</p>
+    <p class="legaleeze center">Version: 0.5.0 &bull; Last Updated: Sun, 09 Dec 2018 09:51:14 -0800</p>
   </div>
 </footer>
 

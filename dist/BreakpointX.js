@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Sun Dec  9 08:59:26 PST 2018_string
+ * Date: Sun Dec  9 09:51:12 PST 2018_string
  */
 /**
  *
@@ -41,9 +41,8 @@
  *   })
  * @endcode
  */
-var jQuery = jQuery || require('jquery');
 var window = window || {};
-var BreakpointX = (function($, window) {
+var BreakpointX = (function(window) {
 
   /**
    * Stores data from the last callback fire.
@@ -100,16 +99,46 @@ var BreakpointX = (function($, window) {
    *   - both
    */
   function actionApplyCss(segment, direction, breakpoint, pSegment) {
-    var p = this.settings.classPrefix;
-    this.$el
-      .removeClass(p + 'smaller')
-      .removeClass(p + 'bigger')
-      .removeClass(p + pSegment.name)
-      .addClass(p + segment.name);
+    removeClass.call(this, 'smaller');
+    removeClass.call(this, 'bigger');
+    removeClass.call(this, pSegment.name);
+    addClass.call(this, segment.name);
     if (direction) {
-      this.$el.addClass(p + direction);
+      addClass.call(this, direction);
     }
   };
+
+  function removeClass(unprefixedClassName) {
+    var className = this.settings.classPrefix + unprefixedClassName;
+    if (this.el.classList)
+      this.el.classList.remove(className);
+    else
+      this.el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+  }
+
+  function addClass(unprefixedClassName) {
+    var className = this.settings.classPrefix + unprefixedClassName;
+    if (this.el.classList)
+      this.el.classList.add(className);
+    else
+      this.el.className += ' ' + className;
+  }
+
+  function extend(out) {
+    out = out || {};
+
+    for (var i = 1; i < arguments.length; i++) {
+      if (!arguments[i])
+        continue;
+
+      for (var key in arguments[i]) {
+        if (arguments[i].hasOwnProperty(key))
+          out[key] = arguments[i][key];
+      }
+    }
+
+    return out;
+  }
 
   /**
    * Determine if a value is a numeric point or not.
@@ -161,9 +190,9 @@ var BreakpointX = (function($, window) {
   function BreakpointX(breakpoints) {
 
     /**
-     * Holds the elements that will receive CSS classes, if set.
+     * Holds the element that will receive CSS classes, if set.
      */
-    this.$el = null;
+    this.el = null;
 
     this.version = '0.5.0';
 
@@ -199,20 +228,20 @@ var BreakpointX = (function($, window) {
       self.breakpoints = [];
     }
     if (arguments.length === 3) {
-      settings = $.extend({}, arguments[2]);
+      settings = extend({}, arguments[2]);
       self.segmentNames = arguments[1].slice();
     } else if (arguments.length === 2) {
       if (arguments[1] instanceof Array) {
         self.segmentNames = arguments[1].slice();
       } else {
-        settings = $.extend({}, arguments[1]);
+        settings = extend({}, arguments[1]);
         self.segmentNames = [];
       }
     }
     if (self.segmentNames.length && self.segmentNames.length - 1 !== self.breakpoints.length) {
       throw new Error('You must have one more segment name than you have breakpoints; you need ' + (self.breakpoints.length + 1) + ' segment names.');
     }
-    self.settings = $.extend({}, self.options, settings);
+    self.settings = extend({}, self.options, settings);
     self.reset();
 
     // Auto-name missing segment names.
@@ -228,14 +257,14 @@ var BreakpointX = (function($, window) {
 
     // Register our own handler if we're to manipulate classes.
     if (self.settings.addClassesTo) {
-      self.$el = $(this.settings.addClassesTo);
+      self.el = this.settings.addClassesTo;
       self
         .addCrossAction(actionApplyCss)
         .triggerActions();
     }
 
     var throttleTimeout = null;
-    $(window).resize(function() {
+    window.addEventListener('resize', function() {
       clearTimeout(throttleTimeout);
       throttleTimeout = setTimeout(function() {
         self.onWindowResize();
@@ -247,13 +276,6 @@ var BreakpointX = (function($, window) {
 
   /**
    * Default options definition.
-   *
-   * Extend globally like this:
-   * @code
-   *   $.extend(BreakpointX.prototype.options, {
-   *     key: 'overridden'
-   *   });
-   * @endcode
    */
   BreakpointX.prototype.options = {
 
@@ -598,7 +620,7 @@ var BreakpointX = (function($, window) {
   };
 
   return BreakpointX;
-})(jQuery, window);
+})(window);
 
 if (typeof module === 'object' && module.exports) {
   module.exports = BreakpointX;

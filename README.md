@@ -4,7 +4,7 @@
 
 ## Summary
 
-This project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will write CSS classes to designated elements.  It provides a PHP class with a simliar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.
+This zero-dependency project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will apply CSS classes to designated elements.  It provides a PHP class with a similar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.
 
 A breakpoint is defined as a single point along the horizontal axis.  To the left lies a segment, and to the right of the highest value breakpoint lies the ray.  To the right of all but the highest value breakpoint, likes a segment.  See the section below _Breakpoint Theory_.
 
@@ -48,7 +48,7 @@ Then you can also retrieve segment info using a name, which includes items such 
 
 ## CSS Classes
 
-To cause CSS classes to be written on an element, pass the appropriate settings, where `addClassesTo` is a jQuery selector or object.  It becomes a property of the instance as `.$el`, so it can be accessed in callbacks, if necessary.
+To cause CSS classes to be written on an element, pass the appropriate settings, where `addClassesTo` is a DOM object.  It becomes a property of the instance as `.el`, so it can be accessed in callbacks, if necessary.  The example shows adding classes to the `html` element.  If you're using jQuery you could do `addClassesTo: $('html').get(0)`.
 
     // Breakpoints only with settings.
     var obj = new BreakpointX([768], ['mobile', 'desktop'], {
@@ -124,10 +124,6 @@ While this is foremost a Javascript project, there is a PHP class that may be he
             }
         }
     }
-
-## Requirements
-
-* jQuery >= 1.4
 
 ## Contributing
 
