@@ -166,9 +166,9 @@ var BreakpointX = (function(window) {
       if (breakpoint !== segment.from) {
         throw new Error(
           'You tried to add an action to an unregistered breakpoint "' +
-            breakpoint +
-            '"; you must use one of: ' +
-            this.breakpoints.join(', ')
+          breakpoint +
+          '"; you must use one of: ' +
+          this.breakpoints.join(', ')
         );
       }
     } else {
@@ -272,8 +272,8 @@ var BreakpointX = (function(window) {
     ) {
       throw new Error(
         'You must have one more segment name than you have breakpoints; you need ' +
-          (self.breakpoints.length + 1) +
-          ' segment names.'
+        (self.breakpoints.length + 1) +
+        ' segment names.'
       );
     }
     self.settings = extend({}, self.options, settings);
@@ -356,6 +356,20 @@ var BreakpointX = (function(window) {
     return this;
   };
 
+  function mergeImportData(value, mediaQuery) {
+    // Add if not present or if the mediaQuery is empty.
+    for (var i in this.importData) {
+      var d = this.importData[i];
+      if (d[0] === value) {
+        if (!d[1]) {
+          this.importData[i] = [value, mediaQuery];
+        }
+        return;
+      }
+    }
+    this.importData.push([value, mediaQuery]);
+  }
+
   /**
    * Add a segment using a media query string.
    *
@@ -364,9 +378,13 @@ var BreakpointX = (function(window) {
    * @returns {BreakpointX}
    */
   BreakpointX.prototype.addSegmentByMedia = function(mediaQuery) {
-    var pixels = mediaQuery.match(/max-width.+?(\d+)px/);
-    pixels = pixels ? pixels[1] * 1 : null;
-    this.importData.push([pixels, mediaQuery]);
+    var min = mediaQuery.match(/min-width.+?(\d+)px/),
+      max = mediaQuery.match(/max-width.+?(\d+)px/);
+    min = min ? min[1] * 1 : null;
+    max = max ? max[1] * 1 : null;
+    min && mergeImportData.call(this, min - 1);
+    mergeImportData.call(this, max, mediaQuery);
+
     // Sort by max pushing null to end.
     var data = this.importData.sort(function(a, b) {
       if (a[0] === b[0]) return 0;
@@ -636,8 +654,8 @@ var BreakpointX = (function(window) {
         segment.type === 'segment'
           ? segment.to
           : Math.round(
-              segment.from * this.settings.breakpointRayImageWidthRatio
-            );
+          segment.from * this.settings.breakpointRayImageWidthRatio
+          );
       segment.name = segmentName;
       segment.width = segment.to;
     }
