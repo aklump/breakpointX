@@ -31,10 +31,10 @@ QUnit.test(
       .addSegmentByMedia('min-width:1080px');
     assert.deepEqual(obj.breakpoints, [768, 960, 1080]);
     assert.deepEqual(obj.segmentNames, [
-      '0-767',
-      '768-959',
-      '960-1079',
-      '1080-infinity',
+      'max-width: 767px',
+      '(min-width:768px) and (max-width:959px)',
+      '(min-width:960px) and (max-width:1079px)',
+      'min-width:1080px',
     ]);
   }
 );
@@ -48,9 +48,16 @@ QUnit.test(
       .addSegmentByMedia('(min-width:480px)and(max-width:767px)')
       .addSegmentByMedia('max-width: 479px)');
     assert.deepEqual(obj.breakpoints, [480, 768]);
-    assert.deepEqual(obj.segmentNames, ['0-479', '480-767', '768-infinity']);
+    assert.deepEqual(obj.segmentNames, [
+      'max-width: 479px)',
+      '(min-width:480px)and(max-width:767px)',
+      'max-width: 768px',
+    ]);
 
-    assert.strictEqual('480-767', obj.getSegment(500).name);
+    assert.strictEqual(
+      '(min-width:480px)and(max-width:767px)',
+      obj.getSegment(500).name
+    );
   }
 );
 
@@ -63,9 +70,16 @@ QUnit.test(
       .addSegmentByMedia('(min-width:480px) and (max-width:767px)')
       .addSegmentByMedia('(max-width:479px)');
     assert.deepEqual(obj.breakpoints, [480, 768]);
-    assert.deepEqual(obj.segmentNames, ['0-479', '480-767', '768-infinity']);
+    assert.deepEqual(obj.segmentNames, [
+      '(max-width:479px)',
+      '(min-width:480px) and (max-width:767px)',
+      '(max-width:768px)',
+    ]);
 
-    assert.strictEqual('480-767', obj.getSegment(500).name);
+    assert.strictEqual(
+      '(min-width:480px) and (max-width:767px)',
+      obj.getSegment(500).name
+    );
   }
 );
 
