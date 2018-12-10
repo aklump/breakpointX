@@ -1,5 +1,5 @@
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.6.4
+ * Breakpoint X (Crossing) jQuery Plugin v0.6.5
  * https://github.com/aklump/breakpointX#readme
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Sun Dec  9 15:11:16 PST 2018_string
+ * Date: Sun Dec  9 16:09:02 PST 2018_string
  */
 /**
  *
@@ -214,7 +214,7 @@ var BreakpointX = (function(window) {
      */
     this.el = null;
 
-    this.version = '0.6.4';
+    this.version = '0.6.5';
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -356,18 +356,27 @@ var BreakpointX = (function(window) {
     return this;
   };
 
+  /**
+   * Add a segment using a media query string.
+   *
+   * @param string mediaQuery
+   *   A media query defining the segment, e.g. "(max-width:479px)"
+   * @returns {BreakpointX}
+   */
   BreakpointX.prototype.addSegmentByMedia = function(mediaQuery) {
     var pixels = mediaQuery.match(/max-width.+?(\d+)px/);
     pixels = pixels ? pixels[1] * 1 : null;
-    this.importData.push(pixels);
+    this.importData.push([pixels, mediaQuery]);
+    // Sort by max pushing null to end.
     var data = this.importData.sort(function(a, b) {
-      return a - b;
+      if (a[0] === b[0]) return 0;
+      if (a[0] === null) return 1;
+      return a[0] - b[0];
     });
-
     this.breakpoints = [];
     var prevPoint = null;
     for (var d in data) {
-      var bp = data[d];
+      var bp = data[d][0];
       var isLast = data.length === 1 || bp - 1 === prevPoint;
       if (isLast) {
         bp = Infinity;
@@ -383,17 +392,26 @@ var BreakpointX = (function(window) {
   };
 
   /**
-   * Rewrite all segment names with auto values.
+   * Generate segment names from either breakpoints for importData.
    */
   function generateSegmentNames() {
     this.segmentNames = [];
     var last = 0;
-    for (var i in this.breakpoints) {
-      var breakpoint = this.breakpoints[i];
-      this.segmentNames.push(last + '-' + (breakpoint - 1));
-      last = breakpoint;
+    if (this.importData.length) {
+      for (var i in this.importData) {
+        var max = this.importData[i][0] || 'infinity',
+          name = this.importData[i][1] || last + '-' + max;
+        this.segmentNames.push(name);
+        last = max;
+      }
+    } else {
+      for (var i in this.breakpoints) {
+        var breakpoint = this.breakpoints[i];
+        this.segmentNames.push(last + '-' + (breakpoint - 1));
+        last = breakpoint;
+      }
+      this.segmentNames.push(last + '-infinity');
     }
-    this.segmentNames.push(last + '-infinity');
   }
 
   /**

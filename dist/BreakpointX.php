@@ -7,12 +7,12 @@ namespace AKlump\BreakpointX;
  *
  * A server-side compliment to BreakpointX.js
  *
- * @version 0.6.4
+ * @version 0.6.5
  * @package AKlump\BreakpointX
  */
 class BreakpointX {
 
-  public $version = '0.6.4';
+  public $version = '0.6.5';
 
   /**
    * An indexed array of segment names.
