@@ -1,5 +1,5 @@
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.6.5
+ * Breakpoint X (Crossing) jQuery Plugin v0.6.6
  * https://github.com/aklump/breakpointX#readme
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Sun Dec  9 16:09:02 PST 2018_string
+ * Date: Mon Dec 10 10:52:56 PST 2018_string
  */
 /**
  *
@@ -214,7 +214,7 @@ var BreakpointX = (function(window) {
      */
     this.el = null;
 
-    this.version = '0.6.5';
+    this.version = '0.6.6';
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -356,6 +356,20 @@ var BreakpointX = (function(window) {
     return this;
   };
 
+  function mergeImportData(value, mediaQuery) {
+    // Add if not present or if the mediaQuery is empty.
+    for (var i in this.importData) {
+      var d = this.importData[i];
+      if (d[0] === value) {
+        if (!d[1]) {
+          this.importData[i] = [value, mediaQuery];
+        }
+        return;
+      }
+    }
+    this.importData.push([value, mediaQuery]);
+  }
+
   /**
    * Add a segment using a media query string.
    *
@@ -364,9 +378,13 @@ var BreakpointX = (function(window) {
    * @returns {BreakpointX}
    */
   BreakpointX.prototype.addSegmentByMedia = function(mediaQuery) {
-    var pixels = mediaQuery.match(/max-width.+?(\d+)px/);
-    pixels = pixels ? pixels[1] * 1 : null;
-    this.importData.push([pixels, mediaQuery]);
+    var min = mediaQuery.match(/min-width.+?(\d+)px/),
+      max = mediaQuery.match(/max-width.+?(\d+)px/);
+    min = min ? min[1] * 1 : null;
+    max = max ? max[1] * 1 : null;
+    min && mergeImportData.call(this, min - 1);
+    mergeImportData.call(this, max, mediaQuery);
+
     // Sort by max pushing null to end.
     var data = this.importData.sort(function(a, b) {
       if (a[0] === b[0]) return 0;
