@@ -13,6 +13,15 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
+QUnit.test('Using string for a class on addClassesTo throws', function(assert) {
+  assert.throws(function() {
+    new BreakpointX({
+      addClassesTo: 'html'
+    });
+  });
+});
+
+
 QUnit.test(
   'Assert lower and upper breakpoints are returned in segments',
   function(assert) {
@@ -166,7 +175,7 @@ QUnit.test('Assert addDevice works', function(assert) {
 QUnit.test('Callback arguments are correct on cross', function(assert) {
   var obj = new BreakpointX([300, 600], ['small', 'medium', 'large']);
   obj
-    .addBreakpointCrossActionIncreasingOnly(600, function(
+    .addBreakpointCrossBiggerAction(600, function(
       segment,
       direction,
       breakpoint,
@@ -697,12 +706,12 @@ QUnit.test(
 );
 
 QUnit.test(
-  'Test action added with addBreakpointCrossActionIncreasingOnly fires the callbacks as expected on window width change using triggerActions.',
+  'Test action added with addBreakpointCrossBiggerAction fires the callbacks as expected on window width change using triggerActions.',
   function(assert) {
     var calledCount = 0;
     var obj = new BreakpointX([480, 768, 1024]);
     obj
-      .addBreakpointCrossActionIncreasingOnly(480, function() {
+      .addBreakpointCrossBiggerAction(480, function() {
         calledCount++;
       })
       .triggerActions(200);
@@ -713,12 +722,12 @@ QUnit.test(
 );
 
 QUnit.test(
-  'Test action added with addBreakpointCrossActionIncreasingOnly fires the callbacks as expected on window width change using triggerActions.',
+  'Test action added with addBreakpointCrossBiggerAction fires the callbacks as expected on window width change using triggerActions.',
   function(assert) {
     var calledCount = 0;
     var obj = new BreakpointX([480, 768, 1024]);
     obj
-      .addBreakpointCrossActionIncreasingOnly(480, function() {
+      .addBreakpointCrossBiggerAction(480, function() {
         calledCount++;
       })
       .triggerActions(700);
@@ -732,12 +741,12 @@ QUnit.test(
 );
 
 QUnit.test(
-  'Test action added with addBreakpointCrossActionDecreasingOnly fires the callbacks as expected on window width change using triggerActions.',
+  'Test action added with addBreakpointCrossSmallerAction fires the callbacks as expected on window width change using triggerActions.',
   function(assert) {
     var calledCount = 0;
     var obj = new BreakpointX([480, 768, 1024]);
     obj
-      .addBreakpointCrossActionDecreasingOnly(480, function() {
+      .addBreakpointCrossSmallerAction(480, function() {
         calledCount++;
       })
       .triggerActions(200);
@@ -748,12 +757,12 @@ QUnit.test(
 );
 
 QUnit.test(
-  'Test action added with addBreakpointCrossActionDecreasingOnly fires the callbacks as expected on window width change using triggerActions.',
+  'Test action added with addBreakpointCrossSmallerAction fires the callbacks as expected on window width change using triggerActions.',
   function(assert) {
     var calledCount = 0;
     var obj = new BreakpointX([480, 768, 1024]);
     obj
-      .addBreakpointCrossActionDecreasingOnly(480, function() {
+      .addBreakpointCrossSmallerAction(480, function() {
         calledCount++;
       })
       .triggerActions(700);

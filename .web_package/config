@@ -8,3 +8,4 @@ push_master = auto
 push_develop = no
 patch_prefix = .
 info_file = package.json
+preserve_patch_zero = true

@@ -79,12 +79,12 @@ When the window width changes, and a breakpoint is hit or crossed, callbacks can
     });
 
     // When the window crosses 768 getting smaller
-    bp.addBreakpointCrossActionDecreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+    bp.addBreakpointCrossSmallerAction(768, function (segment, direction, breakpoint, previousSegment) {
       ... do something in response.
     });
 
     // When the window crosses 768 getting bigger
-    bp.addBreakpointCrossActionIncreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+    bp.addBreakpointCrossBiggerAction(768, function (segment, direction, breakpoint, previousSegment) {
       ... do something in response.
     });
 
