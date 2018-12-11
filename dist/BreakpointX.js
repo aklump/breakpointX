@@ -1,5 +1,5 @@
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.6.6
+ * Breakpoint X (Crossing) jQuery Plugin v0.6.7
  * https://github.com/aklump/breakpointX#readme
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Mon Dec 10 10:52:56 PST 2018_string
+ * Date: Mon Dec 10 17:58:08 PST 2018_string
  */
 /**
  *
@@ -214,7 +214,7 @@ var BreakpointX = (function(window) {
      */
     this.el = null;
 
-    this.version = '0.6.6';
+    this.version = '0.6.7';
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -640,6 +640,8 @@ var BreakpointX = (function(window) {
       to: null,
       type: null,
       width: null,
+      lowerBreakpoint: null,
+      upperBreakpoint: Infinity,
     };
 
     var i = this.segmentNames.indexOf(segmentName);
@@ -649,6 +651,8 @@ var BreakpointX = (function(window) {
       segment.type = nextBp ? 'segment' : 'ray';
       segment.from = prevBp || 0;
       segment.to = nextBp ? nextBp - 1 : Infinity;
+      segment.lowerBreakpoint = segment.from ? segment.from : null;
+      segment.upperBreakpoint = segment.to + 1;
       segment['@media'] = getMediaQuery(segment.from, segment.to);
       segment.imageWidth =
         segment.type === 'segment'
