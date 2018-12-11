@@ -8,6 +8,14 @@ namespace AKlump\BreakpointX;
  */
 class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
+  public function testAssertWeCanIterateObject() {
+    $obj = new BreakpointX([768], ['alpha', 'bravo']);
+    foreach ($obj as $segment_name => $segment) {
+      $this->assertInternalType('array', $segment);
+      $this->assertSame($segment_name, $segment['name']);
+    }
+  }
+
   public function testAssertDeviceAndRenameFirstSegment() {
     $obj = new BreakpointX();
     $segment = $obj

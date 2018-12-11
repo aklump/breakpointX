@@ -10,7 +10,8 @@ namespace AKlump\BreakpointX;
  * @version __version
  * @package AKlump\BreakpointX
  */
-class BreakpointX {
+class BreakpointX implements \Iterator {
+
 
   public $version = '__version';
 
@@ -37,6 +38,12 @@ class BreakpointX {
    */
   protected $_settings = [];
 
+  /**
+   * Internal interation key.
+   *
+   * @var int
+   */
+  protected $iteration = 0;
   /**
    * Hold the default options for settings.
    *
@@ -221,4 +228,25 @@ class BreakpointX {
 
     return $this;
   }
+
+  public function current() {
+    return $this->getSegment($this->segmentNames[$this->iteration]);
+  }
+
+  public function next() {
+    ++$this->iteration;
+  }
+
+  public function key() {
+    return $this->segmentNames[$this->iteration];
+  }
+
+  public function valid() {
+    return isset($this->segmentNames[$this->iteration]);
+  }
+
+  public function rewind() {
+    $this->iteration = 0;
+  }
+
 }
