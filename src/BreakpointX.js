@@ -41,7 +41,6 @@
  *   })
  * @endcode
  */
-var window = window || {};
 var BreakpointX = (function(window) {
   var var_bigger = 'bigger';
   var var_smaller = 'smaller';
