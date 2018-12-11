@@ -7,12 +7,13 @@ namespace AKlump\BreakpointX;
  *
  * A server-side compliment to BreakpointX.js
  *
- * @version 0.6.6
+ * @version 0.6.7
  * @package AKlump\BreakpointX
  */
-class BreakpointX {
+class BreakpointX implements \Iterator {
 
-  public $version = '0.6.6';
+
+  public $version = '0.6.7';
 
   /**
    * An indexed array of segment names.
@@ -36,6 +37,13 @@ class BreakpointX {
    * @var array|mixed
    */
   protected $_settings = [];
+
+  /**
+   * Internal interation key.
+   *
+   * @var int
+   */
+  protected $iteration = 0;
 
   /**
    * Hold the default options for settings.
@@ -142,6 +150,8 @@ class BreakpointX {
       'to',
       'type',
       'width',
+      'lowerBreakpoint',
+      'upperBreakpoint',
     ], NULL);
 
     $i = array_search($segment_name, $this->segmentNames);
@@ -151,6 +161,8 @@ class BreakpointX {
       $segment['type'] = empty($next_bp) ? 'ray' : 'segment';
       $segment['from'] = $prev_bp ? $prev_bp : 0;
       $segment['to'] = $next_bp ? $next_bp - 1 : NULL;
+      $segment['lowerBreakpoint'] = $prev_bp ? $prev_bp : NULL;
+      $segment['upperBreakpoint'] = $next_bp;
       $segment['@media'] = $this->_query($segment['from'], $segment['to']);
       $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
       $segment['name'] = $segment_name;
@@ -221,4 +233,25 @@ class BreakpointX {
 
     return $this;
   }
+
+  public function current() {
+    return $this->getSegment($this->segmentNames[$this->iteration]);
+  }
+
+  public function next() {
+    ++$this->iteration;
+  }
+
+  public function key() {
+    return $this->segmentNames[$this->iteration];
+  }
+
+  public function valid() {
+    return isset($this->segmentNames[$this->iteration]);
+  }
+
+  public function rewind() {
+    $this->iteration = 0;
+  }
+
 }
