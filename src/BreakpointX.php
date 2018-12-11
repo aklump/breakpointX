@@ -44,6 +44,7 @@ class BreakpointX implements \Iterator {
    * @var int
    */
   protected $iteration = 0;
+
   /**
    * Hold the default options for settings.
    *
@@ -149,6 +150,8 @@ class BreakpointX implements \Iterator {
       'to',
       'type',
       'width',
+      'lowerBreakpoint',
+      'upperBreakpoint',
     ], NULL);
 
     $i = array_search($segment_name, $this->segmentNames);
@@ -158,6 +161,8 @@ class BreakpointX implements \Iterator {
       $segment['type'] = empty($next_bp) ? 'ray' : 'segment';
       $segment['from'] = $prev_bp ? $prev_bp : 0;
       $segment['to'] = $next_bp ? $next_bp - 1 : NULL;
+      $segment['lowerBreakpoint'] = $prev_bp ? $prev_bp : NULL;
+      $segment['upperBreakpoint'] = $next_bp;
       $segment['@media'] = $this->_query($segment['from'], $segment['to']);
       $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
       $segment['name'] = $segment_name;

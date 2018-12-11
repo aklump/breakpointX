@@ -13,6 +13,15 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
+QUnit.test('Assert lower and upper breakpoints are returned in segments', function(assert) {
+  assert.strictEqual(obj.getSegment(0)['lowerBreakpoint'], null);
+  assert.strictEqual(obj.getSegment(0)['upperBreakpoint'], 241);
+  assert.strictEqual(obj.getSegment(400)['lowerBreakpoint'], 241);
+  assert.strictEqual(obj.getSegment(400)['upperBreakpoint'], 769);
+  assert.strictEqual(obj.getSegment(800)['lowerBreakpoint'], 769);
+  assert.strictEqual(obj.getSegment(800)['upperBreakpoint'], Infinity);
+});
+
 QUnit.test('Assert we can instantiate with just settings object.', function(
   assert
 ) {
