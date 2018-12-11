@@ -1,5 +1,5 @@
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.6.7
+ * Breakpoint X (Crossing) jQuery Plugin v0.7.1
  * https://github.com/aklump/breakpointX#readme
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Mon Dec 10 17:58:08 PST 2018_string
+ * Date: Mon Dec 10 18:45:43 PST 2018_string
  */
 /**
  *
@@ -17,13 +17,13 @@
  * @code
  *   var bp = new BreakpointX([240, 768], ['small', 'medium', 'large']);
  *   bp
- *   .addBreakpointCrossActionDecreasingOnly(768, function () {
+ *   .addBreakpointCrossSmallerAction(768, function () {
  *     console.log("Now you're in medium!");
  *   })
- *   .addBreakpointCrossActionDecreasingOnly(240, function () {
+ *   .addBreakpointCrossSmallerAction(240, function () {
  *     console.log("Now you're in small!");
  *   })
- *   .addBreakpointCrossActionIncreasingOnly(768, function () {
+ *   .addBreakpointCrossBiggerAction(768, function () {
  *     console.log("Now you're in large!");
  *   })
  *   .addCrossAction(function(segment, direction, breakpoint, previousSegment) {
@@ -41,7 +41,6 @@
  *   })
  * @endcode
  */
-var window = window || {};
 var BreakpointX = (function(window) {
   var var_bigger = 'bigger';
   var var_smaller = 'smaller';
@@ -214,7 +213,7 @@ var BreakpointX = (function(window) {
      */
     this.el = null;
 
-    this.version = '0.6.7';
+    this.version = '0.7.1';
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -286,6 +285,11 @@ var BreakpointX = (function(window) {
 
     // Register our own handler if we're to manipulate classes.
     if (self.settings.addClassesTo) {
+      if (typeof self.settings.addClassesTo !== 'object') {
+        throw new Error(
+          'addClassesTo must be a DOM element; you provided a string'
+        );
+      }
       self.el = this.settings.addClassesTo;
       self.addCrossAction(actionApplyCss).triggerActions();
     }
@@ -724,7 +728,7 @@ var BreakpointX = (function(window) {
    *
    * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addBreakpointCrossActionDecreasingOnly = function(
+  BreakpointX.prototype.addBreakpointCrossSmallerAction = function(
     breakpoint,
     callable
   ) {
@@ -746,7 +750,7 @@ var BreakpointX = (function(window) {
    *
    * @returns {BreakpointX}
    */
-  BreakpointX.prototype.addBreakpointCrossActionIncreasingOnly = function(
+  BreakpointX.prototype.addBreakpointCrossBiggerAction = function(
     breakpoint,
     callable
   ) {

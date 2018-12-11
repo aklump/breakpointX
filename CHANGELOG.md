@@ -1,3 +1,8 @@
+## 0.7.0
+
+* addBreakpointCrossActionIncreasingOnly changed to addBreakpointCrossBiggerAction
+* addBreakpointCrossActionDecreasingOnly changed to addBreakpointCrossSmallerAction
+
 ## 0.6.0
 
 * Removed dependency on jQuery

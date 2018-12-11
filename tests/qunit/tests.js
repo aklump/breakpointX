@@ -16,11 +16,10 @@ var objArgs = {
 QUnit.test('Using string for a class on addClassesTo throws', function(assert) {
   assert.throws(function() {
     new BreakpointX({
-      addClassesTo: 'html'
+      addClassesTo: 'html',
     });
   });
 });
-
 
 QUnit.test(
   'Assert lower and upper breakpoints are returned in segments',

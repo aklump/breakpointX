@@ -112,12 +112,12 @@ bp.addBreakpointCrossAction(function(segment, direction, breakpoint, previousSeg
 });
 
 // When the window crosses 768 getting smaller
-bp.addBreakpointCrossActionDecreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+bp.addBreakpointCrossSmallerAction(768, function (segment, direction, breakpoint, previousSegment) {
   ... do something in response.
 });
 
 // When the window crosses 768 getting bigger
-bp.addBreakpointCrossActionIncreasingOnly(768, function (segment, direction, breakpoint, previousSegment) {
+bp.addBreakpointCrossBiggerAction(768, function (segment, direction, breakpoint, previousSegment) {
   ... do something in response.
 });
 </code></pre>
@@ -205,7 +205,7 @@ $imageWidth = $bp-&gt;getSegment(300)['imageWidth'];
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.6.7 &bull; Last Updated: Mon, 10 Dec 2018 17:58:10 -0800</p>
+    <p class="legaleeze center">Version: 0.7.1 &bull; Last Updated: Mon, 10 Dec 2018 18:45:44 -0800</p>
   </div>
 </footer>
 
