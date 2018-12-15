@@ -4,7 +4,7 @@
  *
  * __description
  *
- * Copyright 2015__year, __author
+ * Copyright 2015-__year, __author
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
