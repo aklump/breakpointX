@@ -1,14 +1,16 @@
 # Breakpoint X (Crossing)
 
-![Breakpoint X](docs/images/breakpoint-x.jpg)
+![Breakpoint X (Crossing)](docs/images/breakpoint-x.jpg)
 
 ## Summary
+
+Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
 
 This zero-dependency project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will apply CSS classes to designated elements.  It provides a PHP class with a similar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.
 
 A breakpoint is defined as a single point along the horizontal axis.  To the left lies a segment, and to the right of the highest value breakpoint lies the ray.  To the right of all but the highest value breakpoint, likes a segment.  See the section below _Breakpoint Theory_.
 
-**Visit <https://aklump.github.io/breakpointX/> for full documentation.**
+**Visit <http://www.intheloftstudios.com/packages/js/breakpointx> for full documentation.**
 
 ## Installation
 
