@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-rm -r "$7/dist"
-rm -r "$7/docs"
-rm "$7/README.md"
-rm "$7/CHANGELOG.md"
-#rm composer.lock
-#rm yarn.lock
-#rm -r node_modules
-#rm -r vendor
+
+wp_rm dist
+wp_rm docs
+wp_rm README.md
+wp_rm CHANGELOG.md

@@ -1,10 +1,1 @@
-/.web_package
-/vendor
-/.idea
-/demo*
-/tests
-composer*
-/yarn.lock
-phpunit*
-/documentation
-*.log
+docs/node_modules

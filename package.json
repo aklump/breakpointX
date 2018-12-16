@@ -14,12 +14,25 @@
         "mobile-first",
         "adaptive"
     ],
+    "files": [
+        "README*",
+        "LICENSE",
+        "CHANGELOG*",
+        "tests",
+        "dist",
+        "docs",
+        "phpunit.xml",
+        "demo.html",
+        "composer.*",
+        "!docs\/node_modules",
+        "!tests\/phpunit\/build"
+    ],
     "author": "Aaron Klump <sourcecode@intheloftstudios.com>",
-    "license": "MIT OR GPL-3.0",
+    "license": "BSD-3-Clause",
     "bugs": {
         "url": "https:\/\/github.com\/aklump\/breakpointX\/issues"
     },
-    "homepage": "https:\/\/github.com\/aklump\/breakpointX#readme",
+    "homepage": "http:\/\/www.intheloftstudios.com\/packages\/js\/breakpointx",
     "devDependencies": {
         "jquery": ">=3.0.0",
         "prettier": "1.15.3",

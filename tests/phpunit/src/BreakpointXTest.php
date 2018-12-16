@@ -10,12 +10,12 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
 
   public function testAssertLowerAndUppersBreakpointsAreReturnedInSegments() {
     $obj = new BreakpointX([241, 769]);
-    $this->assertSame(null, $obj->getSegment(0)['lowerBreakpoint']);
+    $this->assertSame(NULL, $obj->getSegment(0)['lowerBreakpoint']);
     $this->assertSame(241, $obj->getSegment(0)['upperBreakpoint']);
     $this->assertSame(241, $obj->getSegment(400)['lowerBreakpoint']);
     $this->assertSame(769, $obj->getSegment(400)['upperBreakpoint']);
     $this->assertSame(769, $obj->getSegment(800)['lowerBreakpoint']);
-    $this->assertSame(null, $obj->getSegment(800)['upperBreakpoint']);
+    $this->assertSame(NULL, $obj->getSegment(800)['upperBreakpoint']);
   }
 
   public function testAssertWeCanIterateObject() {
