@@ -141,6 +141,22 @@ QUnit.test(
   }
 );
 
+QUnit.test('Assert AddByScreenWidth works as expected', function(assert) {
+  var obj = new BreakpointX();
+  var segment = obj
+    .addByScreenWidth(320)
+    .addByScreenWidth(768)
+    .addByScreenWidth(1336)
+    .getSegment('min_769');
+  assert.strictEqual(segment.name, 'min_769');
+  assert.deepEqual([321, 769, 1337], obj.breakpoints);
+  assert.deepEqual(['min_0', 'min_321', 'min_769', 'min_1337'], obj.segmentNames);
+  assert.strictEqual('min_321', obj.getSegment(400).name);
+  assert.strictEqual(768, obj.getSegment(767).imageWidth);
+  assert.strictEqual(768, obj.getSegment(768).imageWidth);
+  assert.strictEqual(1336, obj.getSegment(769).imageWidth);
+});
+
 QUnit.test('Assert device and rename first segment', function(assert) {
   var obj = new BreakpointX();
   var segment = obj

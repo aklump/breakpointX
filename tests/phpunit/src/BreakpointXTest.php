@@ -26,6 +26,22 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
     }
   }
 
+  public function testAddByScreenWidthWorksAsExpected() {
+    $obj = new BreakpointX();
+    $segment = $obj
+      ->addByScreenWidth(320)
+      ->addByScreenWidth(768)
+      ->addByScreenWidth(1336)
+      ->getSegment('min_769');
+    $this->assertSame('min_769', $segment['name']);
+    $this->assertSame([321, 769, 1337], $obj->breakpoints);
+    $this->assertSame(['min_0', 'min_321', 'min_769', 'min_1337'], $obj->segmentNames);
+    $this->assertSame('min_321', $obj->getSegment(400)['name']);
+    $this->assertSame(768, $obj->getSegment(767)['imageWidth']);
+    $this->assertSame(768, $obj->getSegment(768)['imageWidth']);
+    $this->assertSame(1336, $obj->getSegment(769)['imageWidth']);
+  }
+
   public function testAssertDeviceAndRenameFirstSegment() {
     $obj = new BreakpointX();
     $segment = $obj

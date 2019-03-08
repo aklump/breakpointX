@@ -234,6 +234,27 @@ class BreakpointX implements \Iterator {
     return $this;
   }
 
+  /**
+   * Add a breakpoint based on a screen width.
+   *
+   * @param int $screen_width
+   *   The width of the screen.
+   *
+   * @return $this
+   */
+  public function addByScreenWidth($screen_width) {
+    $breakpoint = $screen_width + 1;
+    $this->breakpoints[] = $breakpoint;
+    sort($this->breakpoints);
+    if ($this->segmentNames[0] === '0-infinity') {
+      $this->segmentNames[0] = 'min_0';
+    }
+    $i = array_search($breakpoint, $this->breakpoints);
+    array_splice($this->segmentNames, $i + 1, 1, 'min_' . $breakpoint);
+
+    return $this;
+  }
+
   public function current() {
     return $this->getSegment($this->segmentNames[$this->iteration]);
   }
