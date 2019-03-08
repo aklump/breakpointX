@@ -1,3 +1,7 @@
+## 0.7.4
+
+* Added addByScreenWidth to address [possible issue](https://github.com/aklump/breakpointX/issues/2) reported with addDevice.
+
 ## 0.7.0
 
 * addBreakpointCrossActionIncreasingOnly changed to addBreakpointCrossBiggerAction

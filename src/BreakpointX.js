@@ -165,9 +165,9 @@ var BreakpointX = (function(window) {
       if (breakpoint !== segment.from) {
         throw new Error(
           'You tried to add an action to an unregistered breakpoint "' +
-          breakpoint +
-          '"; you must use one of: ' +
-          this.breakpoints.join(', ')
+            breakpoint +
+            '"; you must use one of: ' +
+            this.breakpoints.join(', ')
         );
       }
     } else {
@@ -271,8 +271,8 @@ var BreakpointX = (function(window) {
     ) {
       throw new Error(
         'You must have one more segment name than you have breakpoints; you need ' +
-        (self.breakpoints.length + 1) +
-        ' segment names.'
+          (self.breakpoints.length + 1) +
+          ' segment names.'
       );
     }
     self.settings = extend({}, self.options, settings);
@@ -677,8 +677,8 @@ var BreakpointX = (function(window) {
         segment.type === 'segment'
           ? segment.to
           : Math.round(
-          segment.from * this.settings.breakpointRayImageWidthRatio
-          );
+              segment.from * this.settings.breakpointRayImageWidthRatio
+            );
       segment.name = segmentName;
       segment.width = segment.to;
     }

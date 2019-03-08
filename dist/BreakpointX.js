@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Sat Feb  2 13:23:36 PST 2019_string
+ * Date: Fri Mar  8 13:13:28 PST 2019_string
  */
 /**
  *
@@ -356,6 +356,19 @@ var BreakpointX = (function(window) {
     }
     var i = this.breakpoints.indexOf(screenWidth);
     this.segmentNames.splice(i + 1, 1, name);
+
+    return this;
+  };
+
+  BreakpointX.prototype.addByScreenWidth = function(screenWidth) {
+    var breakpoint = screenWidth + 1;
+    this.breakpoints.push(breakpoint);
+    this.breakpoints = this.breakpoints.sort(sortBreakpoints);
+    if (this.segmentNames[0] === '0-infinity') {
+      this.segmentNames[0] = 'min_0';
+    }
+    var i = this.breakpoints.indexOf(breakpoint);
+    this.segmentNames.splice(i + 1, 1, 'min_' + breakpoint);
 
     return this;
   };

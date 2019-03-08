@@ -9,21 +9,19 @@
 
 <body class="page--readme">
 <header>
-  <div class="pager">
-  <a href="CHANGELOG.html" class="prev CHANGELOG">&laquo;CHANGELOG</a>
-  <a href="index.html" class="index">Index</a>
-  <a href="index.html" class="next index">Index&raquo;</a>
-</div>
-</header>
-
-  <div class="search__wrapper">
+  <div class="pager"><a href="index.html" class="prev index">&laquo;Index</a><a href="index.html" class="index pager__book-title"></a><a href="CHANGELOG.html" class="next changelog">CHANGELOG&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
+  </section>
 
-  <h1>__title</h1>
-  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<h1>__title</h1>
 
 <section>
 
@@ -200,14 +198,9 @@ $imageWidth = $bp-&gt;getSegment(300)['imageWidth'];
 </div>
 
 <footer>
-  <div class="pager">
-  <a href="CHANGELOG.html" class="prev CHANGELOG">&laquo;CHANGELOG</a>
-  <a href="index.html" class="index">Index</a>
-  <a href="index.html" class="next index">Index&raquo;</a>
-</div>
-  
+  <div class="pager"><a href="index.html" class="prev index">&laquo;Index</a><a href="index.html" class="index pager__book-title"></a><a href="CHANGELOG.html" class="next changelog">CHANGELOG&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.7.3 &bull; Last Updated: Sat, 02 Feb 2019 13:23:37 -0800</p>
+    <p class="legaleeze center">Version: 0.7.3 &bull; Last Updated: Fri, 08 Mar 2019 13:13:29 -0800</p>
   </div>
 </footer>
 
@@ -216,9 +209,9 @@ $imageWidth = $bp-&gt;getSegment(300)['imageWidth'];
   <script src="search/tipuesearch_set.js"></script>
   <script src="search/tipuesearch.min.js"></script>
   <script>
-    $(document).ready(function () {
-      $('#tipue_search_input').tipuesearch();
-    });
+    $(document).ready(function() {
+      $('#tipue_search_input').tipuesearch()
+    })
   </script>
 <script src="js/core.js"></script>
 </body>
