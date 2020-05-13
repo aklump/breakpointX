@@ -120,6 +120,7 @@ class BreakpointX implements \Iterator {
   public function getSegment($data) {
     $segment_name = $data;
     if ($this->valueIsPoint($data)) {
+      $data = intval($data);
       foreach ($this->breakpoints as $i => $bp) {
         if ($bp > $data) {
           $segment_name = $this->segmentNames[$i];

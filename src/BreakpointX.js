@@ -625,6 +625,7 @@ var BreakpointX = (function(window) {
   BreakpointX.prototype.getSegment = function(data) {
     var segmentName = null;
     if (valueIsPoint(data)) {
+      data = parseInt(data, 10)
       for (var i in this.breakpoints) {
         var bp = this.breakpoints[i];
         if (bp > data) {
