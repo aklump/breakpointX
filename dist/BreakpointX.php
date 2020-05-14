@@ -7,13 +7,13 @@ namespace AKlump\BreakpointX;
  *
  * A server-side compliment to BreakpointX.js
  *
- * @version 0.7.4
+ * @version 0.7.5
  * @package AKlump\BreakpointX
  */
 class BreakpointX implements \Iterator {
 
 
-  public $version = '0.7.4';
+  public $version = '0.7.5';
 
   /**
    * An indexed array of segment names.
@@ -120,6 +120,7 @@ class BreakpointX implements \Iterator {
   public function getSegment($data) {
     $segment_name = $data;
     if ($this->valueIsPoint($data)) {
+      $data = intval($data);
       foreach ($this->breakpoints as $i => $bp) {
         if ($bp > $data) {
           $segment_name = $this->segmentNames[$i];
