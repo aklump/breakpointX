@@ -2,11 +2,13 @@
 
 namespace AKlump\BreakpointX;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @coversDefaultClass BreakpointX;
  * @group              ${test_group}
  */
-class BreakpointXTest extends \PHPUnit_Framework_TestCase {
+class BreakpointXTest extends TestCase {
 
   public function testAssertLowerAndUppersBreakpointsAreReturnedInSegments() {
     $obj = new BreakpointX([241, 769]);
@@ -35,7 +37,12 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
       ->getSegment('min_769');
     $this->assertSame('min_769', $segment['name']);
     $this->assertSame([321, 769, 1337], $obj->breakpoints);
-    $this->assertSame(['min_0', 'min_321', 'min_769', 'min_1337'], $obj->segmentNames);
+    $this->assertSame([
+      'min_0',
+      'min_321',
+      'min_769',
+      'min_1337',
+    ], $obj->segmentNames);
     $this->assertSame('min_321', $obj->getSegment(400)['name']);
     $this->assertSame(768, $obj->getSegment(767)['imageWidth']);
     $this->assertSame(768, $obj->getSegment(768)['imageWidth']);
@@ -191,7 +198,10 @@ class BreakpointXTest extends \PHPUnit_Framework_TestCase {
     ], $this->obj->segmentNames);
   }
 
-  public function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     $this->obj = new BreakpointX([480, 768]);
   }
 }
