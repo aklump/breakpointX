@@ -149,7 +149,7 @@ var BreakpointX = (function(window) {
   function valueIsPoint(value) {
     if (value === Infinity) return true;
     var intval = parseInt(value, 10);
-    return intval >= 0 && intval == value;
+    return intval >= 0 && !isNaN(value);
   }
 
   function valueIsMediaQuery(value) {

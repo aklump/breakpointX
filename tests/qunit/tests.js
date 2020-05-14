@@ -21,6 +21,12 @@ QUnit.test('Using string for a class on addClassesTo throws', function(assert) {
   });
 });
 
+QUnit.test('Assert getSegment works when passed a float value', function(
+  assert
+) {
+  assert.strictEqual(obj.getSegment(400.26)['upperBreakpoint'], 769);
+});
+
 QUnit.test(
   'Assert lower and upper breakpoints are returned in segments',
   function(assert) {
