@@ -13,6 +13,25 @@ var objArgs = {
   segmentNames: ['tiny', 'mobile', 'desktop'],
 };
 
+QUnit.test(
+  'We dont trigger callback when crossing segment.to, only segment.from',
+  function(assert) {
+    var bp1CallCount = 0;
+    var obj = new BreakpointX([768, 960]);
+    obj
+      .addBreakpointCrossAction(768, function() {
+        bp1CallCount++;
+      })
+      .triggerActions(1000);
+    bp1CallCount = 0;
+    obj.onWindowResize(900);
+    assert.strictEqual(bp1CallCount, 0);
+
+    obj.onWindowResize(700);
+    assert.strictEqual(bp1CallCount, 1);
+  }
+);
+
 QUnit.test('Using string for a class on addClassesTo throws', function(assert) {
   assert.throws(function() {
     new BreakpointX({
