@@ -14,6 +14,52 @@ var objArgs = {
 };
 
 QUnit.test(
+  'Multiple callbacks of same type can be added to same breakpoint',
+  function(assert) {
+    var foo = 0;
+    var bar = 0;
+    var baz = 0;
+    var alpha = 0;
+    var obj = new BreakpointX([768, 1024]);
+    obj
+      .addBreakpointCrossAction(768, function() {
+        foo++;
+      })
+      .addBreakpointCrossAction(768, function() {
+        bar++;
+      })
+      .addBreakpointCrossBiggerAction(768, function() {
+        baz++;
+      })
+      .addBreakpointCrossSmallerAction(768, function() {
+        alpha++;
+      })
+      .triggerActions(0);
+    foo = 0;
+    bar = 0;
+    baz = 0;
+    alpha = 0;
+
+    assert.strictEqual(foo, 0);
+    assert.strictEqual(bar, 0);
+    assert.strictEqual(baz, 0);
+    assert.strictEqual(alpha, 0);
+
+    obj.onWindowResize(1000);
+    assert.strictEqual(foo, 1);
+    assert.strictEqual(bar, 1);
+    assert.strictEqual(baz, 1);
+    assert.strictEqual(alpha, 0);
+
+    obj.onWindowResize(500);
+    // assert.strictEqual(foo, 2);
+    // assert.strictEqual(bar, 2);
+    assert.strictEqual(baz, 1);
+    assert.strictEqual(alpha, 1);
+  }
+);
+
+QUnit.test(
   'We dont trigger callback when crossing segment.to, only segment.from',
   function(assert) {
     var bp1CallCount = 0;
