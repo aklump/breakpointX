@@ -165,9 +165,9 @@ var BreakpointX = (function(window) {
       if (breakpoint !== segment.from) {
         throw new Error(
           'You tried to add an action to an unregistered breakpoint "' +
-          breakpoint +
-          '"; you must use one of: ' +
-          this.breakpoints.join(', ')
+            breakpoint +
+            '"; you must use one of: ' +
+            this.breakpoints.join(', ')
         );
       }
     } else {
@@ -271,8 +271,8 @@ var BreakpointX = (function(window) {
     ) {
       throw new Error(
         'You must have one more segment name than you have breakpoints; you need ' +
-        (self.breakpoints.length + 1) +
-        ' segment names.'
+          (self.breakpoints.length + 1) +
+          ' segment names.'
       );
     }
     self.settings = extend({}, self.options, settings);
@@ -466,7 +466,8 @@ var BreakpointX = (function(window) {
       currentWindowWidth = valueIsPoint(width) ? width : this.getWindowWidth(),
       segment = self.getSegment(currentWindowWidth),
       previousSegment = this.pCallback.segment,
-      hasCrossedSomeBreakpoint = previousSegment.name && segment.name !== previousSegment.name,
+      hasCrossedSomeBreakpoint =
+        previousSegment.name && segment.name !== previousSegment.name,
       callbacksCalledCount = 0;
 
     if (!previousSegment.name) {
@@ -491,8 +492,11 @@ var BreakpointX = (function(window) {
           // 'both' and 'bigger' would trigger the same callback twice.  This
           // filters that out.
           if (applyCallbacks) {
-            for (var index in self.actions[callbackDirection][callbackBreakpoint]) {
-              callbackSets[currentSegment.from] = self.actions[callbackDirection][callbackBreakpoint];
+            for (var index in self.actions[callbackDirection][
+              callbackBreakpoint
+            ]) {
+              callbackSets[currentSegment.from] =
+                self.actions[callbackDirection][callbackBreakpoint];
             }
           }
         }
@@ -500,11 +504,16 @@ var BreakpointX = (function(window) {
 
       for (var callbackBreakpoint in callbackSets) {
         for (var index in callbackSets[callbackBreakpoint]) {
-          callbackSets[callbackBreakpoint][index].call(self, segment, undefined, null, previousSegment);
+          callbackSets[callbackBreakpoint][index].call(
+            self,
+            segment,
+            undefined,
+            null,
+            previousSegment
+          );
         }
         callbacksCalledCount++;
       }
-
     } else if (hasCrossedSomeBreakpoint) {
       var eventDirection =
         currentWindowWidth > previousSegment.from ? var_bigger : var_smaller;
@@ -515,7 +524,10 @@ var BreakpointX = (function(window) {
       // Calculate which breakpoints were crosssed.
       var breakpointsCrossed = [];
       for (i in self.breakpoints) {
-        if (windowWidthLow < self.breakpoints[i] && self.breakpoints[i] <= windowWidthHigh) {
+        if (
+          windowWidthLow < self.breakpoints[i] &&
+          self.breakpoints[i] <= windowWidthHigh
+        ) {
           breakpointsCrossed.push(self.breakpoints[i]);
         }
       }
@@ -525,11 +537,21 @@ var BreakpointX = (function(window) {
           var callbackBreakpoint = breakpointsCrossed[j];
           for (i in directionsToProcess) {
             var callbackDirection = directionsToProcess[i];
-            if (self.actions[callbackDirection] && self.actions[callbackDirection][callbackBreakpoint]) {
-
+            if (
+              self.actions[callbackDirection] &&
+              self.actions[callbackDirection][callbackBreakpoint]
+            ) {
               // Cycle through all callbacks in this direction/breakpoint.
-              for (var index in self.actions[callbackDirection][callbackBreakpoint]) {
-                self.actions[callbackDirection][callbackBreakpoint][index].call(self, segment, eventDirection, callbackBreakpoint, previousSegment);
+              for (var index in self.actions[callbackDirection][
+                callbackBreakpoint
+              ]) {
+                self.actions[callbackDirection][callbackBreakpoint][index].call(
+                  self,
+                  segment,
+                  eventDirection,
+                  callbackBreakpoint,
+                  previousSegment
+                );
                 callbacksCalledCount++;
               }
             }
@@ -701,8 +723,8 @@ var BreakpointX = (function(window) {
         segment.type === 'segment'
           ? segment.to
           : Math.round(
-          segment.from * this.settings.breakpointRayImageWidthRatio
-          );
+              segment.from * this.settings.breakpointRayImageWidthRatio
+            );
       segment.name = segmentName;
       segment.width = segment.to;
     }
