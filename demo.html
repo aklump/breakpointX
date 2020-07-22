@@ -13,17 +13,24 @@
 <script src="src/BreakpointX.js"></script>
 <script type="text/javascript">
   $(document).ready(function() {
-    var bpx = new BreakpointX([480, 768], ['small', 'medium', 'large'], {
+    var bpx = new BreakpointX([480, 768, 960], ['small', 'medium', 'large', 'wide'], {
       addClassesTo: document.documentElement,
     });
-
-    console.log(bpx.getSegment('small'));
     bpx
-      .addCrossAction(function(to, direction, breakpoint, from) {
-        console.log('direction:', direction);
-        console.log('breakpoint:', breakpoint);
-        console.log('from:', from);
-        console.log('to:', to);
+      .addCrossAction(function(currentSegment, direction, breakpoint, previousSegment) {
+        console.log('breakpoint crossed:', breakpoint);
+        console.log('crossing direction:', direction);
+        console.log('previous segment: ' + previousSegment.name, previousSegment);
+        console.log('current segment: ' + currentSegment.name, currentSegment);
+        console.log('-----------------------------------------------');
+      })
+      .addBreakpointCrossSmallerAction(768, function() {
+        console.log('crossing 768 getting smaller');
+        console.log('-----------------------------------------------');
+      })
+      .addBreakpointCrossBiggerAction(768, function() {
+        console.log('crossing 768 getting larger');
+        console.log('-----------------------------------------------');
       })
       .triggerActions();
   });
