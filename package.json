@@ -35,7 +35,7 @@
     "homepage": "http:\/\/www.intheloftstudios.com\/packages\/js\/breakpointx",
     "devDependencies": {
         "jquery": "^3.5",
-        "prettier": "1.15.3",
+        "prettier": "^1.15.3",
         "qunit": "^2.8.0",
         "uglify-js": "^3.4.9"
     }
