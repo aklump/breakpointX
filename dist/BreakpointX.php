@@ -7,13 +7,13 @@ namespace AKlump\BreakpointX;
  *
  * A server-side compliment to BreakpointX.js
  *
- * @version 0.7.8
+ * @version 0.7.9
  * @package AKlump\BreakpointX
  */
 class BreakpointX implements \Iterator {
 
 
-  public $version = '0.7.8';
+  public $version = '0.7.9';
 
   /**
    * An indexed array of segment names.
