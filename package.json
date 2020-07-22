@@ -36,7 +36,7 @@
     "devDependencies": {
         "jquery": "^3.5",
         "prettier": "^1.15.3",
-        "qunit": "^2.8.0",
+        "qunit": "^2.10",
         "uglify-js": "^3.4.9"
     }
 }
