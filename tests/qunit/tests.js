@@ -23,7 +23,7 @@ QUnit.test('testMediaMediaMinAndMediaMaxKeysAreCorrect', function(assert) {
   var obj = new BreakpointX([414, 768], ['small', 'medium', 'desktop']);
 
   var segment = obj.getSegment(400);
-  assert.strictEqual(segment['mediaMin'], null);
+  assert.strictEqual(segment['mediaMin'], '');
   assert.strictEqual(segment['mediaMax'], '(max-width:413px)');
 
   var segment = obj.getSegment(500);
@@ -32,7 +32,7 @@ QUnit.test('testMediaMediaMinAndMediaMaxKeysAreCorrect', function(assert) {
 
   var segment = obj.getSegment(800);
   assert.strictEqual(segment['mediaMin'], '(min-width:768px)');
-  assert.strictEqual(segment['mediaMax'], null);
+  assert.strictEqual(segment['mediaMax'], '');
 });
 
 QUnit.test(

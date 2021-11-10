@@ -21,7 +21,7 @@ class BreakpointXTest extends TestCase {
     $obj = new BreakpointX([414, 768], ['small', 'medium', 'desktop']);
 
     $segment = $obj->getSegment(400);
-    $this->assertNull($segment['mediaMin']);
+    $this->assertSame('', $segment['mediaMin']);
     $this->assertSame('(max-width:413px)', $segment['mediaMax']);
 
     $segment = $obj->getSegment(500);
@@ -30,7 +30,7 @@ class BreakpointXTest extends TestCase {
 
     $segment = $obj->getSegment(800);
     $this->assertSame('(min-width:768px)', $segment['mediaMin']);
-    $this->assertNull($segment['mediaMax']);
+    $this->assertSame('', $segment['mediaMax']);
   }
 
   public function testAssertLowerAndUppersBreakpointsAreReturnedInSegments() {

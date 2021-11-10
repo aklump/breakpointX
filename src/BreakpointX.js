@@ -736,10 +736,11 @@ var BreakpointX = (function(window) {
       var minMax = segment.media.split(' and ');
       console.log(minMax);
       if (null === segment.lowerBreakpoint) {
+        segment.mediaMin = '';
         segment.mediaMax = minMax[0];
       } else {
         segment.mediaMin = minMax[0];
-        segment.mediaMax = minMax[1] || null;
+        segment.mediaMax = minMax[1] || '';
       }
 
       segment.imageWidth =

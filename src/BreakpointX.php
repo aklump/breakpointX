@@ -199,11 +199,12 @@ class BreakpointX implements \Iterator {
       $segment['media'] = $segment['@media'];
       list($a, $b) = explode(' and ', $segment['@media'] . ' and ');
       if (empty($segment['lowerBreakpoint'])) {
+        $segment['mediaMin'] = '';
         $segment['mediaMax'] = $a;
       }
       else {
         $segment['mediaMin'] = $a;
-        $segment['mediaMax'] = $b ?: NULL;
+        $segment['mediaMax'] = $b ?: '';
       }
 
       $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
