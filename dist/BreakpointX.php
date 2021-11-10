@@ -7,13 +7,13 @@ namespace AKlump\BreakpointX;
  *
  * A server-side compliment to BreakpointX.js
  *
- * @version 0.8.0
+ * @version 0.8.1
  * @package AKlump\BreakpointX
  */
 class BreakpointX implements \Iterator {
 
 
-  public $version = '0.8.0';
+  public $version = '0.8.1';
 
   /**
    * An indexed array of segment names.
@@ -199,11 +199,12 @@ class BreakpointX implements \Iterator {
       $segment['media'] = $segment['@media'];
       list($a, $b) = explode(' and ', $segment['@media'] . ' and ');
       if (empty($segment['lowerBreakpoint'])) {
+        $segment['mediaMin'] = '';
         $segment['mediaMax'] = $a;
       }
       else {
         $segment['mediaMin'] = $a;
-        $segment['mediaMax'] = $b ?: NULL;
+        $segment['mediaMax'] = $b ?: '';
       }
 
       $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
