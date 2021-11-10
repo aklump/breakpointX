@@ -1,5 +1,5 @@
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.7.10
+ * Breakpoint X (Crossing) jQuery Plugin v0.8.0
  * http://www.intheloftstudios.com/packages/js/breakpointx
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -8,7 +8,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Tue Sep  7 19:16:33 PDT 2021_string
+ * Date: Tue Nov  9 22:13:52 PST 2021_string
  */
 /**
  *
@@ -18,13 +18,13 @@
  *   var bp = new BreakpointX([240, 768], ['small', 'medium', 'large']);
  *   bp
  *   .addBreakpointCrossSmallerAction(768, function () {
- *     console.log("Now you're in medium!");
+ *     console.log('Now you\'re in medium!');
  *   })
  *   .addBreakpointCrossSmallerAction(240, function () {
- *     console.log("Now you're in small!");
+ *     console.log('Now you\'re in small!');
  *   })
  *   .addBreakpointCrossBiggerAction(768, function () {
- *     console.log("Now you're in large!");
+ *     console.log('Now you\'re in large!');
  *   })
  *   .addCrossAction(function(segment, direction, breakpoint, previousSegment) {
  *     ...
@@ -47,6 +47,7 @@ var BreakpointX = (function(window) {
   var var_both = 'both';
   var var_min_width = 'min-width:';
   var var_max_width = 'max-width:';
+  var aliases = [];
 
   /**
    * Helper function to determine the media query by raw data.
@@ -213,7 +214,7 @@ var BreakpointX = (function(window) {
      */
     this.el = null;
 
-    this.version = '0.7.10';
+    this.version = '0.8.0';
 
     /**
      * A public array of segment names in ascending from/to values.
@@ -339,6 +340,11 @@ var BreakpointX = (function(window) {
      * @type {float}
      */
     breakpointRayImageWidthRatio: 1.4,
+  };
+
+  BreakpointX.prototype.aliasSegment = function(pointInSegment, alias) {
+    aliases[alias] = this.getSegment(pointInSegment).name;
+    return this;
   };
 
   BreakpointX.prototype.renameSegment = function(pointInSegment, name) {
@@ -699,6 +705,9 @@ var BreakpointX = (function(window) {
 
     var segment = {
       '@media': null,
+      media: null,
+      mediaMin: null,
+      mediaMax: null,
       from: null,
       imageWidth: null,
       name: null,
@@ -710,6 +719,10 @@ var BreakpointX = (function(window) {
     };
 
     var i = this.segmentNames.indexOf(segmentName);
+    if (segmentName && i < 0 && aliases[segmentName]) {
+      segmentName = aliases[segmentName];
+      i = this.segmentNames.indexOf(segmentName);
+    }
     if (segmentName && i >= 0) {
       var prevBp = this.breakpoints[i - 1] || null;
       var nextBp = this.breakpoints[i] || null;
@@ -719,6 +732,16 @@ var BreakpointX = (function(window) {
       segment.lowerBreakpoint = segment.from ? segment.from : null;
       segment.upperBreakpoint = segment.to + 1;
       segment['@media'] = getMediaQuery(segment.from, segment.to);
+      segment.media = segment['@media'];
+      var minMax = segment.media.split(' and ');
+      console.log(minMax);
+      if (null === segment.lowerBreakpoint) {
+        segment.mediaMax = minMax[0];
+      } else {
+        segment.mediaMin = minMax[0];
+        segment.mediaMax = minMax[1] || null;
+      }
+
       segment.imageWidth =
         segment.type === 'segment'
           ? segment.to
