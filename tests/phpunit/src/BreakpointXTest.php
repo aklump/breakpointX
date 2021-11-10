@@ -10,6 +10,29 @@ use PHPUnit\Framework\TestCase;
  */
 class BreakpointXTest extends TestCase {
 
+  public function testAliasSegmentMethod() {
+    $obj = new BreakpointX();
+    $obj->addDevice('iphone', 414);
+    $obj->aliasSegment(500, 'medium');
+    $this->assertSame($obj->getSegment('medium'), $obj->getSegment('iphone'));
+  }
+
+  public function testMediaMediaMinAndMediaMaxKeysAreCorrect() {
+    $obj = new BreakpointX([414, 768], ['small', 'medium', 'desktop']);
+
+    $segment = $obj->getSegment(400);
+    $this->assertNull($segment['mediaMin']);
+    $this->assertSame('(max-width:413px)', $segment['mediaMax']);
+
+    $segment = $obj->getSegment(500);
+    $this->assertSame('(min-width:414px)', $segment['mediaMin']);
+    $this->assertSame('(max-width:767px)', $segment['mediaMax']);
+
+    $segment = $obj->getSegment(800);
+    $this->assertSame('(min-width:768px)', $segment['mediaMin']);
+    $this->assertNull($segment['mediaMax']);
+  }
+
   public function testAssertLowerAndUppersBreakpointsAreReturnedInSegments() {
     $obj = new BreakpointX([241, 769]);
     $this->assertSame(NULL, $obj->getSegment(0)['lowerBreakpoint']);

@@ -1,3 +1,35 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.8.0] - 2021-11-09
+
+### Added
+
+- New segment keys: media (alias to @media), media_min, and media_max.
+  
+### Changed
+
+- lorem
+
+### Deprecated
+
+- lorem
+
+### Removed
+
+- lorem
+
+### Fixed
+
+- lorem
+
+### Security
+
+- lorem
+
 ## 0.7.4
 
 * Added addByScreenWidth to address [possible issue](https://github.com/aklump/breakpointX/issues/2) reported with addDevice.
@@ -25,11 +57,11 @@
 
 ## 0.5.0
 
-1. The way breakpoints are defined has changed.  The old syntax:
+1. The way breakpoints are defined has changed. The old syntax:
 
         var bp = new BreakpointX({"small": 0, "mobile": 480, "desktop": 768});
 
-    Changes to:
+   Changes to:
 
         var bp = new BreakpointX({"small": 480, "mobile": 768, "desktop": Infinity});
 

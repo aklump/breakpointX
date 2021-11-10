@@ -55,6 +55,13 @@ class BreakpointX implements \Iterator {
   ];
 
   /**
+   * An array of aliases keyed by segment names.
+   *
+   * @var array
+   */
+  protected $aliases = [];
+
+  /**
    * BreakpointX constructor.
    *
    * @param array $breakpoints
@@ -102,12 +109,29 @@ class BreakpointX implements \Iterator {
    * To write settings you must pass an array as the last argument of the
    * contstructor.
    *
+   * @return array
    * @see ::options For the default values and valid keys.
    *
-   * @return array
    */
   public function settings() {
     return $this->_settings;
+  }
+
+  /**
+   * Create an alias to a segment.
+   *
+   * You may create as many alias to a segment as you want.  You can then use
+   * the alias as you would a segment name.
+   *
+   * @param $point_in_segment
+   * @param $alias
+   *
+   * @return $this
+   */
+  public function aliasSegment($point_in_segment, $alias) {
+    $this->aliases[$alias] = $this->getSegment($point_in_segment)['name'];
+
+    return $this;
   }
 
   public function renameSegment($point_in_segment, $name) {
@@ -145,6 +169,9 @@ class BreakpointX implements \Iterator {
     }
     $segment = array_fill_keys([
       '@media',
+      'media',
+      'mediaMin',
+      'mediaMax',
       'from',
       'imageWidth',
       'name',
@@ -156,15 +183,29 @@ class BreakpointX implements \Iterator {
     ], NULL);
 
     $i = array_search($segment_name, $this->segmentNames);
+    if ($segment_name && $i === FALSE && isset($this->aliases[$segment_name])) {
+      $segment_name = $this->aliases[$segment_name];
+      $i = array_search($segment_name, $this->segmentNames);
+    }
     if ($segment_name && $i !== FALSE) {
       $prev_bp = empty($this->breakpoints[$i - 1]) ? NULL : $this->breakpoints[$i - 1];
       $next_bp = empty($this->breakpoints[$i]) ? NULL : $this->breakpoints[$i];
       $segment['type'] = empty($next_bp) ? 'ray' : 'segment';
-      $segment['from'] = $prev_bp ? $prev_bp : 0;
+      $segment['from'] = $prev_bp ?: 0;
       $segment['to'] = $next_bp ? $next_bp - 1 : NULL;
-      $segment['lowerBreakpoint'] = $prev_bp ? $prev_bp : NULL;
+      $segment['lowerBreakpoint'] = $prev_bp ?: NULL;
       $segment['upperBreakpoint'] = $next_bp;
       $segment['@media'] = $this->_query($segment['from'], $segment['to']);
+      $segment['media'] = $segment['@media'];
+      list($a, $b) = explode(' and ', $segment['@media'] . ' and ');
+      if (empty($segment['lowerBreakpoint'])) {
+        $segment['mediaMax'] = $a;
+      }
+      else {
+        $segment['mediaMin'] = $a;
+        $segment['mediaMax'] = $b ?: NULL;
+      }
+
       $segment['imageWidth'] = $segment['type'] === 'segment' ? $segment['to'] : intval($segment['from'] * $this->_settings['breakpointRayImageWidthRatio']);
       $segment['name'] = $segment_name;
       $segment['width'] = $segment['to'];
