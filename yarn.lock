@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-commander@7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-7.1.0.tgz#f2eaecf131f10e36e07d894698226e36ae0eb5ff"
-  integrity sha512-pRxBna3MJe6HKnBGsDyMv8ETbptw3axEdYHoqNh7gu5oDcew8fs0xnivZGm06Ogk8zGAJ9VX+OPEr2GXEQK4dg==
+commander@7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
+  integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
 
 globalyzer@0.1.0:
   version "0.1.0"
@@ -22,10 +22,10 @@ jquery@^3.5:
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.0.tgz#c72a09f15c1bdce142f49dbf1170bdf8adac2470"
   integrity sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
 
-node-watch@0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/node-watch/-/node-watch-0.7.1.tgz#0caaa6a6833b0d533487f953c52a6c787769ba7c"
-  integrity sha512-UWblPYuZYrkCQCW5PxAwYSxaELNBLUckrTBBk8xr1/bUgyOkYYTsUcV4e3ytcazFEOyiRyiUrsG37pu6I0I05g==
+node-watch@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/node-watch/-/node-watch-0.7.2.tgz#545f057da8500487eb8287adcb4cb5a7338d7e21"
+  integrity sha512-g53VjSARRv1JdST0LZRIg8RiuLr1TaBbVPsVvxh0/0Ymvi0xYUjDuoqQQAWtHJQUXhiShowPT/aXKNeHBcyQsw==
 
 prettier@^1.15.3:
   version "1.19.1"
@@ -33,12 +33,12 @@ prettier@^1.15.3:
   integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
 
 qunit@^2.10:
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.17.0.tgz#4c2dd5a4ee91cd8f8462708a37e710a3e622c321"
-  integrity sha512-3zXO4T3KT8liCXYDqu68SmK6D7JgI80R6gUPGjzxXwh9rjwdmmx09YZhGLfT466PC/XlORr8xvxlNx3i3S72Rw==
+  version "2.17.2"
+  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.17.2.tgz#5cb278e131d931f25c109a0fdb0518be7754c25a"
+  integrity sha512-17isVvuOmALzsPjiV7wFg/6O5vJYXBrQZPwocfQSSh0I/rXvfX7bKMFJ4GMVW3U4P8r2mBeUy8EAngti4QD2Vw==
   dependencies:
-    commander "7.1.0"
-    node-watch "0.7.1"
+    commander "7.2.0"
+    node-watch "0.7.2"
     tiny-glob "0.2.9"
 
 tiny-glob@0.2.9:
@@ -50,6 +50,6 @@ tiny-glob@0.2.9:
     globrex "^0.1.2"
 
 uglify-js@^3.4.9:
-  version "3.14.2"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.14.2.tgz#d7dd6a46ca57214f54a2d0a43cad0f35db82ac99"
-  integrity sha512-rtPMlmcO4agTUfz10CbgJ1k6UAoXM2gWb3GoMPPZB/+/Ackf8lNWk11K4rYi2D0apgoFRLtQOZhb+/iGNJq26A==
+  version "3.14.3"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.14.3.tgz#c0f25dfea1e8e5323eccf59610be08b6043c15cf"
+  integrity sha512-mic3aOdiq01DuSVx0TseaEzMIVqebMZ0Z3vaeDhFEh9bsc24hV1TFvN74reA2vs08D0ZWfNjAcJ3UbVLaBss+g==
