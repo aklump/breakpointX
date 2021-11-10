@@ -1,12 +1,12 @@
 {
-    "name": "@aklump/breakpointx",
+    "name": "@aklump\/breakpointx",
     "title": "Breakpoint X (Crossing)",
-    "version": "0.7.10",
+    "version": "0.8.0",
     "description": "Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.",
-    "main": "./dist/BreakpointX.js",
+    "main": ".\/dist\/BreakpointX.js",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/aklump/breakpointX.git"
+        "url": "git+https:\/\/github.com\/aklump\/breakpointX.git"
     },
     "keywords": [
         "responsive",
@@ -24,15 +24,15 @@
         "phpunit.xml",
         "demo.html",
         "composer.*",
-        "!docs/node_modules",
-        "!tests/phpunit/build"
+        "!docs\/node_modules",
+        "!tests\/phpunit\/build"
     ],
     "author": "Aaron Klump <sourcecode@intheloftstudios.com>",
     "license": "BSD-3-Clause",
     "bugs": {
-        "url": "https://github.com/aklump/breakpointX/issues"
+        "url": "https:\/\/github.com\/aklump\/breakpointX\/issues"
     },
-    "homepage": "http://www.intheloftstudios.com/packages/js/breakpointx",
+    "homepage": "http:\/\/www.intheloftstudios.com\/packages\/js\/breakpointx",
     "devDependencies": {
         "jquery": "^3.5",
         "prettier": "^1.15.3",
