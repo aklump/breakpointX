@@ -1,12 +1,3 @@
-.web_package/*
-!.web_package/hooks/
-!.web_package/config
-!.web_package/functions.sh
-!.web_package/functions.php
-!.web_package/composer.json
-!.web_package/composer.lock
-bower_components/
-/tests/phpunit/build
-vendor/
-node_modules/
 .idea/
+node_modules/
+vendor/

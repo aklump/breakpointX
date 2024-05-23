@@ -1,0 +1,8 @@
+master: master
+remote: origin
+create_tags: patch
+push_tags: auto
+push_master: auto
+patch_prefix: .
+version_file: package.json
+preserve_patch_zero: true
