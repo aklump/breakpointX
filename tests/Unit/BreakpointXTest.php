@@ -10,6 +10,22 @@ use PHPUnit\Framework\TestCase;
  */
 class BreakpointXTest extends TestCase {
 
+  private $obj;
+
+  public function testConstructorWithSettingsAsSecondArg() {
+    $obj = new BreakpointX([414, 768], [
+      'breakpointRayImageWidthRatio' => 1.0,
+    ]);
+    $this->assertSame(1.0, $obj->settings()['breakpointRayImageWidthRatio']);
+  }
+
+  public function testConstructorWithThreeArgs() {
+    $obj = new BreakpointX([414, 768], ['small', 'medium', 'desktop'], [
+      'breakpointRayImageWidthRatio' => 1.6,
+    ]);
+    $this->assertSame(1.6, $obj->settings()['breakpointRayImageWidthRatio']);
+  }
+
   public function testAliasSegmentMethod() {
     $obj = new BreakpointX();
     $obj->addDevice('iphone', 414);
@@ -46,7 +62,7 @@ class BreakpointXTest extends TestCase {
   public function testAssertWeCanIterateObject() {
     $obj = new BreakpointX([768], ['alpha', 'bravo']);
     foreach ($obj as $segment_name => $segment) {
-      $this->assertInternalType('array', $segment);
+      $this->assertIsArray($segment);
       $this->assertSame($segment_name, $segment['name']);
     }
   }
@@ -224,7 +240,7 @@ class BreakpointXTest extends TestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $this->obj = new BreakpointX([480, 768]);
   }
 }
