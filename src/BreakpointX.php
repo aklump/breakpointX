@@ -1,4 +1,5 @@
 <?php
+// SPDX-License-Identifier: BSD-3-Clause
 
 namespace AKlump\BreakpointX;
 
@@ -107,7 +108,7 @@ class BreakpointX implements \Iterator {
    * Public accessor for the current settings (read-only).
    *
    * To write settings you must pass an array as the last argument of the
-   * contstructor.
+   * constructor.
    *
    * @return array
    * @see ::options For the default values and valid keys.
@@ -298,22 +299,27 @@ class BreakpointX implements \Iterator {
     return $this;
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return $this->getSegment($this->segmentNames[$this->iteration]);
   }
 
+  #[\ReturnTypeWillChange]
   public function next() {
     ++$this->iteration;
   }
 
+  #[\ReturnTypeWillChange]
   public function key() {
     return $this->segmentNames[$this->iteration];
   }
 
+  #[\ReturnTypeWillChange]
   public function valid() {
     return isset($this->segmentNames[$this->iteration]);
   }
 
+  #[\ReturnTypeWillChange]
   public function rewind() {
     $this->iteration = 0;
   }

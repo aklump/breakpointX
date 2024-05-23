@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+
 /**
  * __title jQuery Plugin v__version
  * __url
