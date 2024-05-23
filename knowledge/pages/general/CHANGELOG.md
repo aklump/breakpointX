@@ -1,34 +1,29 @@
+<!--
+id: changelog
+tags: ''
+-->
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2024-05-23
+
+### Added
+
+- Support for PHP 8
+
+### Changed
+
+- Documentation from loft_docs to knowledge.
+
 ## [0.8.0] - 2021-11-09
 
 ### Added
 
 - New segment keys: media (alias to @media), media_min, and media_max.
-  
-### Changed
-
-- lorem
-
-### Deprecated
-
-- lorem
-
-### Removed
-
-- lorem
-
-### Fixed
-
-- lorem
-
-### Security
-
-- lorem
 
 ## 0.7.4
 

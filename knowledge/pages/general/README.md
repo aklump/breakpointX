@@ -1,26 +1,33 @@
-# __title
+<!--
+id: readme
+tags: ''
+-->
 
-![__title](images/breakpoint-x.jpg)
+# Breakpoint X (Crossing)
+
+![Breakpoint X (Crossing)](../../images/breakpoint-x.jpg)
 
 ## Summary
 
-__description
+Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
 
 This zero-dependency project provides a means to define points along the horizontal axis of the window, breakpoints, which can fire JS callbacks when the width crosses those breakpoints.  It provides a setting, which will apply CSS classes to designated elements.  It provides a PHP class with a similar form, that can be useful if you're using, say, a CMS for coordinating breakpoints.
 
 A breakpoint is defined as a single point along the horizontal axis.  To the left lies a segment, and to the right of the highest value breakpoint lies the ray.  To the right of all but the highest value breakpoint, likes a segment.  See the section below _Breakpoint Theory_.
 
-**Visit <__homepage> for full documentation.**
+**Visit <http://www.intheloftstudios.com/packages/js/breakpointx> for full documentation.**
 
 ## Installation
 
 Install using `yarn add @aklump/breakpointx` or `npm i @aklump/breakpointx`
 
+{{ composer.install|raw }}
+
 ## Quick Start
 
     var bp = new BreakpointX([480, 768]);
 
-![Basic Usage](images/basic.png)
+![Basic Usage](../../images/basic.png)
 
 Get segment info using any point along the axis:
 
@@ -35,11 +42,11 @@ It can be helpful to name your segments:
 
     var obj = new BreakpointX([480, 768], ['small', 'medium', 'large']);
 
-![Basic Usage](images/named.png)
+![Basic Usage](../../images/named.png)
 
 Then you can also retrieve segment info using a name, which includes items such as the width, from point, to point, media query, image width, name, and more.
 
-![segment dump](images/console.jpg)
+![segment dump](../../images/console.jpg)
 
     bp.getSegment(300);
     bp.getSegment('small');
@@ -94,7 +101,7 @@ When the window width changes, and a breakpoint is hit or crossed, callbacks can
 
 Here is an example which demonstrates how you might construct an instance when thinking in terms of physical devices.  It's given in PHP, however the JS methods are exactly the same.
 
-![Device-centric appproach](images/devices.png)
+![Device-centric appproach](../../images/devices.png)
 
     <?php
     $obj = new BreakpointX();
@@ -145,9 +152,9 @@ If you find this project useful... please consider [making a donation](https://w
 
 This cheatsheet will familiarize you with the terms used in this project.
 
-![Cheatsheet](images/breakpoint-cheatsheet.png)
+![Cheatsheet](../../images/breakpoint-cheatsheet.png)
 
-Download this [Cheatsheet](images/breakpoint-cheatsheet.pdf) by [In the Loft Studios](http://www.intheloftstudios.com)
+Download this [Cheatsheet](../../images/breakpoint-cheatsheet.pdf) by [In the Loft Studios](http://www.intheloftstudios.com)
 
 ### Common Mistakes
 
