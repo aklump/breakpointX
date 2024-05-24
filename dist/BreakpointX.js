@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 
 /**
- * Breakpoint X (Crossing) jQuery Plugin v0.9.0
+ * Breakpoint X (Crossing) jQuery Plugin v0.9.1
  * http://www.intheloftstudios.com/packages/js/breakpointx
  *
  * Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.
@@ -10,7 +10,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: Thu May 05 11:00:55 PDT 2024_string
+ * Date: Fri May 05 12:49:38 PDT 2024_string
  */
 /**
  *
@@ -216,7 +216,7 @@ var BreakpointX = (function(window) {
      */
     this.el = null;
 
-    this.version = '0.9.0';
+    this.version = '0.9.1';
 
     /**
      * A public array of segment names in ascending from/to values.
