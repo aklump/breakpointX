@@ -16,7 +16,7 @@ A breakpoint is defined as a single point along the horizontal axis.  To the lef
 
 Install using `yarn add @aklump/breakpointx` or `npm i @aklump/breakpointx`
 
-##   
+##   Install with Composer
 
 1. Require this package:
    
