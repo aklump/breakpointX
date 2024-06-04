@@ -12,6 +12,11 @@ class BreakpointXTest extends TestCase {
 
   private $obj;
 
+  public function testConstructorThrowsIfAnyBreakpointIsZero() {
+    $this->expectException(\OutOfBoundsException::class);
+    new BreakpointX([200, 300, 0, 500]);
+  }
+
   public function testConstructorWithSettingsAsSecondArg() {
     $obj = new BreakpointX([414, 768], [
       'breakpointRayImageWidthRatio' => 1.0,

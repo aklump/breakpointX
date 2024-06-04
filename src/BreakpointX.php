@@ -3,6 +3,8 @@
 
 namespace AKlump\BreakpointX;
 
+use OutOfBoundsException;
+
 /**
  * Class BreakpointX
  *
@@ -72,6 +74,8 @@ class BreakpointX implements \Iterator {
    *   breakpoints
    *   - $settings An array of additional settings to merge in.
    *     - breakpointRayImageWidthRatio
+   *
+   * @throws \OutOfBoundsException If an invalid breakpoint value is received.
    */
   public function __construct(array $breakpoints = []) {
     $args = func_get_args();
@@ -90,7 +94,11 @@ class BreakpointX implements \Iterator {
       }
     }
     $this->_settings = $settings + $this->options;
-    $this->breakpoints = array_map('intval', $breakpoints);
+    $breakpoints = array_map('intval', $breakpoints);
+    if (in_array(0, $breakpoints)) {
+      throw new OutOfBoundsException('Breakpoint "0" is invalid; breakpoints must be > 0.');
+    }
+    $this->breakpoints = $breakpoints;
     sort($this->breakpoints);
 
     // Convert numeric keys to media queries.
