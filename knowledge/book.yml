@@ -1,2 +1,9 @@
 title: 'BreakpointX (Crosssing)'
 uuid: 0f1a448d-6487-4e95-8c69-6818c2d62802
+chapters:
+  -
+    id: general
+    title: General
+    pages:
+      - readme
+      - changelog

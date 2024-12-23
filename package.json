@@ -1,7 +1,7 @@
 {
     "name": "@aklump\/breakpointx",
     "title": "Breakpoint X (Crossing)",
-    "version": "0.9.2",
+    "version": "0.9.3",
     "description": "Define responsive breakpoints, which can fire JS callbacks; optionally apply CSS classes to designated elements.",
     "main": ".\/dist\/BreakpointX.js",
     "repository": {
