@@ -10,7 +10,7 @@
  *
  * @license Dual licensed under the MIT or GPL Version 3 licenses.
  *
- * Date: __date_string
+ * Date: __date
  */
 /**
  *
@@ -736,7 +736,6 @@ var BreakpointX = (function(window) {
       segment['@media'] = getMediaQuery(segment.from, segment.to);
       segment.media = segment['@media'];
       var minMax = segment.media.split(' and ');
-      console.log(minMax);
       if (null === segment.lowerBreakpoint) {
         segment.mediaMin = '';
         segment.mediaMax = minMax[0];
